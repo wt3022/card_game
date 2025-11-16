@@ -222,10 +222,7 @@ func (h *GameConnectHandler) StreamGameEvents(
 
 	// プレイヤーを接続状態にマーク
 	if err := h.gameService.MarkPlayerConnected(gameID, playerID); err != nil {
-		if e, ok := err.(error); ok {
-			return connect.NewError(connect.CodeInternal, e)
-		}
-		return connect.NewError(connect.CodeInternal, fmt.Errorf("%v", err))
+		return connect.NewError(connect.CodeInternal, err)
 	}
 
 	// 切断時に切断状態をマーク

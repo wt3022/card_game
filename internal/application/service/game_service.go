@@ -892,6 +892,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "自分のHPを5回復",
 		},
+		Effect: "自分のHPを5回復",
 	})
 
 	// 5. ドローカード - カードを2枚引く (3コスト)
@@ -922,6 +923,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "カードを2枚引く",
 		},
+		Effect: "カードを2枚引く",
 	})
 
 	// 6. バフスペル - 味方1体の攻撃力+3 (2コスト)
@@ -952,6 +954,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "味方1体の攻撃力+3",
 		},
+		Effect: "味方1体の攻撃力+3",
 	})
 
 	// 7. 防御バフスペル - 味方1体の防御力+3 (2コスト)
@@ -982,6 +985,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "味方1体の防御力+3",
 		},
+		Effect: "味方1体の防御力+3",
 	})
 
 	// 8. 全体バフスペル - 味方全体の攻撃力+2 (4コスト)
@@ -1015,12 +1019,11 @@ func generateSampleDeck(prefix string) []entity.Card {
 	})
 
 	// 9. 破壊スペル - 敵1体を破壊 (5コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-destroy", prefix),
-		Name: "Annihilate",
-		Cost: 5,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-destroy", prefix),
+		"Annihilate",
+		5,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-destroy", prefix),
@@ -1041,7 +1044,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "敵1体を破壊",
 		},
-	})
+	))
 
 	// 10. 手札に戻すスペル - ユニット1体を手札に戻す (3コスト)
 	deck = append(deck, entity.Card{
@@ -1070,6 +1073,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "ユニット1体を手札に戻す",
 		},
+		Effect: "ユニット1体を手札に戻す",
 	})
 
 	// 11. 複合効果スペル - 3ダメージ + カード1枚引く (4コスト)
@@ -1185,6 +1189,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "味方1体に疾走を付与",
 		},
+		Effect: "味方1体に疾走を付与",
 	})
 
 	// 14. マナ回復スペル - マナを2回復 (1コスト)
@@ -1215,6 +1220,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 			},
 			Description: "マナを2回復",
 		},
+		Effect: "マナを2回復",
 	})
 
 	// 15. ForEach効果 - 味方ユニット1体につきランダムな敵に1ダメージ (5コスト)
@@ -1319,5 +1325,6 @@ func createSpellCard(id, name string, cost int, effect *entity.CardEffect) entit
 		Cost:       cost,
 		Type:       entity.CardTypeSpell,
 		CardEffect: effect,
+		Effect:     effect.Description,
 	}
 }
