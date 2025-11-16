@@ -32,11 +32,12 @@ type GameService struct {
 }
 
 func (s *GameService) MarkPlayerDisconnected(gameID string, playerID string) {
-	panic("unimplemented")
+	// 現状は何もしない（将来の拡張用）
 }
 
-func (s *GameService) MarkPlayerConnected(gameID string, playerID string) any {
-	panic("unimplemented")
+func (s *GameService) MarkPlayerConnected(gameID string, playerID string) error {
+	// 現状は何もしない（将来の拡張用）
+	return nil
 }
 
 // MatchmakingPlayer マッチング待機中のプレイヤー
@@ -94,6 +95,9 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player2I
 	// プレイヤーを作成
 	player1 := entity.NewPlayer(player1ID, player1Name, player1Deck)
 	player2 := entity.NewPlayer(player2ID, player2Name, player2Deck)
+	// 先攻のみIsFirstTurn=true、後攻はfalse
+	player1.IsFirstTurn = true
+	player2.IsFirstTurn = false
 
 	// 初期手札をドロー
 	if _, err := player1.DrawCards(entity.InitialHandSize); err != nil {
@@ -310,14 +314,19 @@ func (s *GameService) EndTurn(ctx context.Context, gameID string) error {
 		return nil
 	}
 
-	// フェーズ変更イベントを送信
+	// 最新の状態を取得してイベント送信（ターン切替・ドロー後の状態を必ず反映）
+	session, exists = s.games[gameID]
+	if !exists {
+		return entity.NewErrNotFound("game", gameID)
+	}
+	latestState := session.State
 	s.broadcastEvent(gameID, &event.GameEvent{
 		GameID:    gameID,
 		EventType: "turn_ended",
-		Message:   fmt.Sprintf("Turn ended, now %s's turn", state.CurrentPlayerID),
-		PlayerID:  state.CurrentPlayerID,
+		Message:   fmt.Sprintf("Turn ended, now %s's turn", latestState.CurrentPlayerID),
+		PlayerID:  latestState.CurrentPlayerID,
 		Timestamp: time.Now(),
-		State:     state,
+		State:     latestState,
 	})
 
 	return nil

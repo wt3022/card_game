@@ -262,6 +262,7 @@ func (p *Player) AddTimeToTurn(duration time.Duration) {
 func (p *Player) ResetTurnFlags() {
 	p.HasDrawnThisTurn = false
 	p.ResetUnitsForNewTurn()
+	// p.IsFirstTurnはここでリセットしない（1度ターンを開始したらfalseにするのはドローフェイズ側で行う）
 }
 
 // ========================================

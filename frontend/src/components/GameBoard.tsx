@@ -273,6 +273,10 @@ export default function GameBoard({
                 >
                   <div className="card-cost">{card.cost}</div>
                   <div className="card-name">{card.name}</div>
+                  {/* 魔法カードやユニットカードの効果説明を表示 */}
+                  {card.effect && (
+                    <div className="card-effect">{card.effect}</div>
+                  )}
                   {card.attack !== undefined && card.attack !== null && (
                     <div className="card-stats">
                       <span className="atk">{card.attack}</span>
