@@ -18,9 +18,6 @@ go.work
 bin/
 dist/
 
-# Generated proto files
-api/gen/
-
 # IDEs
 .vscode/
 .idea/
