@@ -1,0 +1,43 @@
+.hand-card {
+  width: 90px;
+  height: 130px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 3px solid #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hand-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hand-card.selected {
+  border-color: #4caf50;
+  transform: translateY(-15px);
+  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+}
+
+.card-back {
+  text-align: center;
+  color: white;
+}
+
+.card-number {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.card-pattern {
+  font-size: 4rem;
+  opacity: 0.8;
+}
+

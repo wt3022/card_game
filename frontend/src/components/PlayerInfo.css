@@ -1,0 +1,183 @@
+.player-info-compact {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.player-info-compact.current {
+  border: 2px solid #4caf50;
+  box-shadow: 0 2px 12px rgba(76, 175, 80, 0.4);
+}
+
+.player-info-compact.attack-target {
+  border: 2px solid #f44336;
+  box-shadow: 0 2px 12px rgba(244, 67, 54, 0.4);
+  cursor: pointer;
+}
+
+.player-info-compact.attack-target:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.5);
+}
+
+.player-name-compact {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+.player-stats-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.stat-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  min-width: 45px;
+}
+
+.stat-compact .stat-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.stat-compact .stat-value {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.stat-compact.hp {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.stat-compact.hp .stat-label,
+.stat-compact.hp .stat-value {
+  color: white;
+}
+
+.stat-compact.mana {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+}
+
+.stat-compact.mana .stat-label,
+.stat-compact.mana .stat-value {
+  color: white;
+}
+
+.stat-compact.deck .stat-value {
+  color: #95a5a6;
+}
+
+.stat-compact.hand .stat-value {
+  color: #f39c12;
+}
+
+.stat-compact.graveyard .stat-value {
+  color: #8e44ad;
+}
+
+.hp-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: white;
+}
+
+.hp-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.hp-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  min-width: 70px;
+}
+
+.stat.hp {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.stat-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.05);
+  min-width: 50px;
+}
+
+.stat-mini .label {
+  font-size: 0.7rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.stat-mini .value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #333;
+  margin-top: 2px;
+}
+
+.stat-mini.mana .value {
+  color: #3498db;
+}
+
+.stat-mini.deck .value {
+  color: #95a5a6;
+}
+
+.stat-mini.hand .value {
+  color: #f39c12;
+}
+
+.stat-mini.graveyard .value {
+  color: #8e44ad;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 5px;
+}
+

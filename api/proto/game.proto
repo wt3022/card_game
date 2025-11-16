@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package cardgame.v1;
+
+option go_package = "card_game/api/gen/proto/cardgame/v1;cardgamev1";
+
+import "common.proto";
+
+// ゲームサービス
+service GameService {
+  rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
+  rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
+  rpc PlayCard(PlayCardRequest) returns (PlayCardResponse);
+  rpc ExecuteAttack(ExecuteAttackRequest) returns (ExecuteAttackResponse);
+  rpc EndTurn(EndTurnRequest) returns (EndTurnResponse);
+  rpc StreamGameEvents(GameEventRequest) returns (stream GameEventResponse);
+  rpc JoinMatchmaking(JoinMatchmakingRequest) returns (stream MatchmakingResponse);
+}
+
+message CreateGameRequest {
+  string player1_id = 1;
+  string player1_name = 2;
+  string player2_id = 3;
+  string player2_name = 4;
+}
+
+message CreateGameResponse {
+  string game_id = 1;
+  GameState game_state = 2;
+}
+
+message GetGameStateRequest {
+  string game_id = 1;
+  string player_id = 2;
+}
+
+message GetGameStateResponse {
+  GameState game_state = 1;
+}
+
+message PlayCardRequest {
+  string game_id = 1;
+  string player_id = 2;
+  string card_id = 3;
+  optional string target_id = 4;
+}
+
+message PlayCardResponse {
+  bool success = 1;
+  string message = 2;
+  GameState game_state = 3;
+}
+
+message ExecuteAttackRequest {
+  string game_id = 1;
+  string player_id = 2;
+  string attacker_id = 3;
+  optional string target_id = 4;
+}
+
+message ExecuteAttackResponse {
+  bool success = 1;
+  string message = 2;
+  AttackResult result = 3;
+  GameState game_state = 4;
+}
+
+message AttackResult {
+  bool attacker_destroyed = 1;
+  bool defender_destroyed = 2;
+  int32 damage = 3;
+  int32 direct_damage = 4;
+}
+
+message EndTurnRequest {
+  string game_id = 1;
+  string player_id = 2;
+}
+
+message EndTurnResponse {
+  bool success = 1;
+  string message = 2;
+  GameState game_state = 3;
+}
+
+message GameEventRequest {
+  string game_id = 1;
+  string player_id = 2;
+}
+
+message GameEventResponse {
+  GameEvent event = 1;
+  GameState game_state = 2;
+}
+
+// マッチメイキング関連
+message JoinMatchmakingRequest {
+  string player_id = 1;
+  string player_name = 2;
+}
+
+message MatchmakingResponse {
+  MatchmakingStatus status = 1;
+  string game_id = 2;
+  GameState game_state = 3;
+  string message = 4;
+}
+
+enum MatchmakingStatus {
+  MATCHMAKING_STATUS_UNSPECIFIED = 0;
+  MATCHMAKING_STATUS_WAITING = 1;      // マッチング待機中
+  MATCHMAKING_STATUS_MATCHED = 2;      // マッチング成功
+  MATCHMAKING_STATUS_GAME_STARTED = 3; // ゲーム開始
+}

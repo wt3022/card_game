@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package cardgame.v1;
+
+option go_package = "card_game/api/gen/proto/cardgame/v1;cardgamev1";
+
+import "google/protobuf/timestamp.proto";
+
+// 共通メッセージ定義
+
+// カードタイプ
+enum CardType {
+  CARD_TYPE_UNSPECIFIED = 0;
+  CARD_TYPE_UNIT = 1;
+  CARD_TYPE_SPELL = 2;
+  CARD_TYPE_LEADER = 3;
+}
+
+// 特性
+enum Trait {
+  TRAIT_UNSPECIFIED = 0;
+  TRAIT_RUSH = 1;           // 疾走: 召喚酔いなし
+  TRAIT_DIRECT = 2;         // 直接攻撃: 相手プレイヤーに直接攻撃できる
+  TRAIT_WINDFURY = 3;       // 疾風: 1ターンに2回攻撃可能
+  TRAIT_PIERCE = 4;         // 貫通: 余剰ダメージがプレイヤーに貫通
+  TRAIT_GUARDIAN = 5;       // 守護: 相手はこのユニットを攻撃しなければならない
+  TRAIT_EFFECT_SHIELD = 6;  // 効果盾: 効果によるダメージを受けない
+  TRAIT_UNTARGETABLE = 7;   // 対象不可: 効果の対象にならない
+}
+
+// ゲームフェイズ
+enum GamePhase {
+  GAME_PHASE_UNSPECIFIED = 0;
+  GAME_PHASE_TURN_START = 1;
+  GAME_PHASE_DRAW = 2;
+  GAME_PHASE_RESOURCE_GAIN = 3;
+  GAME_PHASE_MAIN = 4;
+  GAME_PHASE_TURN_END = 5;
+}
+
+// カード
+message Card {
+  string id = 1;
+  string name = 2;
+  CardType type = 3;
+  int32 cost = 4;
+  optional int32 attack = 5;
+  optional int32 defense = 6;
+  string effect = 7;
+  repeated Trait traits = 8;
+}
+
+// ユニット
+message Unit {
+  string card_id = 1;
+  string instance_id = 2;
+  string name = 3;
+  int32 cost = 4;
+  int32 attack = 5;
+  int32 defense = 6;
+  int32 current_defense = 7;
+  repeated Trait traits = 8;
+  string effect = 9;
+  int32 attacks_remaining = 10;  // 残り攻撃回数（Windfury対応）
+  bool summoned_this_turn = 11;
+  string owner_id = 12;
+}
+
+// プレイヤー
+message Player {
+  string id = 1;
+  string name = 2;
+  int32 hp = 3;
+  int32 max_hp = 4;
+  int32 current_turn_mana = 5;
+  int32 max_mana = 6;
+  int32 hand_count = 7;
+  int32 deck_count = 8;
+  int32 graveyard_count = 9;
+  repeated Unit field = 10;
+  int32 time_remaining_seconds = 11;
+  repeated Card hand = 12;  // 自分のプレイヤーの場合のみ含まれる
+}
+
+// ゲーム状態
+message GameState {
+  string game_id = 1;
+  Player player1 = 2;
+  Player player2 = 3;
+  string current_player_id = 4;
+  int32 current_turn = 5;
+  GamePhase current_phase = 6;
+  bool is_game_over = 7;
+  optional string winner_id = 8;
+  bool is_draw = 9;
+}
+
+// イベント
+message GameEvent {
+  string game_id = 1;
+  int32 turn = 2;
+  string phase = 3;
+  string event_type = 4;
+  string player_id = 5;
+  string details = 6;
+  google.protobuf.Timestamp timestamp = 7;
+}
