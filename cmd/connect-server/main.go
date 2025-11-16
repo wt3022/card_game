@@ -30,11 +30,8 @@ func main() {
 	// GameServiceを初期化
 	gameService := service.NewGameService(logger)
 
-	// MatchmakingServiceを初期化
-	matchmakingService := service.NewMatchmakingService(gameService, logger)
-
 	// Connect-Goハンドラーを初期化
-	connectHandler := handler.NewGameConnectHandler(gameService, matchmakingService)
+	connectHandler := handler.NewGameConnectHandler(gameService)
 
 	// マルチプレクサを作成
 	mux := http.NewServeMux()

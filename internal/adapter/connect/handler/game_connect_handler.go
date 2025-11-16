@@ -25,15 +25,13 @@ import (
 
 // GameConnectHandler Connect-Go用のゲームサービスハンドラー
 type GameConnectHandler struct {
-	gameService        *service.GameService
-	matchmakingService *service.MatchmakingService
+	gameService *service.GameService
 }
 
 // NewGameConnectHandler 新しいGameConnectHandlerを作成
-func NewGameConnectHandler(gameService *service.GameService, matchmakingService *service.MatchmakingService) *GameConnectHandler {
+func NewGameConnectHandler(gameService *service.GameService) *GameConnectHandler {
 	return &GameConnectHandler{
-		gameService:        gameService,
-		matchmakingService: matchmakingService,
+		gameService: gameService,
 	}
 }
 
@@ -224,7 +222,10 @@ func (h *GameConnectHandler) StreamGameEvents(
 
 	// プレイヤーを接続状態にマーク
 	if err := h.gameService.MarkPlayerConnected(gameID, playerID); err != nil {
-		return connect.NewError(connect.CodeInternal, err)
+		if e, ok := err.(error); ok {
+			return connect.NewError(connect.CodeInternal, e)
+		}
+		return connect.NewError(connect.CodeInternal, fmt.Errorf("%v", err))
 	}
 
 	// 切断時に切断状態をマーク
@@ -1118,10 +1119,10 @@ func (h *GameConnectHandler) JoinMatchmaking(
 	playerName := req.Msg.GetPlayerName()
 
 	// マッチングキューに参加
-	notifyChan := h.matchmakingService.JoinQueue(playerID, playerName)
+	notifyChan := h.gameService.JoinQueue(playerID, playerName)
 
 	// 接続が切れた時にキューから退出させる
-	defer h.matchmakingService.LeaveQueue(playerID)
+	defer h.gameService.LeaveQueue(playerID)
 
 	// 待機中のステータスを送信
 	err := stream.Send(&pbv1.MatchmakingResponse{
@@ -1172,11 +1173,9 @@ func (h *GameConnectHandler) JoinMatchmaking(
 	}
 }
 
-
-
 func ShuffleDeck(deck []entity.Card) []entity.Card {
 	shuffled_deck := make([]entity.Card, len(deck))
-	
+
 	round := rand.IntN(len(deck))
 	// ランダムな回数だけシャッフルを繰り返す
 	for range round {
