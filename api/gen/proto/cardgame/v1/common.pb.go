@@ -80,8 +80,8 @@ type Trait int32
 
 const (
 	Trait_TRAIT_UNSPECIFIED   Trait = 0
-	Trait_TRAIT_RUSH          Trait = 1 // 疾走: 召喚酔いなし
-	Trait_TRAIT_DIRECT        Trait = 2 // 直接攻撃: 相手プレイヤーに直接攻撃できる
+	Trait_TRAIT_RUSH          Trait = 1 // 疾走: 場に出たターンにユニット・リーダーに攻撃できる
+	Trait_TRAIT_CHARGE        Trait = 2 // 突進: 場に出たターンにユニットにのみ攻撃できる
 	Trait_TRAIT_WINDFURY      Trait = 3 // 疾風: 1ターンに2回攻撃可能
 	Trait_TRAIT_PIERCE        Trait = 4 // 貫通: 余剰ダメージがプレイヤーに貫通
 	Trait_TRAIT_GUARDIAN      Trait = 5 // 守護: 相手はこのユニットを攻撃しなければならない
@@ -94,7 +94,7 @@ var (
 	Trait_name = map[int32]string{
 		0: "TRAIT_UNSPECIFIED",
 		1: "TRAIT_RUSH",
-		2: "TRAIT_DIRECT",
+		2: "TRAIT_CHARGE",
 		3: "TRAIT_WINDFURY",
 		4: "TRAIT_PIERCE",
 		5: "TRAIT_GUARDIAN",
@@ -104,7 +104,7 @@ var (
 	Trait_value = map[string]int32{
 		"TRAIT_UNSPECIFIED":   0,
 		"TRAIT_RUSH":          1,
-		"TRAIT_DIRECT":        2,
+		"TRAIT_CHARGE":        2,
 		"TRAIT_WINDFURY":      3,
 		"TRAIT_PIERCE":        4,
 		"TRAIT_GUARDIAN":      5,
@@ -847,7 +847,7 @@ const file_common_proto_rawDesc = "" +
 	"\x11TRAIT_UNSPECIFIED\x10\x00\x12\x0e\n" +
 	"\n" +
 	"TRAIT_RUSH\x10\x01\x12\x10\n" +
-	"\fTRAIT_DIRECT\x10\x02\x12\x12\n" +
+	"\fTRAIT_CHARGE\x10\x02\x12\x12\n" +
 	"\x0eTRAIT_WINDFURY\x10\x03\x12\x10\n" +
 	"\fTRAIT_PIERCE\x10\x04\x12\x12\n" +
 	"\x0eTRAIT_GUARDIAN\x10\x05\x12\x17\n" +

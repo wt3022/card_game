@@ -25,8 +25,8 @@ const (
 // ========================================
 
 const (
-	TraitRush     Trait = "RUSH"     // 疾走: 召喚酔いなし
-	TraitDirect   Trait = "DIRECT"   // 直接攻撃: 相手プレイヤーに直接攻撃できる
+	TraitRush     Trait = "RUSH"     // 疾走: 場に出たターンにユニット・リーダーに攻撃できる
+	TraitCharge   Trait = "CHARGE"   // 突進: 場に出たターンにユニットにのみ攻撃できる
 	TraitWindfury Trait = "WINDFURY" // 疾風: 1ターンに2回攻撃可能
 	TraitPierce   Trait = "PIERCE"   // 貫通: 余剰ダメージがプレイヤーに貫通
 )
@@ -60,14 +60,14 @@ var traitInfoMap = map[Trait]TraitInfo{
 	TraitRush: {
 		Trait:       TraitRush,
 		Name:        "疾走",
-		Description: "召喚したターンに攻撃できる",
+		Description: "場に出たターンにユニット・リーダーに攻撃できる",
 		Category:    TraitCategoryCombat,
 		IsStackable: false,
 	},
-	TraitDirect: {
-		Trait:       TraitDirect,
-		Name:        "直接攻撃",
-		Description: "相手プレイヤーに直接攻撃できる",
+	TraitCharge: {
+		Trait:       TraitCharge,
+		Name:        "突進",
+		Description: "場に出たターンにユニットにのみ攻撃できる",
 		Category:    TraitCategoryCombat,
 		IsStackable: false,
 	},

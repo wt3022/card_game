@@ -19,8 +19,8 @@ enum CardType {
 // 特性
 enum Trait {
   TRAIT_UNSPECIFIED = 0;
-  TRAIT_RUSH = 1;           // 疾走: 召喚酔いなし
-  TRAIT_DIRECT = 2;         // 直接攻撃: 相手プレイヤーに直接攻撃できる
+  TRAIT_RUSH = 1;           // 疾走: 場に出たターンにユニット・リーダーに攻撃できる
+  TRAIT_CHARGE = 2;         // 突進: 場に出たターンにユニットにのみ攻撃できる
   TRAIT_WINDFURY = 3;       // 疾風: 1ターンに2回攻撃可能
   TRAIT_PIERCE = 4;         // 貫通: 余剰ダメージがプレイヤーに貫通
   TRAIT_GUARDIAN = 5;       // 守護: 相手はこのユニットを攻撃しなければならない

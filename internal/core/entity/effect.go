@@ -715,8 +715,8 @@ func generateTraitDescription(trait Trait) string {
 	switch trait {
 	case TraitRush:
 		return "疾走"
-	case TraitDirect:
-		return "直接攻撃"
+	case TraitCharge:
+		return "突進"
 	case TraitWindfury:
 		return "疾風"
 	case TraitPierce:

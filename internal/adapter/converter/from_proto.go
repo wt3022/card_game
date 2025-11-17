@@ -78,8 +78,8 @@ func TraitFromProto(pbTrait cardgamev1.Trait) entity.Trait {
 	switch pbTrait {
 	case cardgamev1.Trait_TRAIT_RUSH:
 		return entity.TraitRush
-	case cardgamev1.Trait_TRAIT_DIRECT:
-		return entity.TraitDirect
+	case cardgamev1.Trait_TRAIT_CHARGE:
+		return entity.TraitCharge
 	case cardgamev1.Trait_TRAIT_WINDFURY:
 		return entity.TraitWindfury
 	case cardgamev1.Trait_TRAIT_PIERCE:

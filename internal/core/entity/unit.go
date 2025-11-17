@@ -69,8 +69,8 @@ func (u *Unit) CanAttack() bool {
 		return false
 	}
 
-	// Rush特性を持つ場合は召喚酔いしない
-	if u.HasTrait(TraitRush) {
+	// Rush特性またはCharge特性を持つ場合は召喚酔いしない
+	if u.HasTrait(TraitRush) || u.HasTrait(TraitCharge) {
 		return true
 	}
 
@@ -80,8 +80,9 @@ func (u *Unit) CanAttack() bool {
 
 // CanDirectAttack プレイヤーに直接攻撃できるか確認
 func (u *Unit) CanDirectAttack() bool {
-	// Direct特性を持つ場合のみ直接攻撃可能
-	return u.HasTrait(TraitDirect)
+	// Rush特性を持つ場合のみリーダーに直接攻撃可能
+	// Charge特性の場合はユニットにのみ攻撃可能なので不可
+	return u.HasTrait(TraitRush)
 }
 
 // HasAttacksRemaining 攻撃回数が残っているか確認
@@ -202,8 +203,8 @@ func (u *Unit) ResetForNewTurn() {
 func (u *Unit) InitializeOnSummon() {
 	u.SummonedThisTurn = true
 
-	// Rush特性を持つ場合は召喚直後でも攻撃可能
-	if u.HasTrait(TraitRush) {
+	// Rush特性またはCharge特性を持つ場合は召喚直後でも攻撃可能
+	if u.HasTrait(TraitRush) || u.HasTrait(TraitCharge) {
 		u.AttacksRemaining = u.GetMaxAttacksPerTurn()
 	} else {
 		u.AttacksRemaining = 0

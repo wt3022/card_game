@@ -11,7 +11,7 @@ interface UnitCardProps {
 
 const traitLabels: Record<number, string> = {
   [Trait.RUSH]: '疾走',
-  [Trait.DIRECT]: '直接',
+  [Trait.CHARGE]: '突進',
   [Trait.WINDFURY]: '疾風',
   [Trait.PIERCE]: '貫通',
   [Trait.GUARDIAN]: '守護',
@@ -26,7 +26,8 @@ export default function UnitCard({
   isClickable,
 }: UnitCardProps) {
   const hasRush = unit.traits.includes(Trait.RUSH)
-  const canAttack = unit.attacksRemaining > 0 && (hasRush || !unit.summonedThisTurn)
+  const hasCharge = unit.traits.includes(Trait.CHARGE)
+  const canAttack = unit.attacksRemaining > 0 && (hasRush || hasCharge || !unit.summonedThisTurn)
 
   return (
     <div
@@ -63,7 +64,7 @@ export default function UnitCard({
         <span className="attacks-remaining">
           攻撃: {unit.attacksRemaining}
         </span>
-        {unit.summonedThisTurn && !hasRush && <span className="summoned-badge">召喚酔い</span>}
+        {unit.summonedThisTurn && !hasRush && !hasCharge && <span className="summoned-badge">召喚酔い</span>}
       </div>
     </div>
   )

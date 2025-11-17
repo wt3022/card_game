@@ -52,18 +52,18 @@ export enum Trait {
   UNSPECIFIED = 0,
 
   /**
-   * 疾走: 召喚酔いなし
+   * 疾走: 場に出たターンにユニット・リーダーに攻撃できる
    *
    * @generated from enum value: TRAIT_RUSH = 1;
    */
   RUSH = 1,
 
   /**
-   * 直接攻撃: 相手プレイヤーに直接攻撃できる
+   * 突進: 場に出たターンにユニットにのみ攻撃できる
    *
-   * @generated from enum value: TRAIT_DIRECT = 2;
+   * @generated from enum value: TRAIT_CHARGE = 2;
    */
-  DIRECT = 2,
+  CHARGE = 2,
 
   /**
    * 疾風: 1ターンに2回攻撃可能
@@ -104,7 +104,7 @@ export enum Trait {
 proto3.util.setEnumType(Trait, "cardgame.v1.Trait", [
   { no: 0, name: "TRAIT_UNSPECIFIED" },
   { no: 1, name: "TRAIT_RUSH" },
-  { no: 2, name: "TRAIT_DIRECT" },
+  { no: 2, name: "TRAIT_CHARGE" },
   { no: 3, name: "TRAIT_WINDFURY" },
   { no: 4, name: "TRAIT_PIERCE" },
   { no: 5, name: "TRAIT_GUARDIAN" },

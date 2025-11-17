@@ -545,7 +545,7 @@ func generateSampleDeck(prefix string) []entity.Card {
 		Type:    entity.CardTypeUnit,
 		Attack:  &attackDirect,
 		Defense: &defenseDirect,
-		Traits:  []entity.Trait{entity.TraitDirect},
+		Traits:  []entity.Trait{entity.TraitRush},
 	})
 
 	// EffectShield (効果盾) - 1枚

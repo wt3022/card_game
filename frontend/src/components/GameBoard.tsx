@@ -37,7 +37,7 @@ export default function GameBoard({
   // 特性ラベル
   const traitLabels: Record<number, string> = {
     [Trait.RUSH]: '疾走',
-    [Trait.DIRECT]: '直接',
+    [Trait.CHARGE]: '突進',
     [Trait.WINDFURY]: '疾風',
     [Trait.PIERCE]: '貫通',
     [Trait.GUARDIAN]: '守護',

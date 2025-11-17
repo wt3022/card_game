@@ -76,12 +76,12 @@ func canAttackDirectly(opponent *entity.Player, attackerUnit *entity.Unit) bool 
 		return true
 	}
 
-	// Direct特性を持つ場合は常に可能
-	if attackerUnit.HasTrait(entity.TraitDirect) {
+	// Rush特性を持つ場合は常にリーダーに攻撃可能
+	if attackerUnit.HasTrait(entity.TraitRush) {
 		return true
 	}
 
-	// Pierce特性を持つ場合も可能（旧仕様との互換性）
+	// Pierce特性を持つ場合も可能（Guardian無視として機能）
 	if attackerUnit.HasTrait(entity.TraitPierce) {
 		return true
 	}
