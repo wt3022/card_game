@@ -731,16 +731,16 @@ func generateSampleDeck(prefix string) []entity.Card {
 		Traits:  []entity.Trait{entity.TraitPierce},
 	})
 
-	// Direct (直接攻撃) - 1枚
-	attackDirect, defenseDirect := 2, 1
+	// Charge (突進) - 1枚
+	attackCharge, defenseCharge := 2, 1
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-direct-assassin", prefix),
+		ID:      fmt.Sprintf("%s-charge-assassin", prefix),
 		Name:    "Shadow Assassin",
 		Cost:    3,
 		Type:    entity.CardTypeUnit,
-		Attack:  &attackDirect,
-		Defense: &defenseDirect,
-		Traits:  []entity.Trait{entity.TraitDirect},
+		Attack:  &attackCharge,
+		Defense: &defenseCharge,
+		Traits:  []entity.Trait{entity.TraitCharge},
 	})
 
 	// EffectShield (効果盾) - 1枚
