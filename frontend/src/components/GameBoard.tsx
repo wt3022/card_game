@@ -218,9 +218,17 @@ export default function GameBoard({
             <UnitCard
               key={unit.instanceId}
               unit={unit}
-              onClick={() => handleUnitClick(unit.instanceId)}
+              onClick={() => {
+                // カード選択中ならカード使用の対象として渡す
+                if (selectedCardId) {
+                  handlePlayCard(selectedCardId, unit.instanceId)
+                  setSelectedCardId(null)
+                } else {
+                  handleUnitClick(unit.instanceId)
+                }
+              }}
               isSelected={false}
-              isClickable={!!selectedUnitId}
+              isClickable={!!selectedUnitId || !!selectedCardId}
             />
           ))}
         </div>
