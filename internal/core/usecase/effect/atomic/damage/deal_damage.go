@@ -1,16 +1,10 @@
-package atomic
+package damage
 
 import (
-	"fmt"
-
 	"card_game/internal/core/entity"
 	"card_game/internal/core/port"
+	"fmt"
 )
-
-// ========================================
-// ダメージ処理
-// ユニットまたはプレイヤーにダメージを与える
-// ========================================
 
 // ユニットまたはプレイヤーにダメージを与える
 func ExecuteDealDamage(effect *entity.AtomicEffect, sourcePlayer, opponent *entity.Player, targets []any, game port.GameStateReader) error {
@@ -20,12 +14,10 @@ func ExecuteDealDamage(effect *entity.AtomicEffect, sourcePlayer, opponent *enti
 			// プレイヤーへのダメージ
 			t.TakeDamage(effect.Value)
 			game.AddLog(sourcePlayer.ID, "ダメージ", fmt.Sprintf("%s に %d ダメージ", t.Name, effect.Value))
-
 		case *entity.Unit:
 			// ユニットへの効果ダメージ
 			destroyed := t.TakeDamage(effect.Value, true)
 			game.AddLog(sourcePlayer.ID, "ダメージ", fmt.Sprintf("%s に %d ダメージ", t.Name, effect.Value))
-
 			if destroyed {
 				owner := game.GetPlayerByID(t.OwnerID)
 				owner.RemoveUnitFromField(t.InstanceID)
@@ -33,6 +25,5 @@ func ExecuteDealDamage(effect *entity.AtomicEffect, sourcePlayer, opponent *enti
 			}
 		}
 	}
-
 	return nil
 }

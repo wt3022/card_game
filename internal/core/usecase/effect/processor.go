@@ -5,7 +5,13 @@ import (
 
 	"card_game/internal/core/entity"
 	"card_game/internal/core/port"
-	"card_game/internal/core/usecase/effect/atomic"
+	"card_game/internal/core/usecase/effect/atomic/damage"
+	"card_game/internal/core/usecase/effect/atomic/draw"
+	"card_game/internal/core/usecase/effect/atomic/heal"
+	"card_game/internal/core/usecase/effect/atomic/mana"
+	"card_game/internal/core/usecase/effect/atomic/modify"
+	"card_game/internal/core/usecase/effect/atomic/trait"
+	"card_game/internal/core/usecase/effect/atomic/unit"
 )
 
 // ========================================
@@ -93,32 +99,70 @@ func (p *Processor) executeAtomicEffect(effect *entity.AtomicEffect, ctx *Execut
 	// 原子効果タイプに応じて処理を委譲
 	switch effect.Type {
 	case entity.AtomicEffectDealDamage:
-		return atomic.ExecuteDealDamage(effect, sourcePlayer, opponent, targets, p.game)
+		return damage.ExecuteDealDamage(effect, sourcePlayer, opponent, targets, p.game)
+
+	case entity.AtomicEffectDealSplash:
+		return damage.ExecuteDealSplash(effect, sourcePlayer, opponent, targets, p.game)
 
 	case entity.AtomicEffectRestoreHP:
-		return atomic.ExecuteRestoreHP(effect, sourcePlayer, targets, p.game)
+		return heal.ExecuteRestoreHP(effect, sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectDrawCard:
-		return atomic.ExecuteDrawCard(effect, sourcePlayer, p.game)
+		return draw.ExecuteDrawCard(effect, sourcePlayer, p.game)
 
 	case entity.AtomicEffectModifyAttack:
-		return atomic.ExecuteModifyAttack(effect, sourcePlayer, targets, p.game)
+		return modify.ExecuteModifyAttack(effect, sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectModifyDefense:
-		return atomic.ExecuteModifyDefense(effect, sourcePlayer, targets, p.game)
+		return modify.ExecuteModifyDefense(effect, sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectDestroyUnit:
-		return atomic.ExecuteDestroyUnit(sourcePlayer, targets, p.game)
+		return unit.ExecuteDestroyUnit(sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectGrantTrait:
-		return atomic.ExecuteGrantTrait(effect, sourcePlayer, targets, p.game)
+		return trait.ExecuteGrantTrait(effect, sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectGainMana:
-		return atomic.ExecuteGainMana(effect, sourcePlayer, p.game)
+		return mana.ExecuteGainMana(effect, sourcePlayer, p.game)
+
+	case entity.AtomicEffectRestoreMana:
+		return mana.ExecuteRestoreMana(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectFullRestore:
+		return heal.ExecuteFullRestore(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectDiscardCard:
+		return draw.ExecuteDiscardCard(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectSearchCard:
+		return draw.ExecuteSearchCard(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectShuffleDeck:
+		return draw.ExecuteShuffleDeck(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectModifyCost:
+		return mana.ExecuteModifyCost(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectModifyMaxHP:
+		return modify.ExecuteModifyMaxHP(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectReturnToDeck:
+		return unit.ExecuteReturnToDeck(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectSilenceUnit:
+		return unit.ExecuteSilenceUnit(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectRemoveTrait:
+		return trait.ExecuteRemoveTrait(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectReduceCost:
+		return mana.ExecuteReduceCost(effect, sourcePlayer, targets, p.game)
 
 	case entity.AtomicEffectSummonUnit:
-		// NOTE: 効果によるユニット召喚（トークン生成など）は未実装
-		return entity.NewErrEffectNotImplemented(string(effect.Type))
+		return unit.ExecuteSummonUnit(effect, sourcePlayer, targets, p.game)
+
+	case entity.AtomicEffectReturnToHand:
+		return unit.ExecuteReturnToHand(effect, sourcePlayer, opponent, targets, p.game)
 
 	default:
 		return entity.NewErrEffectNotImplemented(string(effect.Type))
