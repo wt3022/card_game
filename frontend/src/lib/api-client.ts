@@ -25,5 +25,11 @@ const transport = createConnectTransport({
 })
 
 // GameServiceクライアントを作成
+
 export const gameClient = createPromiseClient(GameService, transport)
+
+// StartTurn API呼び出し用ラッパー関数
+export async function startTurn({ gameId, playerId }: { gameId: string; playerId: string }) {
+  return await gameClient.startTurn({ gameId, playerId })
+}
 

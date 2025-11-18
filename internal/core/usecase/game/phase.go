@@ -79,9 +79,9 @@ func (g *State) ExecuteResourceGainPhase(player *entity.Player) {
 	player.RecoverMana()
 
 	g.logger.Info("%s: マナ %d → %d (前ターン残り: %d, 回復: +%d, 最大回復マナ: %d)",
-		player.Name, beforeMana, player.CurrentTurnMana, beforeMana, player.MaxRecoveryMana, player.MaxRecoveryMana)
+		player.Name, beforeMana, player.CurrentTurnMana, beforeMana, player.CurrentRecoveryMana, player.CurrentRecoveryMana)
 	g.AddLog(player.ID, "リソース増加フェイズ",
-		fmt.Sprintf("マナ回復 %d→%d (最大回復マナ: %d)", beforeMana, player.CurrentTurnMana, player.MaxRecoveryMana))
+		fmt.Sprintf("マナ回復 %d→%d (最大回復マナ: %d)", beforeMana, player.CurrentTurnMana, player.CurrentRecoveryMana))
 }
 
 // メインフェイズを実行

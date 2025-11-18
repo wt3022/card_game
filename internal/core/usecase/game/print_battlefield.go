@@ -22,7 +22,7 @@ func (s *State) PrintBattlefield() {
 	// プレイヤー1の情報
 	p1 := s.Player1
 	fmt.Printf("\n■ %s (HP: %d/%d, マナ: %d/%d)\n",
-		p1.Name, p1.HP, p1.MaxHP, p1.CurrentTurnMana, p1.MaxRecoveryMana)
+		p1.Name, p1.HP, p1.MaxHP, p1.CurrentTurnMana, p1.CurrentRecoveryMana)
 	fmt.Printf("  手札: %d枚, デッキ: %d枚, 墓地: %d枚\n",
 		len(p1.Hand), len(p1.Deck), len(p1.Graveyard))
 
@@ -53,7 +53,7 @@ func (s *State) PrintBattlefield() {
 	// プレイヤー2の情報
 	p2 := s.Player2
 	fmt.Printf("■ %s (HP: %d/%d, マナ: %d/%d)\n",
-		p2.Name, p2.HP, p2.MaxHP, p2.CurrentTurnMana, p2.MaxRecoveryMana)
+		p2.Name, p2.HP, p2.MaxHP, p2.CurrentTurnMana, p2.CurrentRecoveryMana)
 	fmt.Printf("  手札: %d枚, デッキ: %d枚, 墓地: %d枚\n",
 		len(p2.Hand), len(p2.Deck), len(p2.Graveyard))
 

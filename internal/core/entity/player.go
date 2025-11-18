@@ -11,20 +11,20 @@ import (
 
 // Player プレイヤーの状態
 type Player struct {
-	ID               string        `json:"id"`                  // プレイヤーID
-	Name             string        `json:"name"`                // プレイヤー名
-	HP               int           `json:"hp"`                  // 現在のHP
-	MaxHP            int           `json:"max_hp"`              // 最大HP
-	CurrentTurnMana  int           `json:"current_turn_mana"`   // 現在のターンのマナ
-	MaxRecoveryMana  int           `json:"max_recovery_mana"`   // 最大回復マナ
-	Hand             []Card        `json:"hand"`                // 手札
-	Deck             []Card        `json:"deck"`                // デッキ
-	Graveyard        []Card        `json:"graveyard"`           // 墓地
-	Field            []Unit        `json:"field"`               // フィールド
-	Leader           *Card         `json:"Leader"`              // リーダー
-	TimeRemaining    time.Duration `json:"time_remaining"`      // ターン残り時間
-	HasDrawnThisTurn bool          `json:"has_drawn_this_turn"` // このターンにドローしたか
-	IsFirstTurn      bool          `json:"is_first_turn"`       // 初ターンかどうか
+	ID                  string        `json:"id"`                    // プレイヤーID
+	Name                string        `json:"name"`                  // プレイヤー名
+	HP                  int           `json:"hp"`                    // 現在のHP
+	MaxHP               int           `json:"max_hp"`                // 最大HP
+	CurrentTurnMana     int           `json:"current_turn_mana"`     // 現在のターンのマナ
+	CurrentRecoveryMana int           `json:"current_recovery_mana"` // 現在の最大回復マナ
+	Hand                []Card        `json:"hand"`                  // 手札
+	Deck                []Card        `json:"deck"`                  // デッキ
+	Graveyard           []Card        `json:"graveyard"`             // 墓地
+	Field               []Unit        `json:"field"`                 // フィールド
+	Leader              *Card         `json:"Leader"`                // リーダー
+	TimeRemaining       time.Duration `json:"time_remaining"`        // ターン残り時間
+	HasDrawnThisTurn    bool          `json:"has_drawn_this_turn"`   // このターンにドローしたか
+	IsFirstTurn         bool          `json:"is_first_turn"`         // 初ターンかどうか
 }
 
 // ========================================
@@ -34,20 +34,20 @@ type Player struct {
 // NewPlayer 新しいプレイヤーを作成
 func NewPlayer(id, name string, deck []Card) *Player {
 	return &Player{
-		ID:               id,
-		Name:             name,
-		HP:               InitialHP,
-		MaxHP:            InitialHP,
-		CurrentTurnMana:  InitialMana,
-		MaxRecoveryMana:  InitialMana,
-		Hand:             []Card{},
-		Deck:             deck,
-		Graveyard:        []Card{},
-		Field:            []Unit{},
-		Leader:           nil,
-		TimeRemaining:    DefaultTurnTime,
-		HasDrawnThisTurn: false,
-		IsFirstTurn:      true,
+		ID:                  id,
+		Name:                name,
+		HP:                  InitialHP,
+		MaxHP:               InitialHP,
+		CurrentTurnMana:     InitialMana,
+		CurrentRecoveryMana: InitialMana,
+		Hand:                []Card{},
+		Deck:                deck,
+		Graveyard:           []Card{},
+		Field:               []Unit{},
+		Leader:              nil,
+		TimeRemaining:       DefaultTurnTime,
+		HasDrawnThisTurn:    false,
+		IsFirstTurn:         true,
 	}
 }
 
@@ -131,9 +131,14 @@ func (p *Player) SpendMana(amount int) error {
 }
 
 // RecoverMana マナを回復
-// ルール: CurrentTurnMana = BeforeTurnMana + MaxRecoveryMana
 func (p *Player) RecoverMana() {
-	p.CurrentTurnMana += p.MaxRecoveryMana
+	beforeTurnMana := p.CurrentTurnMana
+
+	// マナを最大値に回復
+	p.CurrentTurnMana = p.CurrentRecoveryMana
+
+	// 前のターンの残りマナを加算
+	p.CurrentTurnMana += beforeTurnMana
 	if p.CurrentTurnMana > MaxMana {
 		p.CurrentTurnMana = MaxMana
 	}
@@ -149,8 +154,8 @@ func (p *Player) AddMana(amount int) {
 
 // IncrementMaxRecoveryMana 最大回復マナを増加
 func (p *Player) IncrementMaxRecoveryMana() {
-	if p.MaxRecoveryMana < MaxRecoveryMana {
-		p.MaxRecoveryMana++
+	if p.CurrentRecoveryMana < MaxRecoveryMana {
+		p.CurrentRecoveryMana++
 	}
 }
 

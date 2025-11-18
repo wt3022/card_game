@@ -378,9 +378,9 @@ export class Player extends Message<Player> {
   currentTurnMana = 0;
 
   /**
-   * @generated from field: int32 max_mana = 6;
+   * @generated from field: int32 current_recovery_mana = 6;
    */
-  maxMana = 0;
+  currentRecoveryMana = 0;
 
   /**
    * @generated from field: int32 hand_count = 7;
@@ -427,7 +427,7 @@ export class Player extends Message<Player> {
     { no: 3, name: "hp", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 4, name: "max_hp", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 5, name: "current_turn_mana", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: "max_mana", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "current_recovery_mana", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 7, name: "hand_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 8, name: "deck_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 9, name: "graveyard_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },

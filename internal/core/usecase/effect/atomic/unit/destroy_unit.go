@@ -20,6 +20,19 @@ func ExecuteDestroyUnit(sourcePlayer *entity.Player, targets []any, game port.Ga
 			continue
 		}
 
+		// 対象保護チェック: 対象不可/効果盾の確認
+		// 対象不可の場合は効果の対象にならない
+		if unit.HasTrait(entity.TraitUntargetable) {
+			game.AddLog(sourcePlayer.ID, "破壊失敗", fmt.Sprintf("%s は対象不可のため破壊できない", unit.Name))
+			continue
+		}
+
+		// 効果盾 (EffectShield) を持つユニットは、効果による破壊を防ぐ
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "破壊無効化", fmt.Sprintf("%s は効果盾により破壊を無効化", unit.Name))
+			continue
+		}
+
 		// 破壊処理
 		owner := game.GetPlayerByID(unit.OwnerID)
 		if owner == nil {

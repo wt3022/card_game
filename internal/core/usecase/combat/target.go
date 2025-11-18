@@ -50,8 +50,8 @@ func GetAttackableTargets(g port.GameState, playerID string, attackerID string) 
 	} else {
 		// Guardianがいない場合の処理
 		if len(opponent.Field) == 0 {
-			// フィールドが空なら直接攻撃のみ可能
-			canDirectAttack = true
+			// フィールドが空でも、特性によっては直接攻撃不可（例: Charge はユニットにのみ攻撃可能）
+			canDirectAttack = canAttackDirectly(opponent, attackerUnit)
 		} else {
 			// ユニットが対象
 			for i := range opponent.Field {
@@ -71,8 +71,11 @@ func GetAttackableTargets(g port.GameState, playerID string, attackerID string) 
 
 // プレイヤーへの直接攻撃が可能か判定
 func canAttackDirectly(opponent *entity.Player, attackerUnit *entity.Unit) bool {
-	// フィールドが空なら可能
+	// フィールドが空なら基本的に可能。ただし突進(Charge)はユニットにのみ攻撃可能なので例外とする
 	if len(opponent.Field) == 0 {
+		if attackerUnit.HasTrait(entity.TraitCharge) {
+			return false
+		}
 		return true
 	}
 

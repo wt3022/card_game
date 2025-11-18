@@ -51,6 +51,13 @@ func (u *Unit) HasAllTraits(traits []Trait) bool {
 // AddTrait 特性を追加（重複チェック付き）
 func (u *Unit) AddTrait(trait Trait) {
 	u.Traits = AddTrait(u.Traits, trait)
+
+	// 疾走(Rush)または突進(Charge)を付与された場合、
+	// そのユニットが召喚されたターンなら攻撃回数を付与して即攻撃可能にする。
+	// 既に攻撃済みで攻撃回数が0の場合は復帰させない（付与のタイミング次第で挙動を調整）。
+	if (trait == TraitRush || trait == TraitCharge) && u.SummonedThisTurn {
+		u.AttacksRemaining = u.GetMaxAttacksPerTurn()
+	}
 }
 
 // RemoveTrait 特性を削除

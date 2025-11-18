@@ -10,7 +10,7 @@ import "time"
 const (
 	// マナ関連
 	MaxMana         = 10 // 最大マナ
-	InitialMana     = 1  // 初期マナ
+	InitialMana     = 0  // 初期マナ
 	MaxRecoveryMana = 10 // 最大回復マナ
 
 	// プレイヤー関連

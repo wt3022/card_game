@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { gameClient } from '../lib/api-client'
+import { gameClient, startTurn } from '../lib/api-client'
 import type { GameState } from '../gen/common_pb'
 import { MatchmakingStatus } from '../gen/game_pb'
 import './GameSetup.css'
@@ -54,10 +54,34 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
           case MatchmakingStatus.GAME_STARTED:
             setMatchmakingStatus('ゲーム開始！')
             if (response.gameState) {
-              // ゲーム画面に遷移
-              setTimeout(() => {
-                onGameStart(response.gameState!, playerId)
-              }, 1000)
+              // 自分が先攻（currentPlayerId）であれば StartTurn を呼ぶ
+              try {
+                if (response.gameState.currentPlayerId === playerId) {
+                  const startResp = await startTurn({ gameId: response.gameState.gameId, playerId })
+                  if (startResp?.success && startResp.gameState) {
+                    // サーバーが返した最新状態でゲーム開始
+                    setTimeout(() => {
+                      onGameStart(startResp.gameState!, playerId)
+                    }, 300)
+                  } else {
+                    // startTurn が失敗した場合は元の state で開始
+                    setTimeout(() => {
+                      onGameStart(response.gameState!, playerId)
+                    }, 300)
+                  }
+                } else {
+                  // 先攻でなければそのまま開始
+                  setTimeout(() => {
+                    onGameStart(response.gameState!, playerId)
+                  }, 300)
+                }
+              } catch (err) {
+                console.error('StartTurn on game start failed:', err)
+                // エラーでもゲーム開始へ遷移
+                setTimeout(() => {
+                  onGameStart(response.gameState!, playerId)
+                }, 300)
+              }
             }
             return // ストリーム終了
 

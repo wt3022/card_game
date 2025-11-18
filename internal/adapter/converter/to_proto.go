@@ -58,7 +58,7 @@ func PlayerToProto(player *entity.Player, viewerPlayerID string) *cardgamev1.Pla
 		Hp:                   int32(player.HP),
 		MaxHp:                int32(player.MaxHP),
 		CurrentTurnMana:      int32(player.CurrentTurnMana),
-		MaxMana:              int32(entity.MaxMana),
+		CurrentRecoveryMana:  int32(player.CurrentRecoveryMana),
 		HandCount:            int32(len(player.Hand)),
 		DeckCount:            int32(len(player.Deck)),
 		GraveyardCount:       int32(len(player.Graveyard)),
@@ -106,6 +106,12 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 		return nil
 	}
 
+	// 表示用テキスト: Card.Effect が空なら CardEffect.Description を優先して使用
+	effectText := card.Effect
+	if effectText == "" && card.CardEffect != nil {
+		effectText = card.CardEffect.Description
+	}
+
 	return &cardgamev1.Card{
 		Id:      card.ID,
 		Name:    card.Name,
@@ -113,7 +119,7 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 		Cost:    int32(card.Cost),
 		Attack:  intPtrToOptionalInt32(card.Attack),
 		Defense: intPtrToOptionalInt32(card.Defense),
-		Effect:  card.Effect,
+		Effect:  effectText,
 		Traits:  TraitsToProto(card.Traits),
 	}
 }

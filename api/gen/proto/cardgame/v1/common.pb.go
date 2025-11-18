@@ -441,7 +441,7 @@ type Player struct {
 	Hp                   int32                  `protobuf:"varint,3,opt,name=hp,proto3" json:"hp,omitempty"`
 	MaxHp                int32                  `protobuf:"varint,4,opt,name=max_hp,json=maxHp,proto3" json:"max_hp,omitempty"`
 	CurrentTurnMana      int32                  `protobuf:"varint,5,opt,name=current_turn_mana,json=currentTurnMana,proto3" json:"current_turn_mana,omitempty"`
-	MaxMana              int32                  `protobuf:"varint,6,opt,name=max_mana,json=maxMana,proto3" json:"max_mana,omitempty"`
+	CurrentRecoveryMana  int32                  `protobuf:"varint,6,opt,name=current_recovery_mana,json=currentRecoveryMana,proto3" json:"current_recovery_mana,omitempty"`
 	HandCount            int32                  `protobuf:"varint,7,opt,name=hand_count,json=handCount,proto3" json:"hand_count,omitempty"`
 	DeckCount            int32                  `protobuf:"varint,8,opt,name=deck_count,json=deckCount,proto3" json:"deck_count,omitempty"`
 	GraveyardCount       int32                  `protobuf:"varint,9,opt,name=graveyard_count,json=graveyardCount,proto3" json:"graveyard_count,omitempty"`
@@ -517,9 +517,9 @@ func (x *Player) GetCurrentTurnMana() int32 {
 	return 0
 }
 
-func (x *Player) GetMaxMana() int32 {
+func (x *Player) GetCurrentRecoveryMana() int32 {
 	if x != nil {
-		return x.MaxMana
+		return x.CurrentRecoveryMana
 	}
 	return 0
 }
@@ -799,14 +799,14 @@ const file_common_proto_rawDesc = "" +
 	"\x11attacks_remaining\x18\n" +
 	" \x01(\x05R\x10attacksRemaining\x12,\n" +
 	"\x12summoned_this_turn\x18\v \x01(\bR\x10summonedThisTurn\x12\x19\n" +
-	"\bowner_id\x18\f \x01(\tR\aownerId\"\x87\x03\n" +
+	"\bowner_id\x18\f \x01(\tR\aownerId\"\xa0\x03\n" +
 	"\x06Player\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x0e\n" +
 	"\x02hp\x18\x03 \x01(\x05R\x02hp\x12\x15\n" +
 	"\x06max_hp\x18\x04 \x01(\x05R\x05maxHp\x12*\n" +
-	"\x11current_turn_mana\x18\x05 \x01(\x05R\x0fcurrentTurnMana\x12\x19\n" +
-	"\bmax_mana\x18\x06 \x01(\x05R\amaxMana\x12\x1d\n" +
+	"\x11current_turn_mana\x18\x05 \x01(\x05R\x0fcurrentTurnMana\x122\n" +
+	"\x15current_recovery_mana\x18\x06 \x01(\x05R\x13currentRecoveryMana\x12\x1d\n" +
 	"\n" +
 	"hand_count\x18\a \x01(\x05R\thandCount\x12\x1d\n" +
 	"\n" +

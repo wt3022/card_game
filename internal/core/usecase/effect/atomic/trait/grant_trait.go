@@ -15,12 +15,30 @@ import (
 // ユニットに特性を付与
 func ExecuteGrantTrait(effect *entity.AtomicEffect, sourcePlayer *entity.Player, targets []any, game port.GameStateReader) error {
 	// 付与する特性を取得
-	traitStr, ok := effect.Parameters["keyword"].(string)
-	if !ok {
+	var trait entity.Trait
+
+	// サポートするパラメータ名を順にチェック（過去の定義により key が "keyword" または "trait" の場合がある）
+	if v, exists := effect.Parameters["keyword"]; exists {
+		switch tv := v.(type) {
+		case string:
+			trait = entity.Trait(tv)
+		case entity.Trait:
+			trait = tv
+		default:
+			return fmt.Errorf("invalid trait parameter")
+		}
+	} else if v, exists := effect.Parameters["trait"]; exists {
+		switch tv := v.(type) {
+		case string:
+			trait = entity.Trait(tv)
+		case entity.Trait:
+			trait = tv
+		default:
+			return fmt.Errorf("invalid trait parameter")
+		}
+	} else {
 		return fmt.Errorf("invalid trait parameter")
 	}
-
-	trait := entity.Trait(traitStr)
 
 	// 有効な特性か確認
 	if !entity.IsValidTrait(trait) {

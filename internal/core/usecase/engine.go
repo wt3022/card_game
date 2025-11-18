@@ -65,6 +65,30 @@ func (e *Engine) GetAttackableTargets(playerID string, attackerID string) ([]str
 // ターン処理
 // ========================================
 
+func (e *Engine) StartTurn(playerID string) error {
+	player := e.State.GetPlayerByID(playerID)
+	if player == nil {
+		return entity.NewErrNotFound("player", playerID)
+	}
+
+	// 1. 次プレイヤーの開始処理
+	nextPlayer := e.State.GetCurrentPlayer()
+	e.State.ExecuteTurnStartPhase(nextPlayer)
+
+	// 2. ドローフェイズ(先行1ターン目はスキップ)
+	if e.State.GetCurrentTurn() > 1 {
+		e.State.ExecuteDrawPhase(nextPlayer)
+	}
+
+	// 3. リソース増加フェイズ
+	e.State.ExecuteResourceGainPhase(nextPlayer)
+
+	// 4. 勝利判定
+	e.State.CheckVictoryConditions()
+
+	return nil
+}
+
 // ターンを終了
 func (e *Engine) EndTurn(playerID string) error {
 	player := e.State.GetPlayerByID(playerID)
@@ -80,19 +104,6 @@ func (e *Engine) EndTurn(playerID string) error {
 
 	// 3. ターン番号をインクリメント
 	e.State.IncrementCurrentTurn()
-
-	// 4. 次プレイヤーの開始処理
-	nextPlayer := e.State.GetCurrentPlayer()
-	e.State.ExecuteTurnStartPhase(nextPlayer)
-
-	// 5. ドローフェイズ
-	e.State.ExecuteDrawPhase(nextPlayer)
-
-	// 6. リソース増加フェイズ
-	e.State.ExecuteResourceGainPhase(nextPlayer)
-
-	// 7. 勝利判定
-	e.State.CheckVictoryConditions()
 
 	return nil
 }

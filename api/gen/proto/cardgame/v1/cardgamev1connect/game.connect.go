@@ -43,6 +43,8 @@ const (
 	// GameServiceExecuteAttackProcedure is the fully-qualified name of the GameService's ExecuteAttack
 	// RPC.
 	GameServiceExecuteAttackProcedure = "/cardgame.v1.GameService/ExecuteAttack"
+	// GameServiceStartTurnProcedure is the fully-qualified name of the GameService's StartTurn RPC.
+	GameServiceStartTurnProcedure = "/cardgame.v1.GameService/StartTurn"
 	// GameServiceEndTurnProcedure is the fully-qualified name of the GameService's EndTurn RPC.
 	GameServiceEndTurnProcedure = "/cardgame.v1.GameService/EndTurn"
 	// GameServiceStreamGameEventsProcedure is the fully-qualified name of the GameService's
@@ -59,6 +61,7 @@ type GameServiceClient interface {
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
+	StartTurn(context.Context, *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error)
 	EndTurn(context.Context, *connect.Request[v1.EndTurnRequest]) (*connect.Response[v1.EndTurnResponse], error)
 	StreamGameEvents(context.Context, *connect.Request[v1.GameEventRequest]) (*connect.ServerStreamForClient[v1.GameEventResponse], error)
 	JoinMatchmaking(context.Context, *connect.Request[v1.JoinMatchmakingRequest]) (*connect.ServerStreamForClient[v1.MatchmakingResponse], error)
@@ -99,6 +102,12 @@ func NewGameServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(gameServiceMethods.ByName("ExecuteAttack")),
 			connect.WithClientOptions(opts...),
 		),
+		startTurn: connect.NewClient[v1.StartTurnRequest, v1.StartTurnResponse](
+			httpClient,
+			baseURL+GameServiceStartTurnProcedure,
+			connect.WithSchema(gameServiceMethods.ByName("StartTurn")),
+			connect.WithClientOptions(opts...),
+		),
 		endTurn: connect.NewClient[v1.EndTurnRequest, v1.EndTurnResponse](
 			httpClient,
 			baseURL+GameServiceEndTurnProcedure,
@@ -126,6 +135,7 @@ type gameServiceClient struct {
 	getGameState     *connect.Client[v1.GetGameStateRequest, v1.GetGameStateResponse]
 	playCard         *connect.Client[v1.PlayCardRequest, v1.PlayCardResponse]
 	executeAttack    *connect.Client[v1.ExecuteAttackRequest, v1.ExecuteAttackResponse]
+	startTurn        *connect.Client[v1.StartTurnRequest, v1.StartTurnResponse]
 	endTurn          *connect.Client[v1.EndTurnRequest, v1.EndTurnResponse]
 	streamGameEvents *connect.Client[v1.GameEventRequest, v1.GameEventResponse]
 	joinMatchmaking  *connect.Client[v1.JoinMatchmakingRequest, v1.MatchmakingResponse]
@@ -151,6 +161,11 @@ func (c *gameServiceClient) ExecuteAttack(ctx context.Context, req *connect.Requ
 	return c.executeAttack.CallUnary(ctx, req)
 }
 
+// StartTurn calls cardgame.v1.GameService.StartTurn.
+func (c *gameServiceClient) StartTurn(ctx context.Context, req *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error) {
+	return c.startTurn.CallUnary(ctx, req)
+}
+
 // EndTurn calls cardgame.v1.GameService.EndTurn.
 func (c *gameServiceClient) EndTurn(ctx context.Context, req *connect.Request[v1.EndTurnRequest]) (*connect.Response[v1.EndTurnResponse], error) {
 	return c.endTurn.CallUnary(ctx, req)
@@ -172,6 +187,7 @@ type GameServiceHandler interface {
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
+	StartTurn(context.Context, *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error)
 	EndTurn(context.Context, *connect.Request[v1.EndTurnRequest]) (*connect.Response[v1.EndTurnResponse], error)
 	StreamGameEvents(context.Context, *connect.Request[v1.GameEventRequest], *connect.ServerStream[v1.GameEventResponse]) error
 	JoinMatchmaking(context.Context, *connect.Request[v1.JoinMatchmakingRequest], *connect.ServerStream[v1.MatchmakingResponse]) error
@@ -208,6 +224,12 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(gameServiceMethods.ByName("ExecuteAttack")),
 		connect.WithHandlerOptions(opts...),
 	)
+	gameServiceStartTurnHandler := connect.NewUnaryHandler(
+		GameServiceStartTurnProcedure,
+		svc.StartTurn,
+		connect.WithSchema(gameServiceMethods.ByName("StartTurn")),
+		connect.WithHandlerOptions(opts...),
+	)
 	gameServiceEndTurnHandler := connect.NewUnaryHandler(
 		GameServiceEndTurnProcedure,
 		svc.EndTurn,
@@ -236,6 +258,8 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 			gameServicePlayCardHandler.ServeHTTP(w, r)
 		case GameServiceExecuteAttackProcedure:
 			gameServiceExecuteAttackHandler.ServeHTTP(w, r)
+		case GameServiceStartTurnProcedure:
+			gameServiceStartTurnHandler.ServeHTTP(w, r)
 		case GameServiceEndTurnProcedure:
 			gameServiceEndTurnHandler.ServeHTTP(w, r)
 		case GameServiceStreamGameEventsProcedure:
@@ -265,6 +289,10 @@ func (UnimplementedGameServiceHandler) PlayCard(context.Context, *connect.Reques
 
 func (UnimplementedGameServiceHandler) ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.ExecuteAttack is not implemented"))
+}
+
+func (UnimplementedGameServiceHandler) StartTurn(context.Context, *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.StartTurn is not implemented"))
 }
 
 func (UnimplementedGameServiceHandler) EndTurn(context.Context, *connect.Request[v1.EndTurnRequest]) (*connect.Response[v1.EndTurnResponse], error) {

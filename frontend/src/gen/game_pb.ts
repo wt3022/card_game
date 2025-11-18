@@ -493,6 +493,98 @@ export class AttackResult extends Message<AttackResult> {
 }
 
 /**
+ * @generated from message cardgame.v1.StartTurnRequest
+ */
+export class StartTurnRequest extends Message<StartTurnRequest> {
+  /**
+   * @generated from field: string game_id = 1;
+   */
+  gameId = "";
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = "";
+
+  constructor(data?: PartialMessage<StartTurnRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.StartTurnRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined, b: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined): boolean {
+    return proto3.util.equals(StartTurnRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message cardgame.v1.StartTurnResponse
+ */
+export class StartTurnResponse extends Message<StartTurnResponse> {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success = false;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message = "";
+
+  /**
+   * @generated from field: cardgame.v1.GameState game_state = 3;
+   */
+  gameState?: GameState;
+
+  constructor(data?: PartialMessage<StartTurnResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.StartTurnResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined, b: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined): boolean {
+    return proto3.util.equals(StartTurnResponse, a, b);
+  }
+}
+
+/**
  * @generated from message cardgame.v1.EndTurnRequest
  */
 export class EndTurnRequest extends Message<EndTurnRequest> {

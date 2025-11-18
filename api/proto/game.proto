@@ -12,6 +12,7 @@ service GameService {
   rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
   rpc PlayCard(PlayCardRequest) returns (PlayCardResponse);
   rpc ExecuteAttack(ExecuteAttackRequest) returns (ExecuteAttackResponse);
+  rpc StartTurn(StartTurnRequest) returns (StartTurnResponse);
   rpc EndTurn(EndTurnRequest) returns (EndTurnResponse);
   rpc StreamGameEvents(GameEventRequest) returns (stream GameEventResponse);
   rpc JoinMatchmaking(JoinMatchmakingRequest) returns (stream MatchmakingResponse);
@@ -70,6 +71,16 @@ message AttackResult {
   bool defender_destroyed = 2;
   int32 damage = 3;
   int32 direct_damage = 4;
+}
+
+message StartTurnRequest {
+  string game_id = 1;
+  string player_id = 2;
+}
+message StartTurnResponse {
+  bool success = 1;
+  string message = 2;
+  GameState game_state = 3;
 }
 
 message EndTurnRequest {

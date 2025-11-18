@@ -105,9 +105,25 @@ func executeUnitCombat(g port.GameState, attacker, defender *entity.Player, atta
 	attackerDamage := defenderUnit.GetAttack()
 	defenderDamage := attackerUnit.GetAttack()
 
+	// 貫通(Pierce)のために、防御側の事前守備値を保持
+	defenderPreDefense := defenderUnit.GetCurrentDefense()
+
 	// 両方同時にダメージを受ける（戦闘ダメージ）
 	defenderDestroyed := defenderUnit.TakeDamage(defenderDamage, false)
 	attackerDestroyed := attackerUnit.TakeDamage(attackerDamage, false)
+
+	// 貫通処理: 攻撃者がPierceを持っていて、防御側が破壊された場合、余剰ダメージをプレイヤーへ与える
+	if defenderDestroyed && attackerUnit.HasTrait(entity.TraitPierce) {
+		overflow := defenderDamage - defenderPreDefense
+		if overflow > 0 {
+			opponent := g.GetOpponent(action.PlayerID)
+			opponent.TakeDamage(overflow)
+			logger.Info("貫通: %s の余剰ダメージ %d が %s に入った", attackerUnit.Name, overflow, opponent.Name)
+			g.AddLog(action.PlayerID, "貫通", fmt.Sprintf("%s の余剰ダメージ %d が %s に入る", attackerUnit.Name, overflow, opponent.Name))
+			// 勝利判定
+			g.CheckVictoryConditions()
+		}
+	}
 
 	// 結果を処理
 	handleCombatResult(g, attacker, defender, attackerUnit, defenderUnit, attackerDestroyed, defenderDestroyed, attackerDamage, defenderDamage, action)

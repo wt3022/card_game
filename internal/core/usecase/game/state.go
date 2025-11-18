@@ -41,7 +41,7 @@ func NewState(gameID string, player1, player2 *entity.Player, logger port.Logger
 		Player1:         player1,
 		Player2:         player2,
 		CurrentPlayerID: player1.ID,
-		CurrentTurn:     0,
+		CurrentTurn:     1,
 		CurrentPhase:    entity.GamePhaseTurnStart,
 		Enchantments:    []entity.Enchantment{},
 		GameLog:         []entity.GameLogEntry{},

@@ -36,7 +36,7 @@ export default function PlayerInfo({
         </div>
         <div className="stat-compact mana">
           <div className="stat-label">マナ</div>
-          <div className="stat-value">{player.currentTurnMana}/{player.maxMana}</div>
+          <div className="stat-value">{player.currentTurnMana}/{player.currentRecoveryMana}</div>
         </div>
         <div className="stat-compact deck">
           <div className="stat-label">山札</div>
