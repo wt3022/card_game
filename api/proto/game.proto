@@ -10,6 +10,7 @@ import "common.proto";
 service GameService {
   rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
   rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
+  rpc PerformMulligan(PerformMulliganRequest) returns (PerformMulliganResponse);
   rpc PlayCard(PlayCardRequest) returns (PlayCardResponse);
   rpc ExecuteAttack(ExecuteAttackRequest) returns (ExecuteAttackResponse);
   rpc StartTurn(StartTurnRequest) returns (StartTurnResponse);
@@ -37,6 +38,18 @@ message GetGameStateRequest {
 
 message GetGameStateResponse {
   GameState game_state = 1;
+}
+
+message PerformMulliganRequest {
+  string game_id = 1;
+  string player_id = 2;
+  repeated string card_ids = 3; // 戻すカードのIDリスト
+}
+
+message PerformMulliganResponse {
+  bool success = 1;
+  string message = 2;
+  GameState game_state = 3;
 }
 
 message PlayCardRequest {
@@ -77,6 +90,7 @@ message StartTurnRequest {
   string game_id = 1;
   string player_id = 2;
 }
+
 message StartTurnResponse {
   bool success = 1;
   string message = 2;

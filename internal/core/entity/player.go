@@ -93,6 +93,50 @@ func (p *Player) DrawCards(count int) ([]Card, error) {
 }
 
 // ========================================
+// マリガン
+// ========================================
+
+// PerformMulligan 指定されたカードを手札から戻してシャッフル後、同じ枚数をドロー
+func (p *Player) PerformMulligan(cardIDs []string, shuffleFunc func([]Card) []Card) ([]Card, error) {
+	if len(cardIDs) == 0 {
+		// マリガンするカードがない場合は何もしない
+		return []Card{}, nil
+	}
+
+	// 指定されたカードを手札から探して削除
+	cardsToReturn := []Card{}
+	for _, cardID := range cardIDs {
+		found := false
+		for i, card := range p.Hand {
+			if card.ID == cardID {
+				cardsToReturn = append(cardsToReturn, card)
+				// 手札から削除
+				p.Hand = append(p.Hand[:i], p.Hand[i+1:]...)
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, NewErrNotFound("card", cardID)
+		}
+	}
+
+	// カードをデッキに戻す
+	p.Deck = append(p.Deck, cardsToReturn...)
+
+	// デッキをシャッフル
+	p.Deck = shuffleFunc(p.Deck)
+
+	// 同じ枚数をドロー
+	drawnCards, err := p.DrawCards(len(cardsToReturn))
+	if err != nil {
+		return drawnCards, err
+	}
+
+	return drawnCards, nil
+}
+
+// ========================================
 // HP管理
 // ========================================
 

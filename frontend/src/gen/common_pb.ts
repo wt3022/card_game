@@ -504,6 +504,20 @@ export class GameState extends Message<GameState> {
    */
   isDraw = false;
 
+  /**
+   * プレイヤー1がマリガンを完了したか
+   *
+   * @generated from field: bool player1_mulligan_done = 10;
+   */
+  player1MulliganDone = false;
+
+  /**
+   * プレイヤー2がマリガンを完了したか
+   *
+   * @generated from field: bool player2_mulligan_done = 11;
+   */
+  player2MulliganDone = false;
+
   constructor(data?: PartialMessage<GameState>) {
     super();
     proto3.util.initPartial(data, this);
@@ -521,6 +535,8 @@ export class GameState extends Message<GameState> {
     { no: 7, name: "is_game_over", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 8, name: "winner_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
     { no: 9, name: "is_draw", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 10, name: "player1_mulligan_done", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 11, name: "player2_mulligan_done", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GameState {

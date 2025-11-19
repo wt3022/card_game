@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateGameRequest, CreateGameResponse, EndTurnRequest, EndTurnResponse, ExecuteAttackRequest, ExecuteAttackResponse, GameEventRequest, GameEventResponse, GetGameStateRequest, GetGameStateResponse, JoinMatchmakingRequest, MatchmakingResponse, PlayCardRequest, PlayCardResponse, StartTurnRequest, StartTurnResponse } from "./game_pb.js";
+import { CreateGameRequest, CreateGameResponse, EndTurnRequest, EndTurnResponse, ExecuteAttackRequest, ExecuteAttackResponse, GameEventRequest, GameEventResponse, GetGameStateRequest, GetGameStateResponse, JoinMatchmakingRequest, MatchmakingResponse, PerformMulliganRequest, PerformMulliganResponse, PlayCardRequest, PlayCardResponse, StartTurnRequest, StartTurnResponse } from "./game_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -30,6 +30,15 @@ export const GameService = {
       name: "GetGameState",
       I: GetGameStateRequest,
       O: GetGameStateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cardgame.v1.GameService.PerformMulligan
+     */
+    performMulligan: {
+      name: "PerformMulligan",
+      I: PerformMulliganRequest,
+      O: PerformMulliganResponse,
       kind: MethodKind.Unary,
     },
     /**

@@ -138,6 +138,100 @@ func (s *GameService) GetGameState(gameID string) (*game.State, error) {
 	return session.State, nil
 }
 
+// PerformMulligan 指定されたプレイヤーのマリガンを実行
+func (s *GameService) PerformMulligan(ctx context.Context, gameID string, playerID string, cardIDs []string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	session, exists := s.games[gameID]
+	if !exists {
+		return entity.NewErrNotFound("game", gameID)
+	}
+
+	state := session.State
+	player := state.GetPlayerByID(playerID)
+	if player == nil {
+		return entity.NewErrNotFound("player", playerID)
+	}
+
+	// すでにマリガン済みかチェック
+	if state.IsMulliganDone(playerID) {
+		return entity.NewErrInvalidState("mulligan", "マリガンは既に完了しています")
+	}
+
+	// マリガンを実行
+	drawnCards, err := player.PerformMulligan(cardIDs, game.ShuffleDeck)
+	if err != nil {
+		return err
+	}
+
+	// マリガン完了状態を設定
+	if err := state.SetMulliganDone(playerID); err != nil {
+		return err
+	}
+
+	// ログを追加
+	if len(cardIDs) > 0 {
+		state.AddLog(playerID, "マリガン", fmt.Sprintf("%d枚のカードを交換しました", len(cardIDs)))
+		s.logger.Info("%s: %d枚のカードをマリガン", player.Name, len(cardIDs))
+	} else {
+		state.AddLog(playerID, "マリガン", "マリガンをスキップしました")
+		s.logger.Info("%s: マリガンをスキップ", player.Name)
+	}
+
+	// 引いたカードのログ
+	for _, card := range drawnCards {
+		s.logger.Info("%s: マリガンで「%s」を引きました", player.Name, card.Name)
+	}
+
+	// マリガンイベントを送信
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "mulligan_performed",
+		Message:   fmt.Sprintf("%s performed mulligan", playerID),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		State:     state,
+	})
+
+	// 両プレイヤーのマリガンが完了したら、ゲームを開始
+	if state.AreBothPlayersMulliganDone() {
+		s.logger.Info("両プレイヤーのマリガンが完了しました。ゲームを開始します。")
+
+		// マリガン完了イベントを送信
+		s.broadcastEvent(gameID, &event.GameEvent{
+			GameID:    gameID,
+			EventType: "mulligan_completed",
+			Message:   "両プレイヤーのマリガンが完了しました",
+			Timestamp: time.Now(),
+			State:     state,
+		})
+
+		// 先攻プレイヤーのターンを自動的に開始
+		currentPlayer := state.GetCurrentPlayer()
+		if currentPlayer != nil {
+			if err := session.UsecaseEngine.StartTurn(currentPlayer.ID); err != nil {
+				s.logger.Error("最初のターン開始エラー: %v", err)
+				return err
+			}
+
+			// ターン開始イベントを送信
+			s.broadcastEvent(gameID, &event.GameEvent{
+				GameID:    gameID,
+				EventType: "turn_started",
+				Message:   fmt.Sprintf("Turn started for %s", currentPlayer.ID),
+				PlayerID:  currentPlayer.ID,
+				Timestamp: time.Now(),
+				State:     state,
+			})
+
+			s.logger.Info("ゲーム開始: %sのターン", currentPlayer.Name)
+		}
+	}
+
+	return nil
+}
+
 // PlayCard は指定されたプレイヤーがカードをプレイ
 func (s *GameService) PlayCard(ctx context.Context, gameID string, playerID string, cardID string, targetID *string) error {
 	s.mu.Lock()
@@ -339,19 +433,34 @@ func (s *GameService) EndTurn(ctx context.Context, gameID string) error {
 		return nil
 	}
 
-	// 最新の状態を取得してイベント送信
-	session, exists = s.games[gameID]
-	if !exists {
-		return entity.NewErrNotFound("game", gameID)
-	}
-	latestState := session.State
+	// ターン終了イベントを送信
 	s.broadcastEvent(gameID, &event.GameEvent{
 		GameID:    gameID,
 		EventType: "turn_ended",
-		Message:   fmt.Sprintf("Turn ended, now %s's turn", latestState.CurrentPlayerID),
-		PlayerID:  latestState.CurrentPlayerID,
+		Message:   fmt.Sprintf("Turn ended, now %s's turn", state.CurrentPlayerID),
+		PlayerID:  state.CurrentPlayerID,
 		Timestamp: time.Now(),
-		State:     latestState,
+		State:     state,
+	})
+
+	// 次のプレイヤーのターンを自動的に開始
+	nextPlayer := state.GetCurrentPlayer()
+	if nextPlayer == nil {
+		return entity.NewErrNotFound("player", "next_player")
+	}
+
+	if err := session.UsecaseEngine.StartTurn(nextPlayer.ID); err != nil {
+		return err
+	}
+
+	// ターン開始イベントを送信
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "turn_started",
+		Message:   fmt.Sprintf("Turn started for %s", nextPlayer.ID),
+		PlayerID:  nextPlayer.ID,
+		Timestamp: time.Now(),
+		State:     state,
 	})
 
 	return nil

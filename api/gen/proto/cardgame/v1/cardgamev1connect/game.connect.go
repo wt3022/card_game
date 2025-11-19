@@ -38,6 +38,9 @@ const (
 	// GameServiceGetGameStateProcedure is the fully-qualified name of the GameService's GetGameState
 	// RPC.
 	GameServiceGetGameStateProcedure = "/cardgame.v1.GameService/GetGameState"
+	// GameServicePerformMulliganProcedure is the fully-qualified name of the GameService's
+	// PerformMulligan RPC.
+	GameServicePerformMulliganProcedure = "/cardgame.v1.GameService/PerformMulligan"
 	// GameServicePlayCardProcedure is the fully-qualified name of the GameService's PlayCard RPC.
 	GameServicePlayCardProcedure = "/cardgame.v1.GameService/PlayCard"
 	// GameServiceExecuteAttackProcedure is the fully-qualified name of the GameService's ExecuteAttack
@@ -59,6 +62,7 @@ const (
 type GameServiceClient interface {
 	CreateGame(context.Context, *connect.Request[v1.CreateGameRequest]) (*connect.Response[v1.CreateGameResponse], error)
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
+	PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
 	StartTurn(context.Context, *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error)
@@ -88,6 +92,12 @@ func NewGameServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			httpClient,
 			baseURL+GameServiceGetGameStateProcedure,
 			connect.WithSchema(gameServiceMethods.ByName("GetGameState")),
+			connect.WithClientOptions(opts...),
+		),
+		performMulligan: connect.NewClient[v1.PerformMulliganRequest, v1.PerformMulliganResponse](
+			httpClient,
+			baseURL+GameServicePerformMulliganProcedure,
+			connect.WithSchema(gameServiceMethods.ByName("PerformMulligan")),
 			connect.WithClientOptions(opts...),
 		),
 		playCard: connect.NewClient[v1.PlayCardRequest, v1.PlayCardResponse](
@@ -133,6 +143,7 @@ func NewGameServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 type gameServiceClient struct {
 	createGame       *connect.Client[v1.CreateGameRequest, v1.CreateGameResponse]
 	getGameState     *connect.Client[v1.GetGameStateRequest, v1.GetGameStateResponse]
+	performMulligan  *connect.Client[v1.PerformMulliganRequest, v1.PerformMulliganResponse]
 	playCard         *connect.Client[v1.PlayCardRequest, v1.PlayCardResponse]
 	executeAttack    *connect.Client[v1.ExecuteAttackRequest, v1.ExecuteAttackResponse]
 	startTurn        *connect.Client[v1.StartTurnRequest, v1.StartTurnResponse]
@@ -149,6 +160,11 @@ func (c *gameServiceClient) CreateGame(ctx context.Context, req *connect.Request
 // GetGameState calls cardgame.v1.GameService.GetGameState.
 func (c *gameServiceClient) GetGameState(ctx context.Context, req *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error) {
 	return c.getGameState.CallUnary(ctx, req)
+}
+
+// PerformMulligan calls cardgame.v1.GameService.PerformMulligan.
+func (c *gameServiceClient) PerformMulligan(ctx context.Context, req *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error) {
+	return c.performMulligan.CallUnary(ctx, req)
 }
 
 // PlayCard calls cardgame.v1.GameService.PlayCard.
@@ -185,6 +201,7 @@ func (c *gameServiceClient) JoinMatchmaking(ctx context.Context, req *connect.Re
 type GameServiceHandler interface {
 	CreateGame(context.Context, *connect.Request[v1.CreateGameRequest]) (*connect.Response[v1.CreateGameResponse], error)
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
+	PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
 	StartTurn(context.Context, *connect.Request[v1.StartTurnRequest]) (*connect.Response[v1.StartTurnResponse], error)
@@ -210,6 +227,12 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 		GameServiceGetGameStateProcedure,
 		svc.GetGameState,
 		connect.WithSchema(gameServiceMethods.ByName("GetGameState")),
+		connect.WithHandlerOptions(opts...),
+	)
+	gameServicePerformMulliganHandler := connect.NewUnaryHandler(
+		GameServicePerformMulliganProcedure,
+		svc.PerformMulligan,
+		connect.WithSchema(gameServiceMethods.ByName("PerformMulligan")),
 		connect.WithHandlerOptions(opts...),
 	)
 	gameServicePlayCardHandler := connect.NewUnaryHandler(
@@ -254,6 +277,8 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 			gameServiceCreateGameHandler.ServeHTTP(w, r)
 		case GameServiceGetGameStateProcedure:
 			gameServiceGetGameStateHandler.ServeHTTP(w, r)
+		case GameServicePerformMulliganProcedure:
+			gameServicePerformMulliganHandler.ServeHTTP(w, r)
 		case GameServicePlayCardProcedure:
 			gameServicePlayCardHandler.ServeHTTP(w, r)
 		case GameServiceExecuteAttackProcedure:
@@ -281,6 +306,10 @@ func (UnimplementedGameServiceHandler) CreateGame(context.Context, *connect.Requ
 
 func (UnimplementedGameServiceHandler) GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.GetGameState is not implemented"))
+}
+
+func (UnimplementedGameServiceHandler) PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.PerformMulligan is not implemented"))
 }
 
 func (UnimplementedGameServiceHandler) PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error) {

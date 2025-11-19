@@ -568,18 +568,20 @@ func (x *Player) GetHand() []*Card {
 
 // ゲーム状態
 type GameState struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	GameId          string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
-	Player1         *Player                `protobuf:"bytes,2,opt,name=player1,proto3" json:"player1,omitempty"`
-	Player2         *Player                `protobuf:"bytes,3,opt,name=player2,proto3" json:"player2,omitempty"`
-	CurrentPlayerId string                 `protobuf:"bytes,4,opt,name=current_player_id,json=currentPlayerId,proto3" json:"current_player_id,omitempty"`
-	CurrentTurn     int32                  `protobuf:"varint,5,opt,name=current_turn,json=currentTurn,proto3" json:"current_turn,omitempty"`
-	CurrentPhase    GamePhase              `protobuf:"varint,6,opt,name=current_phase,json=currentPhase,proto3,enum=cardgame.v1.GamePhase" json:"current_phase,omitempty"`
-	IsGameOver      bool                   `protobuf:"varint,7,opt,name=is_game_over,json=isGameOver,proto3" json:"is_game_over,omitempty"`
-	WinnerId        *string                `protobuf:"bytes,8,opt,name=winner_id,json=winnerId,proto3,oneof" json:"winner_id,omitempty"`
-	IsDraw          bool                   `protobuf:"varint,9,opt,name=is_draw,json=isDraw,proto3" json:"is_draw,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	GameId              string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	Player1             *Player                `protobuf:"bytes,2,opt,name=player1,proto3" json:"player1,omitempty"`
+	Player2             *Player                `protobuf:"bytes,3,opt,name=player2,proto3" json:"player2,omitempty"`
+	CurrentPlayerId     string                 `protobuf:"bytes,4,opt,name=current_player_id,json=currentPlayerId,proto3" json:"current_player_id,omitempty"`
+	CurrentTurn         int32                  `protobuf:"varint,5,opt,name=current_turn,json=currentTurn,proto3" json:"current_turn,omitempty"`
+	CurrentPhase        GamePhase              `protobuf:"varint,6,opt,name=current_phase,json=currentPhase,proto3,enum=cardgame.v1.GamePhase" json:"current_phase,omitempty"`
+	IsGameOver          bool                   `protobuf:"varint,7,opt,name=is_game_over,json=isGameOver,proto3" json:"is_game_over,omitempty"`
+	WinnerId            *string                `protobuf:"bytes,8,opt,name=winner_id,json=winnerId,proto3,oneof" json:"winner_id,omitempty"`
+	IsDraw              bool                   `protobuf:"varint,9,opt,name=is_draw,json=isDraw,proto3" json:"is_draw,omitempty"`
+	Player1MulliganDone bool                   `protobuf:"varint,10,opt,name=player1_mulligan_done,json=player1MulliganDone,proto3" json:"player1_mulligan_done,omitempty"` // プレイヤー1がマリガンを完了したか
+	Player2MulliganDone bool                   `protobuf:"varint,11,opt,name=player2_mulligan_done,json=player2MulliganDone,proto3" json:"player2_mulligan_done,omitempty"` // プレイヤー2がマリガンを完了したか
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *GameState) Reset() {
@@ -671,6 +673,20 @@ func (x *GameState) GetWinnerId() string {
 func (x *GameState) GetIsDraw() bool {
 	if x != nil {
 		return x.IsDraw
+	}
+	return false
+}
+
+func (x *GameState) GetPlayer1MulliganDone() bool {
+	if x != nil {
+		return x.Player1MulliganDone
+	}
+	return false
+}
+
+func (x *GameState) GetPlayer2MulliganDone() bool {
+	if x != nil {
+		return x.Player2MulliganDone
 	}
 	return false
 }
@@ -815,7 +831,7 @@ const file_common_proto_rawDesc = "" +
 	"\x05field\x18\n" +
 	" \x03(\v2\x11.cardgame.v1.UnitR\x05field\x124\n" +
 	"\x16time_remaining_seconds\x18\v \x01(\x05R\x14timeRemainingSeconds\x12%\n" +
-	"\x04hand\x18\f \x03(\v2\x11.cardgame.v1.CardR\x04hand\"\xf9\x02\n" +
+	"\x04hand\x18\f \x03(\v2\x11.cardgame.v1.CardR\x04hand\"\xe1\x03\n" +
 	"\tGameState\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12-\n" +
 	"\aplayer1\x18\x02 \x01(\v2\x13.cardgame.v1.PlayerR\aplayer1\x12-\n" +
@@ -826,7 +842,10 @@ const file_common_proto_rawDesc = "" +
 	"\fis_game_over\x18\a \x01(\bR\n" +
 	"isGameOver\x12 \n" +
 	"\twinner_id\x18\b \x01(\tH\x00R\bwinnerId\x88\x01\x01\x12\x17\n" +
-	"\ais_draw\x18\t \x01(\bR\x06isDrawB\f\n" +
+	"\ais_draw\x18\t \x01(\bR\x06isDraw\x122\n" +
+	"\x15player1_mulligan_done\x18\n" +
+	" \x01(\bR\x13player1MulliganDone\x122\n" +
+	"\x15player2_mulligan_done\x18\v \x01(\bR\x13player2MulliganDoneB\f\n" +
 	"\n" +
 	"_winner_id\"\xde\x01\n" +
 	"\tGameEvent\x12\x17\n" +

@@ -96,6 +96,37 @@ func (h *GameConnectHandler) GetGameState(
 	return connect.NewResponse(resp), nil
 }
 
+// PerformMulligan マリガンを実行
+func (h *GameConnectHandler) PerformMulligan(
+	ctx context.Context,
+	req *connect.Request[pbv1.PerformMulliganRequest],
+) (*connect.Response[pbv1.PerformMulliganResponse], error) {
+	gameID := req.Msg.GetGameId()
+	playerID := req.Msg.GetPlayerId()
+	cardIDs := req.Msg.GetCardIds()
+
+	// マリガンを実行
+	err := h.gameService.PerformMulligan(ctx, gameID, playerID, cardIDs)
+	if err != nil {
+		return nil, mapDomainErrorToConnectError(err)
+	}
+
+	// 更新されたゲーム状態を取得
+	state, err := h.gameService.GetGameState(gameID)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// レスポンスを作成
+	resp := &pbv1.PerformMulliganResponse{
+		Success:   true,
+		Message:   "Mulligan performed successfully",
+		GameState: converter.GameStateToProto(state, playerID),
+	}
+
+	return connect.NewResponse(resp), nil
+}
+
 // PlayCard カードをプレイ
 func (h *GameConnectHandler) PlayCard(
 	ctx context.Context,

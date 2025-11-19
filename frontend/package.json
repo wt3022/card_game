@@ -2,7 +2,7 @@
   "name": "card-game-frontend",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
+ "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

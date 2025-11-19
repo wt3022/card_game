@@ -224,6 +224,106 @@ export class GetGameStateResponse extends Message<GetGameStateResponse> {
 }
 
 /**
+ * @generated from message cardgame.v1.PerformMulliganRequest
+ */
+export class PerformMulliganRequest extends Message<PerformMulliganRequest> {
+  /**
+   * @generated from field: string game_id = 1;
+   */
+  gameId = "";
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = "";
+
+  /**
+   * 戻すカードのIDリスト
+   *
+   * @generated from field: repeated string card_ids = 3;
+   */
+  cardIds: string[] = [];
+
+  constructor(data?: PartialMessage<PerformMulliganRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PerformMulliganRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "card_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PerformMulliganRequest | PlainMessage<PerformMulliganRequest> | undefined, b: PerformMulliganRequest | PlainMessage<PerformMulliganRequest> | undefined): boolean {
+    return proto3.util.equals(PerformMulliganRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message cardgame.v1.PerformMulliganResponse
+ */
+export class PerformMulliganResponse extends Message<PerformMulliganResponse> {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success = false;
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message = "";
+
+  /**
+   * @generated from field: cardgame.v1.GameState game_state = 3;
+   */
+  gameState?: GameState;
+
+  constructor(data?: PartialMessage<PerformMulliganResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PerformMulliganResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PerformMulliganResponse | PlainMessage<PerformMulliganResponse> | undefined, b: PerformMulliganResponse | PlainMessage<PerformMulliganResponse> | undefined): boolean {
+    return proto3.util.equals(PerformMulliganResponse, a, b);
+  }
+}
+
+/**
  * @generated from message cardgame.v1.PlayCardRequest
  */
 export class PlayCardRequest extends Message<PlayCardRequest> {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { gameClient, startTurn } from '../lib/api-client'
+import { gameClient } from '../lib/api-client'
 import type { GameState } from '../gen/common_pb'
 import { Trait } from '../gen/common_pb'
 import PlayerInfo from './PlayerInfo'
@@ -86,25 +86,6 @@ export default function GameBoard({
             if (response.event?.details) {
               setMessage(response.event.details)
             }
-          }
-          // サーバーからの turn_ended を検知して、自分のターン開始を自動で呼び出す
-          try {
-            const evt = response.event
-            if (
-              evt &&
-              evt.eventType === 'turn_ended' &&
-              evt.playerId === currentPlayerId
-            ) {
-              console.log('Detected opponent end turn -> starting turn for', currentPlayerId)
-              // 自動で StartTurn API を呼び、返ってきた状態で更新する
-              const startResp = await startTurn({ gameId: gameState.gameId, playerId: currentPlayerId })
-              if (startResp?.success && startResp.gameState) {
-                onGameStateUpdate(startResp.gameState)
-                if (startResp.message) setMessage(startResp.message)
-              }
-            }
-          } catch (err) {
-            console.error('Auto startTurn failed:', err)
           }
         }
       } catch (err: any) {

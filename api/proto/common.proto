@@ -93,6 +93,8 @@ message GameState {
   bool is_game_over = 7;
   optional string winner_id = 8;
   bool is_draw = 9;
+  bool player1_mulligan_done = 10;  // プレイヤー1がマリガンを完了したか
+  bool player2_mulligan_done = 11;  // プレイヤー2がマリガンを完了したか
 }
 
 // イベント

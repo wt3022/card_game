@@ -1,0 +1,197 @@
+.mulligan-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.mulligan-modal {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 900px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.mulligan-modal h2 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  text-align: center;
+}
+
+.mulligan-modal p {
+  margin: 0 0 24px 0;
+  text-align: center;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.mulligan-cards {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  min-height: 200px;
+}
+
+.mulligan-card {
+  position: relative;
+  background: white;
+  color: #333;
+  border-radius: 12px;
+  padding: 16px;
+  width: 140px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 3px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.mulligan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.mulligan-card.selected {
+  border-color: #4CAF50;
+  background: #e8f5e9;
+  transform: translateY(-8px);
+}
+
+.mulligan-card .card-cost {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.mulligan-card .card-name {
+  font-weight: bold;
+  font-size: 14px;
+  margin: 8px 0;
+  text-align: center;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mulligan-card .card-effect {
+  font-size: 11px;
+  color: #666;
+  margin: 8px 0;
+  text-align: center;
+  min-height: 32px;
+  line-height: 1.3;
+}
+
+.mulligan-card .card-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #ddd;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.mulligan-card .card-stats .atk {
+  color: #f44336;
+}
+
+.mulligan-card .card-stats .def {
+  color: #2196F3;
+}
+
+.selected-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5);
+}
+
+.mulligan-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.mulligan-actions button {
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 160px;
+}
+
+.btn-skip {
+  background: #757575;
+  color: white;
+}
+
+.btn-skip:hover {
+  background: #616161;
+}
+
+.btn-submit {
+  background: #4CAF50;
+  color: white;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #45a049;
+  transform: scale(1.05);
+}
+
+.btn-submit:disabled {
+  background: #9E9E9E;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: spin 1s linear infinite;
+  margin: 24px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
