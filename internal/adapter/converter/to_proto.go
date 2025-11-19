@@ -28,15 +28,15 @@ func GameStateToProto(state *game.State, viewerPlayerID string) *cardgamev1.Game
 	player2 := state.GetPlayerByID(state.Player2.ID)
 
 	return &cardgamev1.GameState{
-		GameId:             state.GameID,
-		Player1:            PlayerToProto(player1, viewerPlayerID),
-		Player2:            PlayerToProto(player2, viewerPlayerID),
-		CurrentPlayerId:    state.CurrentPlayerID,
-		CurrentTurn:        int32(state.CurrentTurn),
-		CurrentPhase:       GamePhaseToProto(state.CurrentPhase),
-		IsGameOver:         state.IsOver(),
-		WinnerId:           stringPtrToOptional(state.WinnerID),
-		IsDraw:             state.WinnerID != nil && *state.WinnerID == "",
+		GameId:              state.GameID,
+		Player1:             PlayerToProto(player1, viewerPlayerID),
+		Player2:             PlayerToProto(player2, viewerPlayerID),
+		CurrentPlayerId:     state.CurrentPlayerID,
+		CurrentTurn:         int32(state.CurrentTurn),
+		CurrentPhase:        GamePhaseToProto(state.CurrentPhase),
+		IsGameOver:          state.IsOver(),
+		WinnerId:            stringPtrToOptional(state.WinnerID),
+		IsDraw:              state.WinnerID != nil && *state.WinnerID == "",
 		Player1MulliganDone: state.Player1MulliganDone,
 		Player2MulliganDone: state.Player2MulliganDone,
 	}
