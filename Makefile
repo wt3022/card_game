@@ -1,70 +1,79 @@
-.PHONY: help proto proto-go proto-connect install-tools build-server build-connect clean test
-
+.PHONY: help
 help: ## ヘルプを表示
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-# ========================================
-# プロトコルバッファ関連
-# ========================================
+# Proto生成
+.PHONY: proto
+proto: ## Protoファイルからコードを生成
+	@echo "🔨 Generating proto files..."
+	protoc --go_out=. --go_opt=paths=source_relative \
+		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+		--connect-go_out=. --connect-go_opt=paths=source_relative \
+		api/proto/*.proto
 
-install-tools: ## 必要なツールをインストール
-	@echo "📦 Installing protoc plugins..."
+# 依存関係
+.PHONY: deps
+deps: ## Go依存関係をインストール
+	@echo "📦 Installing dependencies..."
+	go mod download
+	go mod tidy
+
+# ツールのインストール
+.PHONY: install-tools
+install-tools: ## Protoツールをインストール
+	@echo "🔧 Installing tools..."
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	go install connectrpc.com/connect/cmd/protoc-gen-connect-go@latest
-	@echo "✅ Tools installed successfully"
 
-proto: proto-connect ## すべてのprotoファイルからコードを生成
-
-proto-connect: ## Connect-Go用のコードを生成
-	@echo "🔨 Generating Connect-Go code from proto files..."
-	protoc -I=api/proto \
-		--go_out=api/gen/proto/cardgame/v1 --go_opt=paths=source_relative \
-		--connect-go_out=api/gen/proto/cardgame/v1 --connect-go_opt=paths=source_relative \
-		api/proto/*.proto
-	@echo "✅ Connect-Go code generated"
-
-# ========================================
-# ビルド関連
-# ========================================
-
+# ビルド
+.PHONY: build-connect
 build-connect: ## Connect-Goサーバーをビルド
 	@echo "🔨 Building Connect-Go server..."
 	go build -o bin/connect-server cmd/connect-server/main.go
-	@echo "✅ Connect-Go server built: bin/connect-server"
 
+.PHONY: build-admin
+build-admin: ## Admin serverをビルド
+	@echo "🔨 Building Admin server..."
+	go build -o bin/admin-server cmd/admin-server/main.go
 
-# ========================================
-# 実行関連
-# ========================================
+.PHONY: build-migrate
+build-migrate: ## Migration toolをビルド
+	@echo "🔨 Building Migration tool..."
+	go build -o bin/migrate cmd/migrate/main.go
 
+.PHONY: build
+build: build-connect build-admin build-migrate ## すべてのサーバーをビルド
+
+# 実行
+.PHONY: run-connect
 run-connect: ## Connect-Goサーバーを起動
-	@echo "🚀 Starting Connect-Go server..."
+	@echo "🚀 Running Connect-Go server..."
 	go run cmd/connect-server/main.go
 
-# ========================================
-# その他
-# ========================================
+.PHONY: run-admin
+run-admin: ## Admin serverを起動
+	@echo "🚀 Running Admin server..."
+	go run cmd/admin-server/main.go
 
-clean: ## 生成ファイルとビルド成果物を削除
-	@echo "🧹 Cleaning generated files..."
-	rm -rf api/gen/
-	rm -rf bin/
-	@echo "✅ Clean complete"
+# データベース
+.PHONY: migrate
+migrate: ## DBマイグレーションを実行
+	@echo "🗄️  Running database migration..."
+	go run cmd/migrate/main.go
 
+# テスト
+.PHONY: test
 test: ## テストを実行
 	@echo "🧪 Running tests..."
 	go test -v ./...
 
-deps: ## 依存関係を更新
-	@echo "📦 Updating dependencies..."
-	go mod tidy
-	go mod download
-	@echo "✅ Dependencies updated"
+# クリーンアップ
+.PHONY: clean
+clean: ## ビルド成果物を削除
+	@echo "🧹 Cleaning..."
+	rm -rf bin/
+	rm -rf api/gen/
 
-# ========================================
-# 開発用
-# ========================================
-
-dev: proto build-connect run-connect ## 開発用: proto生成→ビルド→実行
-
+# デフォルトターゲット
+.DEFAULT_GOAL := help

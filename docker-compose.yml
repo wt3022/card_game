@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:8.4
+    ports:
+      - ${MYSQL_PORT}:3306
+    container_name: card_game-mysql
+    volumes:
+      - ./mysql/volumes:/var/lib/mysql
+      - ./mysql/:/etc/mysql/conf.d
+      - ./mysql/goadmin_schema.sql:/docker-entrypoint-initdb.d/01-goadmin_schema.sql:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    env_file: .env
+

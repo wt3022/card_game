@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
@@ -12,6 +13,8 @@ import (
 	"card_game/internal/adapter/connect/handler"
 	"card_game/internal/application/service"
 	"card_game/internal/core/port"
+
+	"github.com/joho/godotenv"
 )
 
 // ========================================
@@ -24,6 +27,10 @@ import (
 // ========================================
 
 func main() {
+	// .envファイルを読み込む（存在しない場合はスキップ）
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️  .env file not found, using environment variables or defaults")
+	}
 	// ロガーを初期化
 	logger := port.NewConsoleLogger()
 
@@ -54,8 +61,8 @@ func main() {
 	h2cHandler := h2c.NewHandler(handler, &http2.Server{})
 
 	// サーバー起動
-	port := 8080
-	addr := fmt.Sprintf(":%d", port)
+	port := getEnv("GAME_SERVER_PORT", "8080")
+	addr := fmt.Sprintf(":%s", port)
 
 	log.Printf("🎮 Connect-Go Server starting on http://localhost%s", addr)
 	log.Printf("📡 gRPC-Web & HTTP/JSON endpoints:")
@@ -112,4 +119,12 @@ func corsMiddleware(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+// getEnv 環境変数を取得（デフォルト値付き）
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }
