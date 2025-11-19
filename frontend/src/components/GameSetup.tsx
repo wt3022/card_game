@@ -183,22 +183,22 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
       if (!mulliganGameState) return []
       
       // 自分のプレイヤーを特定
-      let myHand = []
       if (mulliganGameState.player1?.id === mulliganPlayerId) {
-        myHand = mulliganGameState.player1.hand || []
+        const myHand = mulliganGameState.player1.hand || []
         console.log('プレイヤー1として手札取得:', myHand.length, '枚')
+        return myHand
       } else if (mulliganGameState.player2?.id === mulliganPlayerId) {
-        myHand = mulliganGameState.player2.hand || []
+        const myHand = mulliganGameState.player2.hand || []
         console.log('プレイヤー2として手札取得:', myHand.length, '枚')
+        return myHand
       } else {
         console.error('プレイヤーIDが一致しません', {
           mulliganPlayerId,
           player1Id: mulliganGameState.player1?.id,
           player2Id: mulliganGameState.player2?.id,
         })
+        return []
       }
-      
-      return myHand
     }
 
     return (
