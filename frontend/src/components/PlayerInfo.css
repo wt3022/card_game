@@ -52,6 +52,18 @@
   min-width: 45px;
 }
 
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
 .stat-compact .stat-label {
   font-size: 0.65rem;
   font-weight: 600;
@@ -168,16 +180,3 @@
 .stat-mini.graveyard .value {
   color: #8e44ad;
 }
-
-.stat-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.stat-value {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-top: 5px;
-}
-

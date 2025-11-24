@@ -1,36 +1,26 @@
-import { useState } from 'react'
-import GameSetup from './components/GameSetup'
-import GameBoard from './components/GameBoard'
-import type { GameState } from './gen/common_pb'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/Auth/ProtectedRoute'
+import Admin from './pages/Admin'
+import Game from './pages/Game'
 import './App.css'
 
 function App() {
-  const [gameState, setGameState] = useState<GameState | null>(null)
-  const [currentPlayerId, setCurrentPlayerId] = useState<string>('')
-
-  const handleGameStart = (state: GameState, playerId: string) => {
-    setGameState(state)
-    setCurrentPlayerId(playerId)
-  }
-
-  const handleGameStateUpdate = (state: GameState) => {
-    setGameState(state)
-  }
-
   return (
-    <div className="app">
-      {!gameState ? (
-        <GameSetup onGameStart={handleGameStart} />
-      ) : (
-        <GameBoard
-          gameState={gameState}
-          currentPlayerId={currentPlayerId}
-          onGameStateUpdate={handleGameStateUpdate}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Game />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <Admin />
+            </ProtectedRoute>
+          }
         />
-      )}
-    </div>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
 export default App
-

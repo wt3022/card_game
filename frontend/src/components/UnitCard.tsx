@@ -27,14 +27,30 @@ export default function UnitCard({
 }: UnitCardProps) {
   const hasRush = unit.traits.includes(Trait.RUSH)
   const hasCharge = unit.traits.includes(Trait.CHARGE)
-  const canAttack = unit.attacksRemaining > 0 && (hasRush || hasCharge || !unit.summonedThisTurn)
+  const canAttack =
+    unit.attacksRemaining > 0 &&
+    (hasRush || hasCharge || !unit.summonedThisTurn)
+
+  const interactiveProps = isClickable
+    ? {
+        role: 'button' as const,
+        tabIndex: 0,
+        onClick,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClick()
+          }
+        },
+      }
+    : {}
 
   return (
     <div
       className={`unit-card ${isSelected ? 'selected' : ''} ${canAttack ? 'can-attack' : ''} ${
         isClickable ? 'clickable' : ''
       }`}
-      onClick={isClickable ? onClick : undefined}
+      {...interactiveProps}
     >
       <div className="unit-header">
         <div className="unit-name">{unit.name}</div>
@@ -61,12 +77,11 @@ export default function UnitCard({
       {unit.effect && <div className="unit-effect">{unit.effect}</div>}
 
       <div className="unit-footer">
-        <span className="attacks-remaining">
-          攻撃: {unit.attacksRemaining}
-        </span>
-        {unit.summonedThisTurn && !hasRush && !hasCharge && <span className="summoned-badge">召喚酔い</span>}
+        <span className="attacks-remaining">攻撃: {unit.attacksRemaining}</span>
+        {unit.summonedThisTurn && !hasRush && !hasCharge && (
+          <span className="summoned-badge">召喚酔い</span>
+        )}
       </div>
     </div>
   )
 }
-

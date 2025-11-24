@@ -22,21 +22,39 @@ export default function PlayerInfo({
     )
   }
 
+  const interactiveProps = onClick
+    ? {
+        role: 'button' as const,
+        tabIndex: 0,
+        onClick,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClick()
+          }
+        },
+      }
+    : {}
+
   return (
     <div
       className={`player-info-compact ${isCurrentPlayer ? 'current' : ''} ${isAttackTarget ? 'attack-target' : ''}`}
-      onClick={onClick}
+      {...interactiveProps}
       style={{ cursor: isAttackTarget ? 'pointer' : 'default' }}
     >
       <div className="player-name-compact">{player.name}</div>
       <div className="player-stats-row">
         <div className="stat-compact hp">
           <div className="stat-label">HP</div>
-          <div className="stat-value">{player.hp}/{player.maxHp}</div>
+          <div className="stat-value">
+            {player.hp}/{player.maxHp}
+          </div>
         </div>
         <div className="stat-compact mana">
           <div className="stat-label">マナ</div>
-          <div className="stat-value">{player.currentTurnMana}/{player.currentRecoveryMana}</div>
+          <div className="stat-value">
+            {player.currentTurnMana}/{player.currentRecoveryMana}
+          </div>
         </div>
         <div className="stat-compact deck">
           <div className="stat-label">山札</div>
@@ -54,4 +72,3 @@ export default function PlayerInfo({
     </div>
   )
 }
-

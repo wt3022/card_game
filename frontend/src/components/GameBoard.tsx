@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { gameClient } from '../lib/api-client'
+import { useEffect, useState } from 'react'
 import type { GameState } from '../gen/common_pb'
 import { Trait } from '../gen/common_pb'
+import { gameClient } from '../lib/api-client'
 import PlayerInfo from './PlayerInfo'
 import UnitCard from './UnitCard'
 import './GameBoard.css'
@@ -28,8 +28,14 @@ export default function GameBoard({
   console.log('GameBoard - player2:', gameState.player2)
 
   const isCurrentPlayerTurn = gameState.currentPlayerId === currentPlayerId
-  const currentPlayer = gameState.player1?.id === currentPlayerId ? gameState.player1 : gameState.player2
-  const opponent = gameState.player1?.id === currentPlayerId ? gameState.player2 : gameState.player1
+  const currentPlayer =
+    gameState.player1?.id === currentPlayerId
+      ? gameState.player1
+      : gameState.player2
+  const opponent =
+    gameState.player1?.id === currentPlayerId
+      ? gameState.player2
+      : gameState.player1
 
   console.log('GameBoard - currentPlayer:', currentPlayer)
   console.log('GameBoard - opponent:', opponent)
@@ -61,35 +67,35 @@ export default function GameBoard({
     const subscribeToEvents = async () => {
       try {
         console.log('Subscribing to game events for gameId:', gameState.gameId)
-        
+
         abortController = new AbortController()
-        
+
         // サーバーサイドストリーミングでイベントを購読
         const stream = gameClient.streamGameEvents(
           {
             gameId: gameState.gameId,
             playerId: currentPlayerId,
           },
-          { signal: abortController.signal }
+          { signal: abortController.signal },
         )
 
         // イベントを受信
         for await (const response of stream) {
           if (!isActive) break
-          
+
           console.log('Received game event:', response)
-          
+
           if (response.gameState) {
             onGameStateUpdate(response.gameState)
-            
+
             // イベント詳細があれば表示
             if (response.event?.details) {
               setMessage(response.event.details)
             }
           }
         }
-      } catch (err: any) {
-        if (isActive && err.name !== 'AbortError') {
+      } catch (err: unknown) {
+        if (isActive && err instanceof Error && err.name !== 'AbortError') {
           console.error('Stream error:', err)
           // エラー時は再接続を試みる
           setTimeout(() => {
@@ -125,7 +131,9 @@ export default function GameBoard({
         setSelectedUnitId(null)
       }
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'ターン終了に失敗しました')
+      setMessage(
+        err instanceof Error ? err.message : 'ターン終了に失敗しました',
+      )
     }
   }
 
@@ -146,7 +154,9 @@ export default function GameBoard({
         setMessage(response.message || 'カードのプレイに失敗しました')
       }
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : 'カードのプレイに失敗しました')
+      setMessage(
+        err instanceof Error ? err.message : 'カードのプレイに失敗しました',
+      )
     }
   }
 
@@ -195,8 +205,14 @@ export default function GameBoard({
   if (gameState.isGameOver) {
     return (
       <div className="game-over">
-        <h2>{gameState.isDraw ? '引き分け' : `${gameState.winnerId === currentPlayerId ? '勝利' : '敗北'}！`}</h2>
-        <button onClick={() => window.location.reload()}>新しいゲーム</button>
+        <h2>
+          {gameState.isDraw
+            ? '引き分け'
+            : `${gameState.winnerId === currentPlayerId ? '勝利' : '敗北'}！`}
+        </h2>
+        <button type="button" onClick={() => window.location.reload()}>
+          新しいゲーム
+        </button>
       </div>
     )
   }
@@ -207,12 +223,14 @@ export default function GameBoard({
 
       {/* 相手の情報 */}
       <div className="opponent-area">
-        <PlayerInfo
-          player={opponent!}
-          isCurrentPlayer={!isCurrentPlayerTurn}
-          onClick={handleOpponentPlayerClick}
-          isAttackTarget={!!selectedUnitId}
-        />
+        {opponent && (
+          <PlayerInfo
+            player={opponent}
+            isCurrentPlayer={!isCurrentPlayerTurn}
+            onClick={handleOpponentPlayerClick}
+            isAttackTarget={!!selectedUnitId}
+          />
+        )}
         <div className="field">
           {opponent?.field.map((unit) => (
             <UnitCard
@@ -240,7 +258,11 @@ export default function GameBoard({
           <span>ターン {gameState.currentTurn}</span>
         </div>
         {isCurrentPlayerTurn && (
-          <button className="end-turn-button" onClick={handleEndTurn}>
+          <button
+            type="button"
+            className="end-turn-button"
+            onClick={handleEndTurn}
+          >
             ターン終了
           </button>
         )}
@@ -271,56 +293,73 @@ export default function GameBoard({
 
       {/* 手札と自分の情報 */}
       <div className="hand-area">
-        <PlayerInfo 
-          player={currentPlayer!} 
-          isCurrentPlayer={isCurrentPlayerTurn}
-          onClick={() => {}}
-          isAttackTarget={false}
-        />
+        {currentPlayer && (
+          <PlayerInfo
+            player={currentPlayer}
+            isCurrentPlayer={isCurrentPlayerTurn}
+            onClick={() => {}}
+            isAttackTarget={false}
+          />
+        )}
         <div className="hand-cards">
-            {currentPlayer?.hand && currentPlayer.hand.length > 0 ? (
-              currentPlayer.hand.map((card) => (
-                <div
-                  key={card.id}
-                  className={`hand-card-detailed ${selectedCardId === card.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedCardId(selectedCardId === card.id ? null : card.id)}
-                  title={`${card.name} - コスト:${card.cost} ${card.effect}`}
-                >
-                  <div className="card-cost">{card.cost}</div>
-                  <div className="card-name">{card.name}</div>
-                  {/* 魔法カードやユニットカードの効果説明を表示 */}
-                  {card.effect && (
-                    <div className="card-effect">{card.effect}</div>
-                  )}
-                  {card.attack !== undefined && card.attack !== null && (
-                    <div className="card-stats">
-                      <span className="atk">{card.attack}</span>
-                      <span className="def">{card.defense}</span>
-                    </div>
-                  )}
-                  {card.traits && card.traits.length > 0 && (
-                    <div className="card-traits">
-                      {card.traits.map((trait) => (
-                        <span key={trait} className="trait-badge-small">
-                          {traitLabels[trait] || trait}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="card-play-button" onClick={(e) => {
+          {currentPlayer?.hand && currentPlayer.hand.length > 0 ? (
+            currentPlayer.hand.map((card) => (
+              <div
+                key={card.id}
+                className={`hand-card-detailed ${selectedCardId === card.id ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() =>
+                  setSelectedCardId(selectedCardId === card.id ? null : card.id)
+                }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setSelectedCardId(
+                      selectedCardId === card.id ? null : card.id,
+                    )
+                  }
+                }}
+                title={`${card.name} - コスト:${card.cost} ${card.effect}`}
+              >
+                <div className="card-cost">{card.cost}</div>
+                <div className="card-name">{card.name}</div>
+                {/* 魔法カードやユニットカードの効果説明を表示 */}
+                {card.effect && (
+                  <div className="card-effect">{card.effect}</div>
+                )}
+                {card.attack !== undefined && card.attack !== null && (
+                  <div className="card-stats">
+                    <span className="atk">{card.attack}</span>
+                    <span className="def">{card.defense}</span>
+                  </div>
+                )}
+                {card.traits && card.traits.length > 0 && (
+                  <div className="card-traits">
+                    {card.traits.map((trait) => (
+                      <span key={trait} className="trait-badge-small">
+                        {traitLabels[trait] || trait}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  className="card-play-button"
+                  onClick={(e) => {
                     e.stopPropagation()
                     handlePlayCard(card.id)
-                  }}>
-                    使用
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-cards">手札がありません</div>
-            )}
+                  }}
+                >
+                  使用
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="no-cards">手札がありません</div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-

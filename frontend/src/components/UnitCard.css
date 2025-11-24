@@ -35,7 +35,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
   }
   50% {
@@ -156,4 +157,3 @@
   font-size: 0.65rem;
   font-weight: 600;
 }
-

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { Card } from '../gen/common_pb'
 import './MulliganModal.css'
 
@@ -56,51 +56,63 @@ export default function MulliganModal({
     <div className="mulligan-modal-overlay">
       <div className="mulligan-modal">
         <h2>マリガン</h2>
-        <p>引き直したいカードを選択してください（{selectedCardIds.size}枚選択中）</p>
-        
+        <p>
+          引き直したいカードを選択してください（{selectedCardIds.size}枚選択中）
+        </p>
+
         <div className="mulligan-cards">
           {hand.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#fff' }}>
+            <div
+              style={{ textAlign: 'center', padding: '40px', color: '#fff' }}
+            >
               手札がありません。スキップしてください。
             </div>
           ) : (
             hand.map((card) => (
-            <div
-              key={card.id}
-              className={`mulligan-card ${selectedCardIds.has(card.id) ? 'selected' : ''}`}
-              onClick={() => toggleCardSelection(card.id)}
-            >
-              <div className="card-cost">{card.cost}</div>
-              <div className="card-name">{card.name}</div>
-              {card.effect && <div className="card-effect">{card.effect}</div>}
-              {card.attack !== undefined && card.attack !== null && (
-                <div className="card-stats">
-                  <span className="atk">⚔️{card.attack}</span>
-                  <span className="def">🛡️{card.defense}</span>
-                </div>
-              )}
-              {selectedCardIds.has(card.id) && (
-                <div className="selected-badge">✓</div>
-              )}
-            </div>
+              <div
+                key={card.id}
+                className={`mulligan-card ${selectedCardIds.has(card.id) ? 'selected' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => toggleCardSelection(card.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    toggleCardSelection(card.id)
+                  }
+                }}
+              >
+                <div className="card-cost">{card.cost}</div>
+                <div className="card-name">{card.name}</div>
+                {card.effect && (
+                  <div className="card-effect">{card.effect}</div>
+                )}
+                {card.attack !== undefined && card.attack !== null && (
+                  <div className="card-stats">
+                    <span className="atk">⚔️{card.attack}</span>
+                    <span className="def">🛡️{card.defense}</span>
+                  </div>
+                )}
+                {selectedCardIds.has(card.id) && (
+                  <div className="selected-badge">✓</div>
+                )}
+              </div>
             ))
           )}
         </div>
 
         <div className="mulligan-actions">
-          <button
-            className="btn-skip"
-            onClick={onSkip}
-          >
+          <button type="button" className="btn-skip" onClick={onSkip}>
             スキップ
           </button>
           <button
+            type="button"
             className="btn-submit"
             onClick={handleSubmit}
             disabled={selectedCardIds.size === 0}
           >
-            {selectedCardIds.size > 0 
-              ? `${selectedCardIds.size}枚引き直す` 
+            {selectedCardIds.size > 0
+              ? `${selectedCardIds.size}枚引き直す`
               : 'カードを選択してください'}
           </button>
         </div>
@@ -108,4 +120,3 @@ export default function MulliganModal({
     </div>
   )
 }
-

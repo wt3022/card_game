@@ -1,0 +1,35 @@
+.game-page {
+  min-height: 100vh;
+}
+
+.game-header {
+  background: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.game-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-link {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.admin-link:hover {
+  background: #5568d3;
+}

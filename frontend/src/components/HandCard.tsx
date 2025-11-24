@@ -6,11 +6,23 @@ interface HandCardProps {
   onClick: () => void
 }
 
-export default function HandCard({ cardIndex, isSelected, onClick }: HandCardProps) {
+export default function HandCard({
+  cardIndex,
+  isSelected,
+  onClick,
+}: HandCardProps) {
   return (
     <div
       className={`hand-card ${isSelected ? 'selected' : ''}`}
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
     >
       <div className="card-back">
         <div className="card-number">#{cardIndex + 1}</div>
@@ -19,4 +31,3 @@ export default function HandCard({ cardIndex, isSelected, onClick }: HandCardPro
     </div>
   )
 }
-

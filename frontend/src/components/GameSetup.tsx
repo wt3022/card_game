@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { gameClient } from '../lib/api-client'
 import type { GameState } from '../gen/common_pb'
 import { MatchmakingStatus } from '../gen/game_pb'
+import { gameClient } from '../lib/api-client'
 import MulliganModal from './MulliganModal'
 import './GameSetup.css'
 
@@ -15,7 +15,9 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
   const [matchmakingStatus, setMatchmakingStatus] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const [showMulligan, setShowMulligan] = useState(false)
-  const [mulliganGameState, setMulliganGameState] = useState<GameState | null>(null)
+  const [mulliganGameState, setMulliganGameState] = useState<GameState | null>(
+    null,
+  )
   const [mulliganPlayerId, setMulliganPlayerId] = useState('')
   const [isWaitingForOpponent, setIsWaitingForOpponent] = useState(false)
 
@@ -49,7 +51,9 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
 
         switch (response.status) {
           case MatchmakingStatus.WAITING:
-            setMatchmakingStatus(response.message || 'マッチング相手を探しています...')
+            setMatchmakingStatus(
+              response.message || 'マッチング相手を探しています...',
+            )
             break
 
           case MatchmakingStatus.MATCHED:
@@ -95,28 +99,36 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
 
       if (response.success && response.gameState) {
         // 両プレイヤーのマリガンがすでに完了しているかチェック
-        const bothDone = response.gameState.player1MulliganDone && response.gameState.player2MulliganDone
-        
+        const bothDone =
+          response.gameState.player1MulliganDone &&
+          response.gameState.player2MulliganDone
+
         if (bothDone) {
           // 両プレイヤーのマリガンが完了している場合、最新の状態を取得してゲーム開始
-          console.log('両プレイヤーのマリガンが完了しました。ゲームを開始します。')
-          
+          console.log(
+            '両プレイヤーのマリガンが完了しました。ゲームを開始します。',
+          )
+
           // サーバー側でStartTurnが実行されるのを少し待つ
-          await new Promise(resolve => setTimeout(resolve, 300))
-          
+          await new Promise((resolve) => setTimeout(resolve, 300))
+
           // 最新のゲーム状態を取得してゲーム開始
           try {
             const latestStateResponse = await gameClient.getGameState({
               gameId: response.gameState.gameId,
               playerId: mulliganPlayerId,
             })
-            
+
             if (latestStateResponse.gameState) {
-              console.log('最新のゲーム状態を取得しました。ゲームを開始します。')
+              console.log(
+                '最新のゲーム状態を取得しました。ゲームを開始します。',
+              )
               onGameStart(latestStateResponse.gameState, mulliganPlayerId)
             } else {
               // 取得できない場合は現在の状態で開始
-              console.log('最新の状態を取得できませんでした。現在の状態で開始します。')
+              console.log(
+                '最新の状態を取得できませんでした。現在の状態で開始します。',
+              )
               onGameStart(response.gameState, mulliganPlayerId)
             }
           } catch (err) {
@@ -127,7 +139,10 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
         } else {
           // まだ相手が完了していない場合、待機状態にしてイベントを購読
           setIsWaitingForOpponent(true)
-          subscribeToMulliganCompletion(response.gameState.gameId, mulliganPlayerId)
+          subscribeToMulliganCompletion(
+            response.gameState.gameId,
+            mulliganPlayerId,
+          )
         }
       } else {
         setError(response.message || 'マリガンに失敗しました')
@@ -143,7 +158,10 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
     await handleMulliganSubmit([])
   }
 
-  const subscribeToMulliganCompletion = async (gameId: string, playerId: string) => {
+  const subscribeToMulliganCompletion = async (
+    gameId: string,
+    playerId: string,
+  ) => {
     try {
       const stream = gameClient.streamGameEvents({
         gameId,
@@ -154,13 +172,19 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
         console.log('Game event:', response)
 
         // マリガン完了イベントを待つ
-        if (response.event?.eventType === 'mulligan_completed' && response.gameState) {
+        if (
+          response.event?.eventType === 'mulligan_completed' &&
+          response.gameState
+        ) {
           console.log('両プレイヤーのマリガンが完了しました')
           // サーバー側で自動的にStartTurnが実行されるので、次のturn_startedイベントを待つ
         }
 
         // ターン開始イベントでゲームを開始
-        if (response.event?.eventType === 'turn_started' && response.gameState) {
+        if (
+          response.event?.eventType === 'turn_started' &&
+          response.gameState
+        ) {
           console.log('ゲーム開始')
           onGameStart(response.gameState, playerId)
           return // ストリーム終了
@@ -178,30 +202,30 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
     setError(null)
   }
 
-    // マリガン用の手札を取得
-    const getMulliganHand = () => {
-      if (!mulliganGameState) return []
-      
-      // 自分のプレイヤーを特定
-      if (mulliganGameState.player1?.id === mulliganPlayerId) {
-        const myHand = mulliganGameState.player1.hand || []
-        console.log('プレイヤー1として手札取得:', myHand.length, '枚')
-        return myHand
-      } else if (mulliganGameState.player2?.id === mulliganPlayerId) {
-        const myHand = mulliganGameState.player2.hand || []
-        console.log('プレイヤー2として手札取得:', myHand.length, '枚')
-        return myHand
-      } else {
-        console.error('プレイヤーIDが一致しません', {
-          mulliganPlayerId,
-          player1Id: mulliganGameState.player1?.id,
-          player2Id: mulliganGameState.player2?.id,
-        })
-        return []
-      }
-    }
+  // マリガン用の手札を取得
+  const getMulliganHand = () => {
+    if (!mulliganGameState) return []
 
-    return (
+    // 自分のプレイヤーを特定
+    if (mulliganGameState.player1?.id === mulliganPlayerId) {
+      const myHand = mulliganGameState.player1.hand || []
+      console.log('プレイヤー1として手札取得:', myHand.length, '枚')
+      return myHand
+    } else if (mulliganGameState.player2?.id === mulliganPlayerId) {
+      const myHand = mulliganGameState.player2.hand || []
+      console.log('プレイヤー2として手札取得:', myHand.length, '枚')
+      return myHand
+    } else {
+      console.error('プレイヤーIDが一致しません', {
+        mulliganPlayerId,
+        player1Id: mulliganGameState.player1?.id,
+        player2Id: mulliganGameState.player2?.id,
+      })
+      return []
+    }
+  }
+
+  return (
     <div className="game-setup">
       {showMulligan && mulliganGameState ? (
         <MulliganModal
@@ -215,7 +239,9 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
           {!matchmaking ? (
             <>
               <h2>🎮 対戦相手を探す</h2>
-              <p className="description">名前を入力してマッチングを開始しましょう</p>
+              <p className="description">
+                名前を入力してマッチングを開始しましょう
+              </p>
 
               <div className="form-group">
                 <label htmlFor="playerName">あなたの名前</label>
@@ -230,13 +256,13 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
                     }
                   }}
                   placeholder="名前を入力してください"
-                  autoFocus
                 />
               </div>
 
               {error && <div className="error-message">{error}</div>}
 
               <button
+                type="button"
                 className="start-button"
                 onClick={handleJoinMatchmaking}
                 disabled={!playerName.trim()}
@@ -254,7 +280,11 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
 
               {error && <div className="error-message">{error}</div>}
 
-              <button className="cancel-button" onClick={handleCancel}>
+              <button
+                type="button"
+                className="cancel-button"
+                onClick={handleCancel}
+              >
                 キャンセル
               </button>
             </>
