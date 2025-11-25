@@ -155,15 +155,15 @@ const (
 // 注意: TimingがImmediate以外の場合、Conditionは無視される
 // 実装: ProcessTimingEffectsでTimingをチェックし、executeAtomicEffectでConditionをチェック
 type AtomicEffect struct {
-	ID         string                 `json:"id"`                   // 効果ID（DB用）
-	Type       AtomicEffectType       `json:"type"`                 // 効果タイプ
-	Target     TargetSelector         `json:"target"`               // 対象選択
-	Value      int                    `json:"value,omitempty"`      // 効果値
-	Multiplier float64                `json:"multiplier,omitempty"` // 倍率（デフォルト1.0）
-	Duration   *int                   `json:"duration,omitempty"`   // 持続ターン数
-	Timing     EffectTiming           `json:"timing"`               // 発動タイミング
-	Condition  *Condition             `json:"condition,omitempty"`  // 発動条件
-	Parameters map[string]interface{} `json:"parameters,omitempty"` // 追加パラメータ
+	ID         string           `json:"id"`                   // 効果ID（DB用）
+	Type       AtomicEffectType `json:"type"`                 // 効果タイプ
+	Target     TargetSelector   `json:"target"`               // 対象選択
+	Value      int              `json:"value,omitempty"`      // 効果値
+	Multiplier float64          `json:"multiplier,omitempty"` // 倍率（デフォルト1.0）
+	Duration   *int             `json:"duration,omitempty"`   // 持続ターン数
+	Timing     EffectTiming     `json:"timing"`               // 発動タイミング
+	Condition  *Condition       `json:"condition,omitempty"`  // 発動条件
+	Parameters map[string]any   `json:"parameters,omitempty"` // 追加パラメータ
 }
 
 // 演算子ごとのノード型（型安全性のため）
@@ -310,7 +310,6 @@ func (n *EffectChainNode) HasMultipleOperators() bool {
 type EffectDefinition struct {
 	ID            string           `json:"id"`             // 定義ID（DB用）
 	Name          string           `json:"name"`           // 効果名
-	Description   string           `json:"description"`    // 説明文
 	Root          *EffectChainNode `json:"root"`           // ルートノード
 	RequireTarget bool             `json:"require_target"` // 対象選択必須
 }

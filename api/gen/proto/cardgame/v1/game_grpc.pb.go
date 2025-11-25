@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v6.33.0
-// source: api/proto/game.proto
+// source: game.proto
 
 package cardgamev1
 
@@ -21,10 +21,13 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	GameService_CreateGame_FullMethodName       = "/cardgame.v1.GameService/CreateGame"
 	GameService_GetGameState_FullMethodName     = "/cardgame.v1.GameService/GetGameState"
+	GameService_PerformMulligan_FullMethodName  = "/cardgame.v1.GameService/PerformMulligan"
 	GameService_PlayCard_FullMethodName         = "/cardgame.v1.GameService/PlayCard"
 	GameService_ExecuteAttack_FullMethodName    = "/cardgame.v1.GameService/ExecuteAttack"
+	GameService_StartTurn_FullMethodName        = "/cardgame.v1.GameService/StartTurn"
 	GameService_EndTurn_FullMethodName          = "/cardgame.v1.GameService/EndTurn"
 	GameService_StreamGameEvents_FullMethodName = "/cardgame.v1.GameService/StreamGameEvents"
+	GameService_JoinMatchmaking_FullMethodName  = "/cardgame.v1.GameService/JoinMatchmaking"
 )
 
 // GameServiceClient is the client API for GameService service.
@@ -35,10 +38,13 @@ const (
 type GameServiceClient interface {
 	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error)
 	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (*GetGameStateResponse, error)
+	PerformMulligan(ctx context.Context, in *PerformMulliganRequest, opts ...grpc.CallOption) (*PerformMulliganResponse, error)
 	PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayCardResponse, error)
 	ExecuteAttack(ctx context.Context, in *ExecuteAttackRequest, opts ...grpc.CallOption) (*ExecuteAttackResponse, error)
+	StartTurn(ctx context.Context, in *StartTurnRequest, opts ...grpc.CallOption) (*StartTurnResponse, error)
 	EndTurn(ctx context.Context, in *EndTurnRequest, opts ...grpc.CallOption) (*EndTurnResponse, error)
-	StreamGameEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[GameEventRequest, GameEventResponse], error)
+	StreamGameEvents(ctx context.Context, in *GameEventRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GameEventResponse], error)
+	JoinMatchmaking(ctx context.Context, in *JoinMatchmakingRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[MatchmakingResponse], error)
 }
 
 type gameServiceClient struct {
@@ -69,6 +75,16 @@ func (c *gameServiceClient) GetGameState(ctx context.Context, in *GetGameStateRe
 	return out, nil
 }
 
+func (c *gameServiceClient) PerformMulligan(ctx context.Context, in *PerformMulliganRequest, opts ...grpc.CallOption) (*PerformMulliganResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PerformMulliganResponse)
+	err := c.cc.Invoke(ctx, GameService_PerformMulligan_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gameServiceClient) PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayCardResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PlayCardResponse)
@@ -89,6 +105,16 @@ func (c *gameServiceClient) ExecuteAttack(ctx context.Context, in *ExecuteAttack
 	return out, nil
 }
 
+func (c *gameServiceClient) StartTurn(ctx context.Context, in *StartTurnRequest, opts ...grpc.CallOption) (*StartTurnResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartTurnResponse)
+	err := c.cc.Invoke(ctx, GameService_StartTurn_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gameServiceClient) EndTurn(ctx context.Context, in *EndTurnRequest, opts ...grpc.CallOption) (*EndTurnResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(EndTurnResponse)
@@ -99,18 +125,43 @@ func (c *gameServiceClient) EndTurn(ctx context.Context, in *EndTurnRequest, opt
 	return out, nil
 }
 
-func (c *gameServiceClient) StreamGameEvents(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[GameEventRequest, GameEventResponse], error) {
+func (c *gameServiceClient) StreamGameEvents(ctx context.Context, in *GameEventRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GameEventResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &GameService_ServiceDesc.Streams[0], GameService_StreamGameEvents_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	x := &grpc.GenericClientStream[GameEventRequest, GameEventResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
 	return x, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GameService_StreamGameEventsClient = grpc.BidiStreamingClient[GameEventRequest, GameEventResponse]
+type GameService_StreamGameEventsClient = grpc.ServerStreamingClient[GameEventResponse]
+
+func (c *gameServiceClient) JoinMatchmaking(ctx context.Context, in *JoinMatchmakingRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[MatchmakingResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GameService_ServiceDesc.Streams[1], GameService_JoinMatchmaking_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[JoinMatchmakingRequest, MatchmakingResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type GameService_JoinMatchmakingClient = grpc.ServerStreamingClient[MatchmakingResponse]
 
 // GameServiceServer is the server API for GameService service.
 // All implementations must embed UnimplementedGameServiceServer
@@ -120,10 +171,13 @@ type GameService_StreamGameEventsClient = grpc.BidiStreamingClient[GameEventRequ
 type GameServiceServer interface {
 	CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error)
 	GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error)
+	PerformMulligan(context.Context, *PerformMulliganRequest) (*PerformMulliganResponse, error)
 	PlayCard(context.Context, *PlayCardRequest) (*PlayCardResponse, error)
 	ExecuteAttack(context.Context, *ExecuteAttackRequest) (*ExecuteAttackResponse, error)
+	StartTurn(context.Context, *StartTurnRequest) (*StartTurnResponse, error)
 	EndTurn(context.Context, *EndTurnRequest) (*EndTurnResponse, error)
-	StreamGameEvents(grpc.BidiStreamingServer[GameEventRequest, GameEventResponse]) error
+	StreamGameEvents(*GameEventRequest, grpc.ServerStreamingServer[GameEventResponse]) error
+	JoinMatchmaking(*JoinMatchmakingRequest, grpc.ServerStreamingServer[MatchmakingResponse]) error
 	mustEmbedUnimplementedGameServiceServer()
 }
 
@@ -140,17 +194,26 @@ func (UnimplementedGameServiceServer) CreateGame(context.Context, *CreateGameReq
 func (UnimplementedGameServiceServer) GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGameState not implemented")
 }
+func (UnimplementedGameServiceServer) PerformMulligan(context.Context, *PerformMulliganRequest) (*PerformMulliganResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PerformMulligan not implemented")
+}
 func (UnimplementedGameServiceServer) PlayCard(context.Context, *PlayCardRequest) (*PlayCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PlayCard not implemented")
 }
 func (UnimplementedGameServiceServer) ExecuteAttack(context.Context, *ExecuteAttackRequest) (*ExecuteAttackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ExecuteAttack not implemented")
 }
+func (UnimplementedGameServiceServer) StartTurn(context.Context, *StartTurnRequest) (*StartTurnResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartTurn not implemented")
+}
 func (UnimplementedGameServiceServer) EndTurn(context.Context, *EndTurnRequest) (*EndTurnResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EndTurn not implemented")
 }
-func (UnimplementedGameServiceServer) StreamGameEvents(grpc.BidiStreamingServer[GameEventRequest, GameEventResponse]) error {
+func (UnimplementedGameServiceServer) StreamGameEvents(*GameEventRequest, grpc.ServerStreamingServer[GameEventResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method StreamGameEvents not implemented")
+}
+func (UnimplementedGameServiceServer) JoinMatchmaking(*JoinMatchmakingRequest, grpc.ServerStreamingServer[MatchmakingResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method JoinMatchmaking not implemented")
 }
 func (UnimplementedGameServiceServer) mustEmbedUnimplementedGameServiceServer() {}
 func (UnimplementedGameServiceServer) testEmbeddedByValue()                     {}
@@ -209,6 +272,24 @@ func _GameService_GetGameState_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameService_PerformMulligan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PerformMulliganRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).PerformMulligan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_PerformMulligan_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).PerformMulligan(ctx, req.(*PerformMulliganRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GameService_PlayCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PlayCardRequest)
 	if err := dec(in); err != nil {
@@ -245,6 +326,24 @@ func _GameService_ExecuteAttack_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameService_StartTurn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartTurnRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).StartTurn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_StartTurn_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).StartTurn(ctx, req.(*StartTurnRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GameService_EndTurn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EndTurnRequest)
 	if err := dec(in); err != nil {
@@ -264,11 +363,26 @@ func _GameService_EndTurn_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _GameService_StreamGameEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(GameServiceServer).StreamGameEvents(&grpc.GenericServerStream[GameEventRequest, GameEventResponse]{ServerStream: stream})
+	m := new(GameEventRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GameServiceServer).StreamGameEvents(m, &grpc.GenericServerStream[GameEventRequest, GameEventResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GameService_StreamGameEventsServer = grpc.BidiStreamingServer[GameEventRequest, GameEventResponse]
+type GameService_StreamGameEventsServer = grpc.ServerStreamingServer[GameEventResponse]
+
+func _GameService_JoinMatchmaking_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(JoinMatchmakingRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GameServiceServer).JoinMatchmaking(m, &grpc.GenericServerStream[JoinMatchmakingRequest, MatchmakingResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type GameService_JoinMatchmakingServer = grpc.ServerStreamingServer[MatchmakingResponse]
 
 // GameService_ServiceDesc is the grpc.ServiceDesc for GameService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -286,12 +400,20 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GameService_GetGameState_Handler,
 		},
 		{
+			MethodName: "PerformMulligan",
+			Handler:    _GameService_PerformMulligan_Handler,
+		},
+		{
 			MethodName: "PlayCard",
 			Handler:    _GameService_PlayCard_Handler,
 		},
 		{
 			MethodName: "ExecuteAttack",
 			Handler:    _GameService_ExecuteAttack_Handler,
+		},
+		{
+			MethodName: "StartTurn",
+			Handler:    _GameService_StartTurn_Handler,
 		},
 		{
 			MethodName: "EndTurn",
@@ -303,8 +425,12 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "StreamGameEvents",
 			Handler:       _GameService_StreamGameEvents_Handler,
 			ServerStreams: true,
-			ClientStreams: true,
+		},
+		{
+			StreamName:    "JoinMatchmaking",
+			Handler:       _GameService_JoinMatchmaking_Handler,
+			ServerStreams: true,
 		},
 	},
-	Metadata: "api/proto/game.proto",
+	Metadata: "game.proto",
 }

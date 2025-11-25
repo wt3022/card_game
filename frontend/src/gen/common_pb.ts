@@ -211,6 +211,13 @@ export class Card extends Message<Card> {
    */
   traits: Trait[] = []
 
+  /**
+   * カード管理UI向けの効果定義JSON（編集用）
+   *
+   * @generated from field: string card_effect_json = 9;
+   */
+  cardEffectJson = ''
+
   constructor(data?: PartialMessage<Card>) {
     super()
     proto3.util.initPartial(data, this)
@@ -244,6 +251,12 @@ export class Card extends Message<Card> {
       kind: 'enum',
       T: proto3.getEnumType(Trait),
       repeated: true,
+    },
+    {
+      no: 9,
+      name: 'card_effect_json',
+      kind: 'scalar',
+      T: 9 /* ScalarType.STRING */,
     },
   ])
 

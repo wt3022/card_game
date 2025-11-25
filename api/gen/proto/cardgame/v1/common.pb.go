@@ -201,17 +201,18 @@ func (GamePhase) EnumDescriptor() ([]byte, []int) {
 
 // カード
 type Card struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type          CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
-	Cost          int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
-	Attack        *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
-	Defense       *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
-	Effect        string                 `protobuf:"bytes,7,opt,name=effect,proto3" json:"effect,omitempty"`
-	Traits        []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type           CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
+	Cost           int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
+	Attack         *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
+	Defense        *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
+	Effect         string                 `protobuf:"bytes,7,opt,name=effect,proto3" json:"effect,omitempty"`
+	Traits         []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
+	CardEffectJson string                 `protobuf:"bytes,9,opt,name=card_effect_json,json=cardEffectJson,proto3" json:"card_effect_json,omitempty"` // カード管理UI向けの効果定義JSON（編集用）
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Card) Reset() {
@@ -298,6 +299,13 @@ func (x *Card) GetTraits() []Trait {
 		return x.Traits
 	}
 	return nil
+}
+
+func (x *Card) GetCardEffectJson() string {
+	if x != nil {
+		return x.CardEffectJson
+	}
+	return ""
 }
 
 // ユニット
@@ -788,7 +796,7 @@ var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x80\x02\n" +
+	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaa\x02\n" +
 	"\x04Card\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -797,7 +805,8 @@ const file_common_proto_rawDesc = "" +
 	"\x06attack\x18\x05 \x01(\x05H\x00R\x06attack\x88\x01\x01\x12\x1d\n" +
 	"\adefense\x18\x06 \x01(\x05H\x01R\adefense\x88\x01\x01\x12\x16\n" +
 	"\x06effect\x18\a \x01(\tR\x06effect\x12*\n" +
-	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traitsB\t\n" +
+	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12(\n" +
+	"\x10card_effect_json\x18\t \x01(\tR\x0ecardEffectJsonB\t\n" +
 	"\a_attackB\n" +
 	"\n" +
 	"\b_defense\"\xfd\x02\n" +

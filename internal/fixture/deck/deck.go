@@ -379,17 +379,15 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	))
 
 	// 4. 回復スペル - 自分のHPを5回復 (2コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-heal", prefix),
-		Name: "Healing Light",
-		Cost: 2,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-heal", prefix),
+		"Healing Light",
+		2,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-heal", prefix),
 					Name:          "Healing Light",
-					Description:   "自分のHPを5回復",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -404,23 +402,19 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "自分のHPを5回復",
 		},
-		Effect: "自分のHPを5回復",
-	})
+	))
 
 	// 5. ドローカード - カードを2枚引く (3コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-draw", prefix),
-		Name: "Arcane Wisdom",
-		Cost: 3,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-draw", prefix),
+		"Arcane Wisdom",
+		3,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-draw", prefix),
 					Name:          "Arcane Wisdom",
-					Description:   "カードを2枚引く",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -435,23 +429,19 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "カードを2枚引く",
 		},
-		Effect: "カードを2枚引く",
-	})
+	))
 
 	// 6. バフスペル - 味方1体の攻撃力+3 (2コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-strengthen", prefix),
-		Name: "Power Boost",
-		Cost: 2,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-strengthen", prefix),
+		"Power Boost",
+		2,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-strengthen", prefix),
 					Name:          "Power Boost",
-					Description:   "味方1体の攻撃力+3",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -466,23 +456,19 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "味方1体の攻撃力+3",
 		},
-		Effect: "味方1体の攻撃力+3",
-	})
+	))
 
 	// 7. 防御バフスペル - 味方1体の防御力+3 (2コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-fortify", prefix),
-		Name: "Iron Skin",
-		Cost: 2,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-fortify", prefix),
+		"Iron Skin",
+		2,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-fortify", prefix),
 					Name:          "Iron Skin",
-					Description:   "味方1体の防御力+3",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -497,23 +483,19 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "味方1体の防御力+3",
 		},
-		Effect: "味方1体の防御力+3",
-	})
+	))
 
 	// 8. 全体バフスペル - 味方全体の攻撃力+2 (4コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-rally", prefix),
-		Name: "Rally",
-		Cost: 4,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-rally", prefix),
+		"Rally",
+		4,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-rally", prefix),
 					Name:          "Rally",
-					Description:   "味方全体の攻撃力+2",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -528,9 +510,8 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "味方全体の攻撃力+2",
 		},
-	})
+	))
 
 	// 9. 破壊スペル - 敵1体を破壊 (5コスト)
 	deck = append(deck, createSpellCard(
@@ -542,7 +523,6 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 				{
 					ID:            fmt.Sprintf("%s-effect-destroy", prefix),
 					Name:          "Annihilate",
-					Description:   "敵1体を破壊",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -561,17 +541,15 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	))
 
 	// 10. 手札に戻すスペル - ユニット1体を手札に戻す (3コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-bounce", prefix),
-		Name: "Recall",
-		Cost: 3,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-bounce", prefix),
+		"Recall",
+		3,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-bounce", prefix),
 					Name:          "Recall",
-					Description:   "ユニット1体を手札に戻す",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -585,10 +563,8 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "ユニット1体を手札に戻す",
 		},
-		Effect: "ユニット1体を手札に戻す",
-	})
+	))
 
 	// 11. 複合効果スペル - 3ダメージ + カード1枚引く (4コスト)
 	deck = append(deck, createSpellCard(
@@ -674,17 +650,15 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	))
 
 	// 13. 特性付与スペル - 味方1体にRushを付与 (3コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-haste", prefix),
-		Name: "Haste",
-		Cost: 3,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-haste", prefix),
+		"Haste",
+		3,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-haste", prefix),
 					Name:          "Haste",
-					Description:   "味方1体に疾走を付与",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -701,23 +675,19 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "味方1体に疾走を付与",
 		},
-		Effect: "味方1体に疾走を付与",
-	})
+	))
 
 	// 14. マナ回復スペル - マナを2回復 (1コスト)
-	deck = append(deck, entity.Card{
-		ID:   fmt.Sprintf("%s-spell-mana-potion", prefix),
-		Name: "Mana Potion",
-		Cost: 1,
-		Type: entity.CardTypeSpell,
-		CardEffect: &entity.CardEffect{
+	deck = append(deck, createSpellCard(
+		fmt.Sprintf("%s-spell-mana-potion", prefix),
+		"Mana Potion",
+		1,
+		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
 					ID:            fmt.Sprintf("%s-effect-mana-potion", prefix),
 					Name:          "Mana Potion",
-					Description:   "マナを2回復",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -732,10 +702,8 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 					},
 				},
 			},
-			Description: "マナを2回復",
 		},
-		Effect: "マナを2回復",
-	})
+	))
 
 	// 15. ForEach効果 - 味方ユニット1体につきランダムな敵に1ダメージ (5コスト)
 	deck = append(deck, createSpellCard(
@@ -822,9 +790,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 }
 
 func createSpellCard(id, name string, cost int, effect *entity.CardEffect) entity.Card {
-	for _, def := range effect.Definitions {
-		def.Description = def.GenerateDescription()
-	}
+	// カード効果の説明文を自動生成
 	effect.Description = effect.GenerateDescription()
 
 	return entity.Card{

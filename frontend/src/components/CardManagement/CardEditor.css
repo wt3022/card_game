@@ -103,3 +103,144 @@
   margin-bottom: 1rem;
   border: 1px solid #fcc;
 }
+
+.traits-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f9f9f9;
+}
+
+.trait-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.trait-checkbox:hover {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.trait-checkbox input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
+.trait-checkbox span {
+  user-select: none;
+  font-size: 0.9rem;
+}
+
+.card-effect-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.card-effect-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+/* EffectNodeEditor styles */
+.effect-node-editor {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  border-left: 4px solid #667eea;
+}
+
+.effect-node-header {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.effect-node-header select {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.effect-node-header button {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.effect-node-header button:hover {
+  background: #c82333;
+}
+
+.effect-node-content {
+  margin-top: 1rem;
+}
+
+.effect-node-next,
+.effect-node-children,
+.effect-node-then,
+.effect-node-else,
+.effect-node-repeat-effect,
+.effect-node-foreach-effect,
+.effect-node-foreach-target {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.effect-node-condition {
+  margin-bottom: 1rem;
+}
+
+.condition-editor {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.condition-editor select,
+.condition-editor input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.atomic-effect-editor {
+  padding: 1rem;
+  background: #f0f4ff;
+  border-radius: 4px;
+  border: 1px solid #c8d4f0;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+}

@@ -36,6 +36,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  padding-right: 3.5rem; /* 削除ボタンのスペースを確保 */
 }
 
 .card-item-name {

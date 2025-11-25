@@ -6,10 +6,15 @@ help: ## ヘルプを表示
 .PHONY: proto
 proto: ## Protoファイルからコードを生成
 	@echo "🔨 Generating proto files..."
-	protoc --go_out=. --go_opt=paths=source_relative \
-		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
-		--connect-go_out=. --connect-go_opt=paths=source_relative \
-		api/proto/*.proto
+	protoc --proto_path=api/proto \
+		--go_out=api/gen/proto/cardgame/v1 --go_opt=paths=source_relative \
+		--go-grpc_out=api/gen/proto/cardgame/v1 --go-grpc_opt=paths=source_relative \
+		--connect-go_out=api/gen/proto/cardgame/v1 --connect-go_opt=paths=source_relative \
+		api/proto/auth.proto \
+		api/proto/common.proto \
+		api/proto/card_management.proto \
+		api/proto/game.proto
+
 
 # 依存関係
 .PHONY: deps
@@ -32,18 +37,8 @@ build-connect: ## Connect-Goサーバーをビルド
 	@echo "🔨 Building Connect-Go server..."
 	go build -o bin/connect-server cmd/connect-server/main.go
 
-.PHONY: build-admin
-build-admin: ## Admin serverをビルド
-	@echo "🔨 Building Admin server..."
-	go build -o bin/admin-server cmd/admin-server/main.go
-
-.PHONY: build-migrate
-build-migrate: ## Migration toolをビルド
-	@echo "🔨 Building Migration tool..."
-	go build -o bin/migrate cmd/migrate/main.go
-
 .PHONY: build
-build: build-connect build-admin build-migrate ## すべてのサーバーをビルド
+build: build-connect ## すべてのサーバーをビルド
 
 # 実行
 .PHONY: run-connect
@@ -51,16 +46,6 @@ run-connect: ## Connect-Goサーバーを起動
 	@echo "🚀 Running Connect-Go server..."
 	go run cmd/connect-server/main.go
 
-.PHONY: run-admin
-run-admin: ## Admin serverを起動
-	@echo "🚀 Running Admin server..."
-	go run cmd/admin-server/main.go
-
-# データベース
-.PHONY: migrate
-migrate: ## DBマイグレーションを実行
-	@echo "🗄️  Running database migration..."
-	go run cmd/migrate/main.go
 
 # テスト
 .PHONY: test

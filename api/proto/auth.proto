@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package cardgame.v1;
+
+option go_package = "card_game/api/gen/proto/cardgame/v1;cardgamev1";
+
+// 認証サービス
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+// ログインリクエスト
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// ログインレスポンス
+message LoginResponse {
+  string access_token = 1;
+  string user_id = 2;
+  string username = 3;
+  string role = 4;
+}
+
+// トークンリフレッシュリクエスト
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+// トークンリフレッシュレスポンス
+message RefreshTokenResponse {
+  string access_token = 1;
+}
+

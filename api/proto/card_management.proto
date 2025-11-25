@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package cardgame.v1;
+
+option go_package = "card_game/api/gen/proto/cardgame/v1;cardgamev1";
+
+import "common.proto";
+
+// カード管理サービス
+service CardManagementService {
+  rpc CreateCard(CreateCardRequest) returns (CreateCardResponse);
+  rpc GetCard(GetCardRequest) returns (GetCardResponse);
+  rpc ListCards(ListCardsRequest) returns (ListCardsResponse);
+  rpc UpdateCard(UpdateCardRequest) returns (UpdateCardResponse);
+  rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse);
+}
+
+// カード作成リクエスト
+message CreateCardRequest {
+  string id = 1;
+  string name = 2;
+  CardType type = 3;
+  int32 cost = 4;
+  optional int32 attack = 5;
+  optional int32 defense = 6;
+  string effect_text = 7;
+  repeated Trait traits = 8;
+  string card_effect_json = 9; // CardEffectModelをJSON文字列として送信（model構造に合わせる）
+}
+
+// カード作成レスポンス
+message CreateCardResponse {
+  Card card = 1;
+}
+
+// カード取得リクエスト
+message GetCardRequest {
+  string id = 1;
+}
+
+// カード取得レスポンス
+message GetCardResponse {
+  Card card = 1;
+}
+
+// カード一覧リクエスト
+message ListCardsRequest {
+  optional CardType type = 1; // 指定された場合、そのタイプのみ取得
+}
+
+// カード一覧レスポンス
+message ListCardsResponse {
+  repeated Card cards = 1;
+}
+
+// カード更新リクエスト
+message UpdateCardRequest {
+  string id = 1;
+  string name = 2;
+  CardType type = 3;
+  int32 cost = 4;
+  optional int32 attack = 5;
+  optional int32 defense = 6;
+  string effect_text = 7;
+  repeated Trait traits = 8;
+  string card_effect_json = 9; // CardEffectModelをJSON文字列として送信（model構造に合わせる）
+}
+
+// カード更新レスポンス
+message UpdateCardResponse {
+  Card card = 1;
+}
+
+// カード削除リクエスト
+message DeleteCardRequest {
+  string id = 1;
+}
+
+// カード削除レスポンス
+message DeleteCardResponse {
+  bool success = 1;
+  string message = 2;
+}
+

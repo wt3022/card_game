@@ -61,7 +61,7 @@ export class CreateCardRequest extends Message<CreateCardRequest> {
   traits: Trait[] = []
 
   /**
-   * CardEffectをJSON文字列として送信
+   * CardEffectModelをJSON文字列として送信（model構造に合わせる）
    *
    * @generated from field: string card_effect_json = 9;
    */
@@ -453,7 +453,7 @@ export class UpdateCardRequest extends Message<UpdateCardRequest> {
   traits: Trait[] = []
 
   /**
-   * CardEffectをJSON文字列として送信
+   * CardEffectModelをJSON文字列として送信（model構造に合わせる）
    *
    * @generated from field: string card_effect_json = 9;
    */

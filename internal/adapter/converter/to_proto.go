@@ -1,6 +1,8 @@
 package converter
 
 import (
+	"encoding/json"
+
 	cardgamev1 "card_game/api/gen/proto/cardgame/v1"
 	"card_game/internal/core/entity"
 	"card_game/internal/core/usecase/game"
@@ -114,15 +116,23 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 		effectText = card.CardEffect.Description
 	}
 
+	var cardEffectJSON string
+	if card.CardEffect != nil {
+		if data, err := json.Marshal(card.CardEffect); err == nil {
+			cardEffectJSON = string(data)
+		}
+	}
+
 	return &cardgamev1.Card{
-		Id:      card.ID,
-		Name:    card.Name,
-		Type:    CardTypeToProto(card.Type),
-		Cost:    int32(card.Cost),
-		Attack:  intPtrToOptionalInt32(card.Attack),
-		Defense: intPtrToOptionalInt32(card.Defense),
-		Effect:  effectText,
-		Traits:  TraitsToProto(card.Traits),
+		Id:             card.ID,
+		Name:           card.Name,
+		Type:           CardTypeToProto(card.Type),
+		Cost:           int32(card.Cost),
+		Attack:         intPtrToOptionalInt32(card.Attack),
+		Defense:        intPtrToOptionalInt32(card.Defense),
+		Effect:         effectText,
+		Traits:         TraitsToProto(card.Traits),
+		CardEffectJson: cardEffectJSON,
 	}
 }
 

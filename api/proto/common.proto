@@ -48,6 +48,7 @@ message Card {
   optional int32 defense = 6;
   string effect = 7;
   repeated Trait traits = 8;
+  string card_effect_json = 9; // カード管理UI向けの効果定義JSON（編集用）
 }
 
 // ユニット

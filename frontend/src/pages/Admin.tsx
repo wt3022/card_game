@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import CardEditor from '../components/CardManagement/CardEditor'
 import CardList from '../components/CardManagement/CardList'
@@ -15,7 +15,10 @@ export default function Admin() {
   const [error, setError] = useState<string | null>(null)
   const userInfo = getUserInfo()
 
-  const cardClient = createAuthenticatedClient(CardManagementService)
+  const cardClient = useMemo(
+    () => createAuthenticatedClient(CardManagementService),
+    [],
+  )
 
   const loadCards = useCallback(async () => {
     try {
