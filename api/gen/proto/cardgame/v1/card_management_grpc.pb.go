@@ -24,6 +24,11 @@ const (
 	CardManagementService_ListCards_FullMethodName  = "/cardgame.v1.CardManagementService/ListCards"
 	CardManagementService_UpdateCard_FullMethodName = "/cardgame.v1.CardManagementService/UpdateCard"
 	CardManagementService_DeleteCard_FullMethodName = "/cardgame.v1.CardManagementService/DeleteCard"
+	CardManagementService_CreateDeck_FullMethodName = "/cardgame.v1.CardManagementService/CreateDeck"
+	CardManagementService_GetDeck_FullMethodName    = "/cardgame.v1.CardManagementService/GetDeck"
+	CardManagementService_ListDecks_FullMethodName  = "/cardgame.v1.CardManagementService/ListDecks"
+	CardManagementService_UpdateDeck_FullMethodName = "/cardgame.v1.CardManagementService/UpdateDeck"
+	CardManagementService_DeleteDeck_FullMethodName = "/cardgame.v1.CardManagementService/DeleteDeck"
 )
 
 // CardManagementServiceClient is the client API for CardManagementService service.
@@ -37,6 +42,11 @@ type CardManagementServiceClient interface {
 	ListCards(ctx context.Context, in *ListCardsRequest, opts ...grpc.CallOption) (*ListCardsResponse, error)
 	UpdateCard(ctx context.Context, in *UpdateCardRequest, opts ...grpc.CallOption) (*UpdateCardResponse, error)
 	DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error)
+	CreateDeck(ctx context.Context, in *CreateDeckRequest, opts ...grpc.CallOption) (*CreateDeckResponse, error)
+	GetDeck(ctx context.Context, in *GetDeckRequest, opts ...grpc.CallOption) (*GetDeckResponse, error)
+	ListDecks(ctx context.Context, in *ListDecksRequest, opts ...grpc.CallOption) (*ListDecksResponse, error)
+	UpdateDeck(ctx context.Context, in *UpdateDeckRequest, opts ...grpc.CallOption) (*UpdateDeckResponse, error)
+	DeleteDeck(ctx context.Context, in *DeleteDeckRequest, opts ...grpc.CallOption) (*DeleteDeckResponse, error)
 }
 
 type cardManagementServiceClient struct {
@@ -97,6 +107,56 @@ func (c *cardManagementServiceClient) DeleteCard(ctx context.Context, in *Delete
 	return out, nil
 }
 
+func (c *cardManagementServiceClient) CreateDeck(ctx context.Context, in *CreateDeckRequest, opts ...grpc.CallOption) (*CreateDeckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDeckResponse)
+	err := c.cc.Invoke(ctx, CardManagementService_CreateDeck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardManagementServiceClient) GetDeck(ctx context.Context, in *GetDeckRequest, opts ...grpc.CallOption) (*GetDeckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDeckResponse)
+	err := c.cc.Invoke(ctx, CardManagementService_GetDeck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardManagementServiceClient) ListDecks(ctx context.Context, in *ListDecksRequest, opts ...grpc.CallOption) (*ListDecksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListDecksResponse)
+	err := c.cc.Invoke(ctx, CardManagementService_ListDecks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardManagementServiceClient) UpdateDeck(ctx context.Context, in *UpdateDeckRequest, opts ...grpc.CallOption) (*UpdateDeckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateDeckResponse)
+	err := c.cc.Invoke(ctx, CardManagementService_UpdateDeck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cardManagementServiceClient) DeleteDeck(ctx context.Context, in *DeleteDeckRequest, opts ...grpc.CallOption) (*DeleteDeckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteDeckResponse)
+	err := c.cc.Invoke(ctx, CardManagementService_DeleteDeck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CardManagementServiceServer is the server API for CardManagementService service.
 // All implementations must embed UnimplementedCardManagementServiceServer
 // for forward compatibility.
@@ -108,6 +168,11 @@ type CardManagementServiceServer interface {
 	ListCards(context.Context, *ListCardsRequest) (*ListCardsResponse, error)
 	UpdateCard(context.Context, *UpdateCardRequest) (*UpdateCardResponse, error)
 	DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error)
+	CreateDeck(context.Context, *CreateDeckRequest) (*CreateDeckResponse, error)
+	GetDeck(context.Context, *GetDeckRequest) (*GetDeckResponse, error)
+	ListDecks(context.Context, *ListDecksRequest) (*ListDecksResponse, error)
+	UpdateDeck(context.Context, *UpdateDeckRequest) (*UpdateDeckResponse, error)
+	DeleteDeck(context.Context, *DeleteDeckRequest) (*DeleteDeckResponse, error)
 	mustEmbedUnimplementedCardManagementServiceServer()
 }
 
@@ -132,6 +197,21 @@ func (UnimplementedCardManagementServiceServer) UpdateCard(context.Context, *Upd
 }
 func (UnimplementedCardManagementServiceServer) DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
+}
+func (UnimplementedCardManagementServiceServer) CreateDeck(context.Context, *CreateDeckRequest) (*CreateDeckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDeck not implemented")
+}
+func (UnimplementedCardManagementServiceServer) GetDeck(context.Context, *GetDeckRequest) (*GetDeckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeck not implemented")
+}
+func (UnimplementedCardManagementServiceServer) ListDecks(context.Context, *ListDecksRequest) (*ListDecksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDecks not implemented")
+}
+func (UnimplementedCardManagementServiceServer) UpdateDeck(context.Context, *UpdateDeckRequest) (*UpdateDeckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDeck not implemented")
+}
+func (UnimplementedCardManagementServiceServer) DeleteDeck(context.Context, *DeleteDeckRequest) (*DeleteDeckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteDeck not implemented")
 }
 func (UnimplementedCardManagementServiceServer) mustEmbedUnimplementedCardManagementServiceServer() {}
 func (UnimplementedCardManagementServiceServer) testEmbeddedByValue()                               {}
@@ -244,6 +324,96 @@ func _CardManagementService_DeleteCard_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CardManagementService_CreateDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDeckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardManagementServiceServer).CreateDeck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardManagementService_CreateDeck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardManagementServiceServer).CreateDeck(ctx, req.(*CreateDeckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardManagementService_GetDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardManagementServiceServer).GetDeck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardManagementService_GetDeck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardManagementServiceServer).GetDeck(ctx, req.(*GetDeckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardManagementService_ListDecks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDecksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardManagementServiceServer).ListDecks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardManagementService_ListDecks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardManagementServiceServer).ListDecks(ctx, req.(*ListDecksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardManagementService_UpdateDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateDeckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardManagementServiceServer).UpdateDeck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardManagementService_UpdateDeck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardManagementServiceServer).UpdateDeck(ctx, req.(*UpdateDeckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CardManagementService_DeleteDeck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDeckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CardManagementServiceServer).DeleteDeck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CardManagementService_DeleteDeck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CardManagementServiceServer).DeleteDeck(ctx, req.(*DeleteDeckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CardManagementService_ServiceDesc is the grpc.ServiceDesc for CardManagementService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -270,6 +440,26 @@ var CardManagementService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCard",
 			Handler:    _CardManagementService_DeleteCard_Handler,
+		},
+		{
+			MethodName: "CreateDeck",
+			Handler:    _CardManagementService_CreateDeck_Handler,
+		},
+		{
+			MethodName: "GetDeck",
+			Handler:    _CardManagementService_GetDeck_Handler,
+		},
+		{
+			MethodName: "ListDecks",
+			Handler:    _CardManagementService_ListDecks_Handler,
+		},
+		{
+			MethodName: "UpdateDeck",
+			Handler:    _CardManagementService_UpdateDeck_Handler,
+		},
+		{
+			MethodName: "DeleteDeck",
+			Handler:    _CardManagementService_DeleteDeck_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

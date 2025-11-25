@@ -1,8 +1,6 @@
 package converter
 
 import (
-	"encoding/json"
-
 	cardgamev1 "card_game/api/gen/proto/cardgame/v1"
 	"card_game/internal/core/entity"
 	"card_game/internal/core/usecase/game"
@@ -116,23 +114,24 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 		effectText = card.CardEffect.Description
 	}
 
-	var cardEffectJSON string
-	if card.CardEffect != nil {
-		if data, err := json.Marshal(card.CardEffect); err == nil {
-			cardEffectJSON = string(data)
-		}
-	}
+	// CardEffectの変換
+	// TODO: entity.CardEffectとproto CardEffectの構造が異なるため、段階的に実装
+	// entity側はゲームエンジン用の複雑な構造、proto側は管理UI用の別設計として実装予定
+	var cardEffect *cardgamev1.CardEffect
+	// if card.CardEffect != nil {
+	//     cardEffect = CardEffectToProto(card.CardEffect)
+	// }
 
 	return &cardgamev1.Card{
-		Id:             card.ID,
-		Name:           card.Name,
-		Type:           CardTypeToProto(card.Type),
-		Cost:           int32(card.Cost),
-		Attack:         intPtrToOptionalInt32(card.Attack),
-		Defense:        intPtrToOptionalInt32(card.Defense),
-		Effect:         effectText,
-		Traits:         TraitsToProto(card.Traits),
-		CardEffectJson: cardEffectJSON,
+		Id:         card.ID,
+		Name:       card.Name,
+		Type:       CardTypeToProto(card.Type),
+		Cost:       int32(card.Cost),
+		Attack:     intPtrToOptionalInt32(card.Attack),
+		Defense:    intPtrToOptionalInt32(card.Defense),
+		Effect:     effectText,
+		Traits:     TraitsToProto(card.Traits),
+		CardEffect: cardEffect, // TODO: 実装予定
 	}
 }
 
@@ -263,4 +262,21 @@ func stringPtrToOptional(v *string) *string {
 		return nil
 	}
 	return v
+}
+
+// DeckToProto デッキをProtoに変換
+func DeckToProto(deck *entity.Deck) *cardgamev1.Deck {
+	if deck == nil {
+		return nil
+	}
+
+	return &cardgamev1.Deck{
+		Id:          deck.ID,
+		Name:        deck.Name,
+		Description: deck.Description,
+		CardIds:     deck.CardIDs,
+		UserId:      deck.UserID,
+		CreatedAt:   timestamppb.New(deck.CreatedAt),
+		UpdatedAt:   timestamppb.New(deck.UpdatedAt),
+	}
 }

@@ -59,9 +59,6 @@ type MatchResult struct {
 
 // NewGameService は新しいGameServiceを作成
 func NewGameService(logger port.Logger) *GameService {
-	if logger == nil {
-		logger = port.NewConsoleLogger()
-	}
 	return &GameService{
 		games:            make(map[string]*GameSession),
 		eventBroadcaster: event.NewBroadcaster(),

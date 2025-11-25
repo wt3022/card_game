@@ -55,6 +55,7 @@ type ErrorCategory string
 const (
 	ErrorCategoryNotFound     ErrorCategory = "NOT_FOUND"     // 404相当
 	ErrorCategoryInvalidInput ErrorCategory = "INVALID_INPUT" // 400相当
+	ErrorCategoryValidation   ErrorCategory = "VALIDATION"    // 400相当（バリデーションエラー）
 	ErrorCategoryPrecondition ErrorCategory = "PRECONDITION"  // 412相当（ターン外、マナ不足、ゲーム終了後など）
 	ErrorCategoryConflict     ErrorCategory = "CONFLICT"      // 409相当（既に存在など）
 	ErrorCategoryInternal     ErrorCategory = "INTERNAL"      // 500相当（内部エラー）
@@ -358,4 +359,33 @@ func GetErrorCategory(err error) ErrorCategory {
 		return domainErr.Category()
 	}
 	return ErrorCategoryInternal
+}
+
+// ErrInvalidDeck 無効なデッキエラー
+type ErrInvalidDeck struct {
+	Field  string
+	Reason string
+}
+
+func (e *ErrInvalidDeck) Error() string {
+	return fmt.Sprintf("invalid deck %s: %s", e.Field, e.Reason)
+}
+
+func (e *ErrInvalidDeck) Code() ErrorCode {
+	return ErrorCodeInvalidResource
+}
+
+func (e *ErrInvalidDeck) Category() ErrorCategory {
+	return ErrorCategoryValidation
+}
+
+func (e *ErrInvalidDeck) IsRetryable() bool {
+	return false
+}
+
+func NewErrInvalidDeck(field, reason string) DomainError {
+	return &ErrInvalidDeck{
+		Field:  field,
+		Reason: reason,
+	}
 }

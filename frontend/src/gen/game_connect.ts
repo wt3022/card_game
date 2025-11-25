@@ -3,27 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { MethodKind } from '@bufbuild/protobuf'
-import {
-  CreateGameRequest,
-  CreateGameResponse,
-  EndTurnRequest,
-  EndTurnResponse,
-  ExecuteAttackRequest,
-  ExecuteAttackResponse,
-  GameEventRequest,
-  GameEventResponse,
-  GetGameStateRequest,
-  GetGameStateResponse,
-  JoinMatchmakingRequest,
-  MatchmakingResponse,
-  PerformMulliganRequest,
-  PerformMulliganResponse,
-  PlayCardRequest,
-  PlayCardResponse,
-  StartTurnRequest,
-  StartTurnResponse,
-} from './game_pb.js'
+import { CreateGameRequest, CreateGameResponse, EndTurnRequest, EndTurnResponse, ExecuteAttackRequest, ExecuteAttackResponse, GameEventRequest, GameEventResponse, GetGameStateRequest, GetGameStateResponse, JoinMatchmakingRequest, MatchmakingResponse, PerformMulliganRequest, PerformMulliganResponse, PlayCardRequest, PlayCardResponse, StartTurnRequest, StartTurnResponse } from "./game_pb.js";
+import { MethodKind } from "@bufbuild/protobuf";
 
 /**
  * ゲームサービス
@@ -31,13 +12,13 @@ import {
  * @generated from service cardgame.v1.GameService
  */
 export const GameService = {
-  typeName: 'cardgame.v1.GameService',
+  typeName: "cardgame.v1.GameService",
   methods: {
     /**
      * @generated from rpc cardgame.v1.GameService.CreateGame
      */
     createGame: {
-      name: 'CreateGame',
+      name: "CreateGame",
       I: CreateGameRequest,
       O: CreateGameResponse,
       kind: MethodKind.Unary,
@@ -46,7 +27,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.GetGameState
      */
     getGameState: {
-      name: 'GetGameState',
+      name: "GetGameState",
       I: GetGameStateRequest,
       O: GetGameStateResponse,
       kind: MethodKind.Unary,
@@ -55,7 +36,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.PerformMulligan
      */
     performMulligan: {
-      name: 'PerformMulligan',
+      name: "PerformMulligan",
       I: PerformMulliganRequest,
       O: PerformMulliganResponse,
       kind: MethodKind.Unary,
@@ -64,7 +45,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.PlayCard
      */
     playCard: {
-      name: 'PlayCard',
+      name: "PlayCard",
       I: PlayCardRequest,
       O: PlayCardResponse,
       kind: MethodKind.Unary,
@@ -73,7 +54,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.ExecuteAttack
      */
     executeAttack: {
-      name: 'ExecuteAttack',
+      name: "ExecuteAttack",
       I: ExecuteAttackRequest,
       O: ExecuteAttackResponse,
       kind: MethodKind.Unary,
@@ -82,7 +63,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.StartTurn
      */
     startTurn: {
-      name: 'StartTurn',
+      name: "StartTurn",
       I: StartTurnRequest,
       O: StartTurnResponse,
       kind: MethodKind.Unary,
@@ -91,7 +72,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.EndTurn
      */
     endTurn: {
-      name: 'EndTurn',
+      name: "EndTurn",
       I: EndTurnRequest,
       O: EndTurnResponse,
       kind: MethodKind.Unary,
@@ -100,7 +81,7 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.StreamGameEvents
      */
     streamGameEvents: {
-      name: 'StreamGameEvents',
+      name: "StreamGameEvents",
       I: GameEventRequest,
       O: GameEventResponse,
       kind: MethodKind.ServerStreaming,
@@ -109,10 +90,11 @@ export const GameService = {
      * @generated from rpc cardgame.v1.GameService.JoinMatchmaking
      */
     joinMatchmaking: {
-      name: 'JoinMatchmaking',
+      name: "JoinMatchmaking",
       I: JoinMatchmakingRequest,
       O: MatchmakingResponse,
       kind: MethodKind.ServerStreaming,
     },
-  },
-} as const
+  }
+} as const;
+

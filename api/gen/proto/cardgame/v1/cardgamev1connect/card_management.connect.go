@@ -48,6 +48,21 @@ const (
 	// CardManagementServiceDeleteCardProcedure is the fully-qualified name of the
 	// CardManagementService's DeleteCard RPC.
 	CardManagementServiceDeleteCardProcedure = "/cardgame.v1.CardManagementService/DeleteCard"
+	// CardManagementServiceCreateDeckProcedure is the fully-qualified name of the
+	// CardManagementService's CreateDeck RPC.
+	CardManagementServiceCreateDeckProcedure = "/cardgame.v1.CardManagementService/CreateDeck"
+	// CardManagementServiceGetDeckProcedure is the fully-qualified name of the CardManagementService's
+	// GetDeck RPC.
+	CardManagementServiceGetDeckProcedure = "/cardgame.v1.CardManagementService/GetDeck"
+	// CardManagementServiceListDecksProcedure is the fully-qualified name of the
+	// CardManagementService's ListDecks RPC.
+	CardManagementServiceListDecksProcedure = "/cardgame.v1.CardManagementService/ListDecks"
+	// CardManagementServiceUpdateDeckProcedure is the fully-qualified name of the
+	// CardManagementService's UpdateDeck RPC.
+	CardManagementServiceUpdateDeckProcedure = "/cardgame.v1.CardManagementService/UpdateDeck"
+	// CardManagementServiceDeleteDeckProcedure is the fully-qualified name of the
+	// CardManagementService's DeleteDeck RPC.
+	CardManagementServiceDeleteDeckProcedure = "/cardgame.v1.CardManagementService/DeleteDeck"
 )
 
 // CardManagementServiceClient is a client for the cardgame.v1.CardManagementService service.
@@ -57,6 +72,11 @@ type CardManagementServiceClient interface {
 	ListCards(context.Context, *connect.Request[v1.ListCardsRequest]) (*connect.Response[v1.ListCardsResponse], error)
 	UpdateCard(context.Context, *connect.Request[v1.UpdateCardRequest]) (*connect.Response[v1.UpdateCardResponse], error)
 	DeleteCard(context.Context, *connect.Request[v1.DeleteCardRequest]) (*connect.Response[v1.DeleteCardResponse], error)
+	CreateDeck(context.Context, *connect.Request[v1.CreateDeckRequest]) (*connect.Response[v1.CreateDeckResponse], error)
+	GetDeck(context.Context, *connect.Request[v1.GetDeckRequest]) (*connect.Response[v1.GetDeckResponse], error)
+	ListDecks(context.Context, *connect.Request[v1.ListDecksRequest]) (*connect.Response[v1.ListDecksResponse], error)
+	UpdateDeck(context.Context, *connect.Request[v1.UpdateDeckRequest]) (*connect.Response[v1.UpdateDeckResponse], error)
+	DeleteDeck(context.Context, *connect.Request[v1.DeleteDeckRequest]) (*connect.Response[v1.DeleteDeckResponse], error)
 }
 
 // NewCardManagementServiceClient constructs a client for the cardgame.v1.CardManagementService
@@ -100,6 +120,36 @@ func NewCardManagementServiceClient(httpClient connect.HTTPClient, baseURL strin
 			connect.WithSchema(cardManagementServiceMethods.ByName("DeleteCard")),
 			connect.WithClientOptions(opts...),
 		),
+		createDeck: connect.NewClient[v1.CreateDeckRequest, v1.CreateDeckResponse](
+			httpClient,
+			baseURL+CardManagementServiceCreateDeckProcedure,
+			connect.WithSchema(cardManagementServiceMethods.ByName("CreateDeck")),
+			connect.WithClientOptions(opts...),
+		),
+		getDeck: connect.NewClient[v1.GetDeckRequest, v1.GetDeckResponse](
+			httpClient,
+			baseURL+CardManagementServiceGetDeckProcedure,
+			connect.WithSchema(cardManagementServiceMethods.ByName("GetDeck")),
+			connect.WithClientOptions(opts...),
+		),
+		listDecks: connect.NewClient[v1.ListDecksRequest, v1.ListDecksResponse](
+			httpClient,
+			baseURL+CardManagementServiceListDecksProcedure,
+			connect.WithSchema(cardManagementServiceMethods.ByName("ListDecks")),
+			connect.WithClientOptions(opts...),
+		),
+		updateDeck: connect.NewClient[v1.UpdateDeckRequest, v1.UpdateDeckResponse](
+			httpClient,
+			baseURL+CardManagementServiceUpdateDeckProcedure,
+			connect.WithSchema(cardManagementServiceMethods.ByName("UpdateDeck")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteDeck: connect.NewClient[v1.DeleteDeckRequest, v1.DeleteDeckResponse](
+			httpClient,
+			baseURL+CardManagementServiceDeleteDeckProcedure,
+			connect.WithSchema(cardManagementServiceMethods.ByName("DeleteDeck")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -110,6 +160,11 @@ type cardManagementServiceClient struct {
 	listCards  *connect.Client[v1.ListCardsRequest, v1.ListCardsResponse]
 	updateCard *connect.Client[v1.UpdateCardRequest, v1.UpdateCardResponse]
 	deleteCard *connect.Client[v1.DeleteCardRequest, v1.DeleteCardResponse]
+	createDeck *connect.Client[v1.CreateDeckRequest, v1.CreateDeckResponse]
+	getDeck    *connect.Client[v1.GetDeckRequest, v1.GetDeckResponse]
+	listDecks  *connect.Client[v1.ListDecksRequest, v1.ListDecksResponse]
+	updateDeck *connect.Client[v1.UpdateDeckRequest, v1.UpdateDeckResponse]
+	deleteDeck *connect.Client[v1.DeleteDeckRequest, v1.DeleteDeckResponse]
 }
 
 // CreateCard calls cardgame.v1.CardManagementService.CreateCard.
@@ -137,6 +192,31 @@ func (c *cardManagementServiceClient) DeleteCard(ctx context.Context, req *conne
 	return c.deleteCard.CallUnary(ctx, req)
 }
 
+// CreateDeck calls cardgame.v1.CardManagementService.CreateDeck.
+func (c *cardManagementServiceClient) CreateDeck(ctx context.Context, req *connect.Request[v1.CreateDeckRequest]) (*connect.Response[v1.CreateDeckResponse], error) {
+	return c.createDeck.CallUnary(ctx, req)
+}
+
+// GetDeck calls cardgame.v1.CardManagementService.GetDeck.
+func (c *cardManagementServiceClient) GetDeck(ctx context.Context, req *connect.Request[v1.GetDeckRequest]) (*connect.Response[v1.GetDeckResponse], error) {
+	return c.getDeck.CallUnary(ctx, req)
+}
+
+// ListDecks calls cardgame.v1.CardManagementService.ListDecks.
+func (c *cardManagementServiceClient) ListDecks(ctx context.Context, req *connect.Request[v1.ListDecksRequest]) (*connect.Response[v1.ListDecksResponse], error) {
+	return c.listDecks.CallUnary(ctx, req)
+}
+
+// UpdateDeck calls cardgame.v1.CardManagementService.UpdateDeck.
+func (c *cardManagementServiceClient) UpdateDeck(ctx context.Context, req *connect.Request[v1.UpdateDeckRequest]) (*connect.Response[v1.UpdateDeckResponse], error) {
+	return c.updateDeck.CallUnary(ctx, req)
+}
+
+// DeleteDeck calls cardgame.v1.CardManagementService.DeleteDeck.
+func (c *cardManagementServiceClient) DeleteDeck(ctx context.Context, req *connect.Request[v1.DeleteDeckRequest]) (*connect.Response[v1.DeleteDeckResponse], error) {
+	return c.deleteDeck.CallUnary(ctx, req)
+}
+
 // CardManagementServiceHandler is an implementation of the cardgame.v1.CardManagementService
 // service.
 type CardManagementServiceHandler interface {
@@ -145,6 +225,11 @@ type CardManagementServiceHandler interface {
 	ListCards(context.Context, *connect.Request[v1.ListCardsRequest]) (*connect.Response[v1.ListCardsResponse], error)
 	UpdateCard(context.Context, *connect.Request[v1.UpdateCardRequest]) (*connect.Response[v1.UpdateCardResponse], error)
 	DeleteCard(context.Context, *connect.Request[v1.DeleteCardRequest]) (*connect.Response[v1.DeleteCardResponse], error)
+	CreateDeck(context.Context, *connect.Request[v1.CreateDeckRequest]) (*connect.Response[v1.CreateDeckResponse], error)
+	GetDeck(context.Context, *connect.Request[v1.GetDeckRequest]) (*connect.Response[v1.GetDeckResponse], error)
+	ListDecks(context.Context, *connect.Request[v1.ListDecksRequest]) (*connect.Response[v1.ListDecksResponse], error)
+	UpdateDeck(context.Context, *connect.Request[v1.UpdateDeckRequest]) (*connect.Response[v1.UpdateDeckResponse], error)
+	DeleteDeck(context.Context, *connect.Request[v1.DeleteDeckRequest]) (*connect.Response[v1.DeleteDeckResponse], error)
 }
 
 // NewCardManagementServiceHandler builds an HTTP handler from the service implementation. It
@@ -184,6 +269,36 @@ func NewCardManagementServiceHandler(svc CardManagementServiceHandler, opts ...c
 		connect.WithSchema(cardManagementServiceMethods.ByName("DeleteCard")),
 		connect.WithHandlerOptions(opts...),
 	)
+	cardManagementServiceCreateDeckHandler := connect.NewUnaryHandler(
+		CardManagementServiceCreateDeckProcedure,
+		svc.CreateDeck,
+		connect.WithSchema(cardManagementServiceMethods.ByName("CreateDeck")),
+		connect.WithHandlerOptions(opts...),
+	)
+	cardManagementServiceGetDeckHandler := connect.NewUnaryHandler(
+		CardManagementServiceGetDeckProcedure,
+		svc.GetDeck,
+		connect.WithSchema(cardManagementServiceMethods.ByName("GetDeck")),
+		connect.WithHandlerOptions(opts...),
+	)
+	cardManagementServiceListDecksHandler := connect.NewUnaryHandler(
+		CardManagementServiceListDecksProcedure,
+		svc.ListDecks,
+		connect.WithSchema(cardManagementServiceMethods.ByName("ListDecks")),
+		connect.WithHandlerOptions(opts...),
+	)
+	cardManagementServiceUpdateDeckHandler := connect.NewUnaryHandler(
+		CardManagementServiceUpdateDeckProcedure,
+		svc.UpdateDeck,
+		connect.WithSchema(cardManagementServiceMethods.ByName("UpdateDeck")),
+		connect.WithHandlerOptions(opts...),
+	)
+	cardManagementServiceDeleteDeckHandler := connect.NewUnaryHandler(
+		CardManagementServiceDeleteDeckProcedure,
+		svc.DeleteDeck,
+		connect.WithSchema(cardManagementServiceMethods.ByName("DeleteDeck")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cardgame.v1.CardManagementService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case CardManagementServiceCreateCardProcedure:
@@ -196,6 +311,16 @@ func NewCardManagementServiceHandler(svc CardManagementServiceHandler, opts ...c
 			cardManagementServiceUpdateCardHandler.ServeHTTP(w, r)
 		case CardManagementServiceDeleteCardProcedure:
 			cardManagementServiceDeleteCardHandler.ServeHTTP(w, r)
+		case CardManagementServiceCreateDeckProcedure:
+			cardManagementServiceCreateDeckHandler.ServeHTTP(w, r)
+		case CardManagementServiceGetDeckProcedure:
+			cardManagementServiceGetDeckHandler.ServeHTTP(w, r)
+		case CardManagementServiceListDecksProcedure:
+			cardManagementServiceListDecksHandler.ServeHTTP(w, r)
+		case CardManagementServiceUpdateDeckProcedure:
+			cardManagementServiceUpdateDeckHandler.ServeHTTP(w, r)
+		case CardManagementServiceDeleteDeckProcedure:
+			cardManagementServiceDeleteDeckHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -223,4 +348,24 @@ func (UnimplementedCardManagementServiceHandler) UpdateCard(context.Context, *co
 
 func (UnimplementedCardManagementServiceHandler) DeleteCard(context.Context, *connect.Request[v1.DeleteCardRequest]) (*connect.Response[v1.DeleteCardResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.DeleteCard is not implemented"))
+}
+
+func (UnimplementedCardManagementServiceHandler) CreateDeck(context.Context, *connect.Request[v1.CreateDeckRequest]) (*connect.Response[v1.CreateDeckResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.CreateDeck is not implemented"))
+}
+
+func (UnimplementedCardManagementServiceHandler) GetDeck(context.Context, *connect.Request[v1.GetDeckRequest]) (*connect.Response[v1.GetDeckResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.GetDeck is not implemented"))
+}
+
+func (UnimplementedCardManagementServiceHandler) ListDecks(context.Context, *connect.Request[v1.ListDecksRequest]) (*connect.Response[v1.ListDecksResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.ListDecks is not implemented"))
+}
+
+func (UnimplementedCardManagementServiceHandler) UpdateDeck(context.Context, *connect.Request[v1.UpdateDeckRequest]) (*connect.Response[v1.UpdateDeckResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.UpdateDeck is not implemented"))
+}
+
+func (UnimplementedCardManagementServiceHandler) DeleteDeck(context.Context, *connect.Request[v1.DeleteDeckRequest]) (*connect.Response[v1.DeleteDeckResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.CardManagementService.DeleteDeck is not implemented"))
 }

@@ -38,6 +38,112 @@ enum GamePhase {
   GAME_PHASE_TURN_END = 5;
 }
 
+// カード効果タイプ
+enum AtomicEffectType {
+  ATOMIC_EFFECT_TYPE_UNSPECIFIED = 0;
+  ATOMIC_EFFECT_TYPE_DEAL_DAMAGE = 1;
+  ATOMIC_EFFECT_TYPE_DEAL_SPLASH = 2;
+  ATOMIC_EFFECT_TYPE_RESTORE_HP = 3;
+  ATOMIC_EFFECT_TYPE_RESTORE_MANA = 4;
+  ATOMIC_EFFECT_TYPE_FULL_RESTORE = 5;
+  ATOMIC_EFFECT_TYPE_DRAW_CARD = 6;
+  ATOMIC_EFFECT_TYPE_DISCARD_CARD = 7;
+  ATOMIC_EFFECT_TYPE_SEARCH_CARD = 8;
+  ATOMIC_EFFECT_TYPE_SHUFFLE_DECK = 9;
+  ATOMIC_EFFECT_TYPE_MODIFY_ATTACK = 10;
+  ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE = 11;
+  ATOMIC_EFFECT_TYPE_MODIFY_COST = 12;
+  ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP = 13;
+  ATOMIC_EFFECT_TYPE_SUMMON_UNIT = 14;
+  ATOMIC_EFFECT_TYPE_DESTROY_UNIT = 15;
+  ATOMIC_EFFECT_TYPE_RETURN_TO_HAND = 16;
+  ATOMIC_EFFECT_TYPE_RETURN_TO_DECK = 17;
+  ATOMIC_EFFECT_TYPE_DISABLE_UNIT = 18;
+  ATOMIC_EFFECT_TYPE_GRANT_TRAIT = 19;
+  ATOMIC_EFFECT_TYPE_REMOVE_TRAIT = 20;
+  ATOMIC_EFFECT_TYPE_GAIN_MANA = 21;
+  ATOMIC_EFFECT_TYPE_REDUCE_COST = 22;
+}
+
+// ターゲット対象タイプ
+enum TargetType {
+  TARGET_TYPE_UNSPECIFIED = 0;
+  TARGET_TYPE_SELF = 1;
+  TARGET_TYPE_ENEMY_LEADER = 2;
+  TARGET_TYPE_ALLY_LEADER = 3;
+  TARGET_TYPE_ENEMY_UNIT = 4;
+  TARGET_TYPE_ALLY_UNIT = 5;
+  TARGET_TYPE_ALL_UNITS = 6;
+  TARGET_TYPE_ALL_ENEMY_UNITS = 7;
+  TARGET_TYPE_ALL_ALLY_UNITS = 8;
+  TARGET_TYPE_RANDOM_ENEMY_UNIT = 9;
+  TARGET_TYPE_RANDOM_ALLY_UNIT = 10;
+}
+
+// 効果チェーンノードタイプ
+enum EffectChainNodeType {
+  EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED = 0;
+  EFFECT_CHAIN_NODE_TYPE_THEN = 1;      // 順次実行
+  EFFECT_CHAIN_NODE_TYPE_AND = 2;       // 並列実行
+  EFFECT_CHAIN_NODE_TYPE_IF_ELSE = 3;   // 条件分岐
+  EFFECT_CHAIN_NODE_TYPE_REPEAT = 4;    // 繰り返し
+  EFFECT_CHAIN_NODE_TYPE_FOREACH = 5;   // 反復
+}
+
+// 原子効果
+message AtomicEffect {
+  uint32 id = 1;
+  AtomicEffectType type = 2;
+  optional TargetSelector target = 3;
+  optional int32 value = 4;
+  optional string card_id = 5;
+  optional Trait trait = 6;
+}
+
+// ターゲットセレクター
+message TargetSelector {
+  uint32 id = 1;
+  TargetType type = 2;
+  optional ConditionFilter filter = 3;
+}
+
+// 条件フィルター
+message ConditionFilter {
+  uint32 id = 1;
+  string condition_type = 2;  // "HAS_TRAIT", "ATTACK_RANGE", "DEFENSE_RANGE", etc.
+  repeated string parameters = 3;
+}
+
+// 効果チェーンノード
+message EffectChainNode {
+  uint32 id = 1;
+  EffectChainNodeType type = 2;
+  optional AtomicEffect atomic_effect = 3;
+  optional EffectChainNode next = 4;           // THEN用
+  repeated EffectChainNode children = 5;       // AND用
+  optional EffectChainNode then_node = 6;      // IF_ELSE用
+  optional EffectChainNode else_node = 7;      // IF_ELSE用
+  optional ConditionFilter condition = 8;      // IF_ELSE用
+  optional EffectChainNode repeat_effect = 9;  // REPEAT用
+  optional int32 repeat_count = 10;            // REPEAT用
+  optional EffectChainNode foreach_effect = 11; // FOREACH用
+  optional TargetSelector foreach_target = 12;  // FOREACH用
+}
+
+// 効果定義
+message EffectDefinition {
+  uint32 id = 1;
+  bool require_target = 2;
+  optional EffectChainNode root = 3;
+}
+
+// カード効果
+message CardEffect {
+  uint32 id = 1;
+  string card_id = 2;
+  repeated EffectDefinition definitions = 3;
+}
+
 // カード
 message Card {
   string id = 1;
@@ -48,7 +154,7 @@ message Card {
   optional int32 defense = 6;
   string effect = 7;
   repeated Trait traits = 8;
-  string card_effect_json = 9; // カード管理UI向けの効果定義JSON（編集用）
+  optional CardEffect card_effect = 9; // カード管理UI向けの効果定義(型安全)
 }
 
 // ユニット
@@ -107,4 +213,15 @@ message GameEvent {
   string player_id = 5;
   string details = 6;
   google.protobuf.Timestamp timestamp = 7;
+}
+
+// デッキ
+message Deck {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string card_ids = 4;
+  string user_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }

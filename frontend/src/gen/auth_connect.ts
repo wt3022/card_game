@@ -3,13 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { MethodKind } from '@bufbuild/protobuf'
-import {
-  LoginRequest,
-  LoginResponse,
-  RefreshTokenRequest,
-  RefreshTokenResponse,
-} from './auth_pb.js'
+import { LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse } from "./auth_pb.js";
+import { MethodKind } from "@bufbuild/protobuf";
 
 /**
  * 認証サービス
@@ -17,13 +12,13 @@ import {
  * @generated from service cardgame.v1.AuthService
  */
 export const AuthService = {
-  typeName: 'cardgame.v1.AuthService',
+  typeName: "cardgame.v1.AuthService",
   methods: {
     /**
      * @generated from rpc cardgame.v1.AuthService.Login
      */
     login: {
-      name: 'Login',
+      name: "Login",
       I: LoginRequest,
       O: LoginResponse,
       kind: MethodKind.Unary,
@@ -32,10 +27,11 @@ export const AuthService = {
      * @generated from rpc cardgame.v1.AuthService.RefreshToken
      */
     refreshToken: {
-      name: 'RefreshToken',
+      name: "RefreshToken",
       I: RefreshTokenRequest,
       O: RefreshTokenResponse,
       kind: MethodKind.Unary,
     },
-  },
-} as const
+  }
+} as const;
+

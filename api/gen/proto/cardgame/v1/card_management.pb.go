@@ -23,18 +23,18 @@ const (
 
 // カード作成リクエスト
 type CreateCardRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type           CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
-	Cost           int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
-	Attack         *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
-	Defense        *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
-	EffectText     string                 `protobuf:"bytes,7,opt,name=effect_text,json=effectText,proto3" json:"effect_text,omitempty"`
-	Traits         []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
-	CardEffectJson string                 `protobuf:"bytes,9,opt,name=card_effect_json,json=cardEffectJson,proto3" json:"card_effect_json,omitempty"` // CardEffectModelをJSON文字列として送信（model構造に合わせる）
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type          CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
+	Cost          int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
+	Attack        *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
+	Defense       *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
+	EffectText    string                 `protobuf:"bytes,7,opt,name=effect_text,json=effectText,proto3" json:"effect_text,omitempty"`
+	Traits        []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
+	CardEffect    *CardEffect            `protobuf:"bytes,9,opt,name=card_effect,json=cardEffect,proto3,oneof" json:"card_effect,omitempty"` // CardEffectModel構造を型安全に送信
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateCardRequest) Reset() {
@@ -123,11 +123,11 @@ func (x *CreateCardRequest) GetTraits() []Trait {
 	return nil
 }
 
-func (x *CreateCardRequest) GetCardEffectJson() string {
+func (x *CreateCardRequest) GetCardEffect() *CardEffect {
 	if x != nil {
-		return x.CardEffectJson
+		return x.CardEffect
 	}
-	return ""
+	return nil
 }
 
 // カード作成レスポンス
@@ -357,18 +357,18 @@ func (x *ListCardsResponse) GetCards() []*Card {
 
 // カード更新リクエスト
 type UpdateCardRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type           CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
-	Cost           int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
-	Attack         *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
-	Defense        *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
-	EffectText     string                 `protobuf:"bytes,7,opt,name=effect_text,json=effectText,proto3" json:"effect_text,omitempty"`
-	Traits         []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
-	CardEffectJson string                 `protobuf:"bytes,9,opt,name=card_effect_json,json=cardEffectJson,proto3" json:"card_effect_json,omitempty"` // CardEffectModelをJSON文字列として送信（model構造に合わせる）
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type          CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
+	Cost          int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
+	Attack        *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
+	Defense       *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
+	EffectText    string                 `protobuf:"bytes,7,opt,name=effect_text,json=effectText,proto3" json:"effect_text,omitempty"`
+	Traits        []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
+	CardEffect    *CardEffect            `protobuf:"bytes,9,opt,name=card_effect,json=cardEffect,proto3,oneof" json:"card_effect,omitempty"` // CardEffectModel構造を型安全に送信
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateCardRequest) Reset() {
@@ -457,11 +457,11 @@ func (x *UpdateCardRequest) GetTraits() []Trait {
 	return nil
 }
 
-func (x *UpdateCardRequest) GetCardEffectJson() string {
+func (x *UpdateCardRequest) GetCardEffect() *CardEffect {
 	if x != nil {
-		return x.CardEffectJson
+		return x.CardEffect
 	}
-	return ""
+	return nil
 }
 
 // カード更新レスポンス
@@ -607,11 +607,509 @@ func (x *DeleteCardResponse) GetMessage() string {
 	return ""
 }
 
+// デッキ作成リクエスト
+type CreateDeckRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	CardIds       []string               `protobuf:"bytes,3,rep,name=card_ids,json=cardIds,proto3" json:"card_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDeckRequest) Reset() {
+	*x = CreateDeckRequest{}
+	mi := &file_card_management_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeckRequest) ProtoMessage() {}
+
+func (x *CreateDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeckRequest.ProtoReflect.Descriptor instead.
+func (*CreateDeckRequest) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CreateDeckRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateDeckRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateDeckRequest) GetCardIds() []string {
+	if x != nil {
+		return x.CardIds
+	}
+	return nil
+}
+
+// デッキ作成レスポンス
+type CreateDeckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Deck          *Deck                  `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDeckResponse) Reset() {
+	*x = CreateDeckResponse{}
+	mi := &file_card_management_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDeckResponse) ProtoMessage() {}
+
+func (x *CreateDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDeckResponse.ProtoReflect.Descriptor instead.
+func (*CreateDeckResponse) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+// デッキ取得リクエスト
+type GetDeckRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeckRequest) Reset() {
+	*x = GetDeckRequest{}
+	mi := &file_card_management_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeckRequest) ProtoMessage() {}
+
+func (x *GetDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeckRequest.ProtoReflect.Descriptor instead.
+func (*GetDeckRequest) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetDeckRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// デッキ取得レスポンス
+type GetDeckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Deck          *Deck                  `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDeckResponse) Reset() {
+	*x = GetDeckResponse{}
+	mi := &file_card_management_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDeckResponse) ProtoMessage() {}
+
+func (x *GetDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDeckResponse.ProtoReflect.Descriptor instead.
+func (*GetDeckResponse) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+// デッキ一覧リクエスト
+type ListDecksRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        *string                `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"` // 指定された場合、そのユーザーのデッキのみ取得
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDecksRequest) Reset() {
+	*x = ListDecksRequest{}
+	mi := &file_card_management_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDecksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDecksRequest) ProtoMessage() {}
+
+func (x *ListDecksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDecksRequest.ProtoReflect.Descriptor instead.
+func (*ListDecksRequest) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ListDecksRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+// デッキ一覧レスポンス
+type ListDecksResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Decks         []*Deck                `protobuf:"bytes,1,rep,name=decks,proto3" json:"decks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListDecksResponse) Reset() {
+	*x = ListDecksResponse{}
+	mi := &file_card_management_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListDecksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListDecksResponse) ProtoMessage() {}
+
+func (x *ListDecksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListDecksResponse.ProtoReflect.Descriptor instead.
+func (*ListDecksResponse) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ListDecksResponse) GetDecks() []*Deck {
+	if x != nil {
+		return x.Decks
+	}
+	return nil
+}
+
+// デッキ更新リクエスト
+type UpdateDeckRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	CardIds       []string               `protobuf:"bytes,4,rep,name=card_ids,json=cardIds,proto3" json:"card_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDeckRequest) Reset() {
+	*x = UpdateDeckRequest{}
+	mi := &file_card_management_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeckRequest) ProtoMessage() {}
+
+func (x *UpdateDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeckRequest.ProtoReflect.Descriptor instead.
+func (*UpdateDeckRequest) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *UpdateDeckRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateDeckRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateDeckRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateDeckRequest) GetCardIds() []string {
+	if x != nil {
+		return x.CardIds
+	}
+	return nil
+}
+
+// デッキ更新レスポンス
+type UpdateDeckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Deck          *Deck                  `protobuf:"bytes,1,opt,name=deck,proto3" json:"deck,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateDeckResponse) Reset() {
+	*x = UpdateDeckResponse{}
+	mi := &file_card_management_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateDeckResponse) ProtoMessage() {}
+
+func (x *UpdateDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateDeckResponse.ProtoReflect.Descriptor instead.
+func (*UpdateDeckResponse) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *UpdateDeckResponse) GetDeck() *Deck {
+	if x != nil {
+		return x.Deck
+	}
+	return nil
+}
+
+// デッキ削除リクエスト
+type DeleteDeckRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteDeckRequest) Reset() {
+	*x = DeleteDeckRequest{}
+	mi := &file_card_management_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteDeckRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteDeckRequest) ProtoMessage() {}
+
+func (x *DeleteDeckRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteDeckRequest.ProtoReflect.Descriptor instead.
+func (*DeleteDeckRequest) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *DeleteDeckRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// デッキ削除レスポンス
+type DeleteDeckResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteDeckResponse) Reset() {
+	*x = DeleteDeckResponse{}
+	mi := &file_card_management_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteDeckResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteDeckResponse) ProtoMessage() {}
+
+func (x *DeleteDeckResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_card_management_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteDeckResponse.ProtoReflect.Descriptor instead.
+func (*DeleteDeckResponse) Descriptor() ([]byte, []int) {
+	return file_card_management_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *DeleteDeckResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteDeckResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 var File_card_management_proto protoreflect.FileDescriptor
 
 const file_card_management_proto_rawDesc = "" +
 	"\n" +
-	"\x15card_management.proto\x12\vcardgame.v1\x1a\fcommon.proto\"\xc0\x02\n" +
+	"\x15card_management.proto\x12\vcardgame.v1\x1a\fcommon.proto\"\xe5\x02\n" +
 	"\x11CreateCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -621,11 +1119,13 @@ const file_card_management_proto_rawDesc = "" +
 	"\adefense\x18\x06 \x01(\x05H\x01R\adefense\x88\x01\x01\x12\x1f\n" +
 	"\veffect_text\x18\a \x01(\tR\n" +
 	"effectText\x12*\n" +
-	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12(\n" +
-	"\x10card_effect_json\x18\t \x01(\tR\x0ecardEffectJsonB\t\n" +
+	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12=\n" +
+	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x02R\n" +
+	"cardEffect\x88\x01\x01B\t\n" +
 	"\a_attackB\n" +
 	"\n" +
-	"\b_defense\";\n" +
+	"\b_defenseB\x0e\n" +
+	"\f_card_effect\";\n" +
 	"\x12CreateCardResponse\x12%\n" +
 	"\x04card\x18\x01 \x01(\v2\x11.cardgame.v1.CardR\x04card\" \n" +
 	"\x0eGetCardRequest\x12\x0e\n" +
@@ -636,7 +1136,7 @@ const file_card_management_proto_rawDesc = "" +
 	"\x04type\x18\x01 \x01(\x0e2\x15.cardgame.v1.CardTypeH\x00R\x04type\x88\x01\x01B\a\n" +
 	"\x05_type\"<\n" +
 	"\x11ListCardsResponse\x12'\n" +
-	"\x05cards\x18\x01 \x03(\v2\x11.cardgame.v1.CardR\x05cards\"\xc0\x02\n" +
+	"\x05cards\x18\x01 \x03(\v2\x11.cardgame.v1.CardR\x05cards\"\xe5\x02\n" +
 	"\x11UpdateCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -646,18 +1146,48 @@ const file_card_management_proto_rawDesc = "" +
 	"\adefense\x18\x06 \x01(\x05H\x01R\adefense\x88\x01\x01\x12\x1f\n" +
 	"\veffect_text\x18\a \x01(\tR\n" +
 	"effectText\x12*\n" +
-	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12(\n" +
-	"\x10card_effect_json\x18\t \x01(\tR\x0ecardEffectJsonB\t\n" +
+	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12=\n" +
+	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x02R\n" +
+	"cardEffect\x88\x01\x01B\t\n" +
 	"\a_attackB\n" +
 	"\n" +
-	"\b_defense\";\n" +
+	"\b_defenseB\x0e\n" +
+	"\f_card_effect\";\n" +
 	"\x12UpdateCardResponse\x12%\n" +
 	"\x04card\x18\x01 \x01(\v2\x11.cardgame.v1.CardR\x04card\"#\n" +
 	"\x11DeleteCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"H\n" +
 	"\x12DeleteCardResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\x96\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"d\n" +
+	"\x11CreateDeckRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x19\n" +
+	"\bcard_ids\x18\x03 \x03(\tR\acardIds\";\n" +
+	"\x12CreateDeckResponse\x12%\n" +
+	"\x04deck\x18\x01 \x01(\v2\x11.cardgame.v1.DeckR\x04deck\" \n" +
+	"\x0eGetDeckRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"8\n" +
+	"\x0fGetDeckResponse\x12%\n" +
+	"\x04deck\x18\x01 \x01(\v2\x11.cardgame.v1.DeckR\x04deck\"<\n" +
+	"\x10ListDecksRequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\tH\x00R\x06userId\x88\x01\x01B\n" +
+	"\n" +
+	"\b_user_id\"<\n" +
+	"\x11ListDecksResponse\x12'\n" +
+	"\x05decks\x18\x01 \x03(\v2\x11.cardgame.v1.DeckR\x05decks\"t\n" +
+	"\x11UpdateDeckRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x19\n" +
+	"\bcard_ids\x18\x04 \x03(\tR\acardIds\";\n" +
+	"\x12UpdateDeckResponse\x12%\n" +
+	"\x04deck\x18\x01 \x01(\v2\x11.cardgame.v1.DeckR\x04deck\"#\n" +
+	"\x11DeleteDeckRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"H\n" +
+	"\x12DeleteDeckResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\x95\x06\n" +
 	"\x15CardManagementService\x12M\n" +
 	"\n" +
 	"CreateCard\x12\x1e.cardgame.v1.CreateCardRequest\x1a\x1f.cardgame.v1.CreateCardResponse\x12D\n" +
@@ -666,7 +1196,15 @@ const file_card_management_proto_rawDesc = "" +
 	"\n" +
 	"UpdateCard\x12\x1e.cardgame.v1.UpdateCardRequest\x1a\x1f.cardgame.v1.UpdateCardResponse\x12M\n" +
 	"\n" +
-	"DeleteCard\x12\x1e.cardgame.v1.DeleteCardRequest\x1a\x1f.cardgame.v1.DeleteCardResponseB0Z.card_game/api/gen/proto/cardgame/v1;cardgamev1b\x06proto3"
+	"DeleteCard\x12\x1e.cardgame.v1.DeleteCardRequest\x1a\x1f.cardgame.v1.DeleteCardResponse\x12M\n" +
+	"\n" +
+	"CreateDeck\x12\x1e.cardgame.v1.CreateDeckRequest\x1a\x1f.cardgame.v1.CreateDeckResponse\x12D\n" +
+	"\aGetDeck\x12\x1b.cardgame.v1.GetDeckRequest\x1a\x1c.cardgame.v1.GetDeckResponse\x12J\n" +
+	"\tListDecks\x12\x1d.cardgame.v1.ListDecksRequest\x1a\x1e.cardgame.v1.ListDecksResponse\x12M\n" +
+	"\n" +
+	"UpdateDeck\x12\x1e.cardgame.v1.UpdateDeckRequest\x1a\x1f.cardgame.v1.UpdateDeckResponse\x12M\n" +
+	"\n" +
+	"DeleteDeck\x12\x1e.cardgame.v1.DeleteDeckRequest\x1a\x1f.cardgame.v1.DeleteDeckResponseB0Z.card_game/api/gen/proto/cardgame/v1;cardgamev1b\x06proto3"
 
 var (
 	file_card_management_proto_rawDescOnce sync.Once
@@ -680,7 +1218,7 @@ func file_card_management_proto_rawDescGZIP() []byte {
 	return file_card_management_proto_rawDescData
 }
 
-var file_card_management_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_card_management_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_card_management_proto_goTypes = []any{
 	(*CreateCardRequest)(nil),  // 0: cardgame.v1.CreateCardRequest
 	(*CreateCardResponse)(nil), // 1: cardgame.v1.CreateCardResponse
@@ -692,35 +1230,63 @@ var file_card_management_proto_goTypes = []any{
 	(*UpdateCardResponse)(nil), // 7: cardgame.v1.UpdateCardResponse
 	(*DeleteCardRequest)(nil),  // 8: cardgame.v1.DeleteCardRequest
 	(*DeleteCardResponse)(nil), // 9: cardgame.v1.DeleteCardResponse
-	(CardType)(0),              // 10: cardgame.v1.CardType
-	(Trait)(0),                 // 11: cardgame.v1.Trait
-	(*Card)(nil),               // 12: cardgame.v1.Card
+	(*CreateDeckRequest)(nil),  // 10: cardgame.v1.CreateDeckRequest
+	(*CreateDeckResponse)(nil), // 11: cardgame.v1.CreateDeckResponse
+	(*GetDeckRequest)(nil),     // 12: cardgame.v1.GetDeckRequest
+	(*GetDeckResponse)(nil),    // 13: cardgame.v1.GetDeckResponse
+	(*ListDecksRequest)(nil),   // 14: cardgame.v1.ListDecksRequest
+	(*ListDecksResponse)(nil),  // 15: cardgame.v1.ListDecksResponse
+	(*UpdateDeckRequest)(nil),  // 16: cardgame.v1.UpdateDeckRequest
+	(*UpdateDeckResponse)(nil), // 17: cardgame.v1.UpdateDeckResponse
+	(*DeleteDeckRequest)(nil),  // 18: cardgame.v1.DeleteDeckRequest
+	(*DeleteDeckResponse)(nil), // 19: cardgame.v1.DeleteDeckResponse
+	(CardType)(0),              // 20: cardgame.v1.CardType
+	(Trait)(0),                 // 21: cardgame.v1.Trait
+	(*CardEffect)(nil),         // 22: cardgame.v1.CardEffect
+	(*Card)(nil),               // 23: cardgame.v1.Card
+	(*Deck)(nil),               // 24: cardgame.v1.Deck
 }
 var file_card_management_proto_depIdxs = []int32{
-	10, // 0: cardgame.v1.CreateCardRequest.type:type_name -> cardgame.v1.CardType
-	11, // 1: cardgame.v1.CreateCardRequest.traits:type_name -> cardgame.v1.Trait
-	12, // 2: cardgame.v1.CreateCardResponse.card:type_name -> cardgame.v1.Card
-	12, // 3: cardgame.v1.GetCardResponse.card:type_name -> cardgame.v1.Card
-	10, // 4: cardgame.v1.ListCardsRequest.type:type_name -> cardgame.v1.CardType
-	12, // 5: cardgame.v1.ListCardsResponse.cards:type_name -> cardgame.v1.Card
-	10, // 6: cardgame.v1.UpdateCardRequest.type:type_name -> cardgame.v1.CardType
-	11, // 7: cardgame.v1.UpdateCardRequest.traits:type_name -> cardgame.v1.Trait
-	12, // 8: cardgame.v1.UpdateCardResponse.card:type_name -> cardgame.v1.Card
-	0,  // 9: cardgame.v1.CardManagementService.CreateCard:input_type -> cardgame.v1.CreateCardRequest
-	2,  // 10: cardgame.v1.CardManagementService.GetCard:input_type -> cardgame.v1.GetCardRequest
-	4,  // 11: cardgame.v1.CardManagementService.ListCards:input_type -> cardgame.v1.ListCardsRequest
-	6,  // 12: cardgame.v1.CardManagementService.UpdateCard:input_type -> cardgame.v1.UpdateCardRequest
-	8,  // 13: cardgame.v1.CardManagementService.DeleteCard:input_type -> cardgame.v1.DeleteCardRequest
-	1,  // 14: cardgame.v1.CardManagementService.CreateCard:output_type -> cardgame.v1.CreateCardResponse
-	3,  // 15: cardgame.v1.CardManagementService.GetCard:output_type -> cardgame.v1.GetCardResponse
-	5,  // 16: cardgame.v1.CardManagementService.ListCards:output_type -> cardgame.v1.ListCardsResponse
-	7,  // 17: cardgame.v1.CardManagementService.UpdateCard:output_type -> cardgame.v1.UpdateCardResponse
-	9,  // 18: cardgame.v1.CardManagementService.DeleteCard:output_type -> cardgame.v1.DeleteCardResponse
-	14, // [14:19] is the sub-list for method output_type
-	9,  // [9:14] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	20, // 0: cardgame.v1.CreateCardRequest.type:type_name -> cardgame.v1.CardType
+	21, // 1: cardgame.v1.CreateCardRequest.traits:type_name -> cardgame.v1.Trait
+	22, // 2: cardgame.v1.CreateCardRequest.card_effect:type_name -> cardgame.v1.CardEffect
+	23, // 3: cardgame.v1.CreateCardResponse.card:type_name -> cardgame.v1.Card
+	23, // 4: cardgame.v1.GetCardResponse.card:type_name -> cardgame.v1.Card
+	20, // 5: cardgame.v1.ListCardsRequest.type:type_name -> cardgame.v1.CardType
+	23, // 6: cardgame.v1.ListCardsResponse.cards:type_name -> cardgame.v1.Card
+	20, // 7: cardgame.v1.UpdateCardRequest.type:type_name -> cardgame.v1.CardType
+	21, // 8: cardgame.v1.UpdateCardRequest.traits:type_name -> cardgame.v1.Trait
+	22, // 9: cardgame.v1.UpdateCardRequest.card_effect:type_name -> cardgame.v1.CardEffect
+	23, // 10: cardgame.v1.UpdateCardResponse.card:type_name -> cardgame.v1.Card
+	24, // 11: cardgame.v1.CreateDeckResponse.deck:type_name -> cardgame.v1.Deck
+	24, // 12: cardgame.v1.GetDeckResponse.deck:type_name -> cardgame.v1.Deck
+	24, // 13: cardgame.v1.ListDecksResponse.decks:type_name -> cardgame.v1.Deck
+	24, // 14: cardgame.v1.UpdateDeckResponse.deck:type_name -> cardgame.v1.Deck
+	0,  // 15: cardgame.v1.CardManagementService.CreateCard:input_type -> cardgame.v1.CreateCardRequest
+	2,  // 16: cardgame.v1.CardManagementService.GetCard:input_type -> cardgame.v1.GetCardRequest
+	4,  // 17: cardgame.v1.CardManagementService.ListCards:input_type -> cardgame.v1.ListCardsRequest
+	6,  // 18: cardgame.v1.CardManagementService.UpdateCard:input_type -> cardgame.v1.UpdateCardRequest
+	8,  // 19: cardgame.v1.CardManagementService.DeleteCard:input_type -> cardgame.v1.DeleteCardRequest
+	10, // 20: cardgame.v1.CardManagementService.CreateDeck:input_type -> cardgame.v1.CreateDeckRequest
+	12, // 21: cardgame.v1.CardManagementService.GetDeck:input_type -> cardgame.v1.GetDeckRequest
+	14, // 22: cardgame.v1.CardManagementService.ListDecks:input_type -> cardgame.v1.ListDecksRequest
+	16, // 23: cardgame.v1.CardManagementService.UpdateDeck:input_type -> cardgame.v1.UpdateDeckRequest
+	18, // 24: cardgame.v1.CardManagementService.DeleteDeck:input_type -> cardgame.v1.DeleteDeckRequest
+	1,  // 25: cardgame.v1.CardManagementService.CreateCard:output_type -> cardgame.v1.CreateCardResponse
+	3,  // 26: cardgame.v1.CardManagementService.GetCard:output_type -> cardgame.v1.GetCardResponse
+	5,  // 27: cardgame.v1.CardManagementService.ListCards:output_type -> cardgame.v1.ListCardsResponse
+	7,  // 28: cardgame.v1.CardManagementService.UpdateCard:output_type -> cardgame.v1.UpdateCardResponse
+	9,  // 29: cardgame.v1.CardManagementService.DeleteCard:output_type -> cardgame.v1.DeleteCardResponse
+	11, // 30: cardgame.v1.CardManagementService.CreateDeck:output_type -> cardgame.v1.CreateDeckResponse
+	13, // 31: cardgame.v1.CardManagementService.GetDeck:output_type -> cardgame.v1.GetDeckResponse
+	15, // 32: cardgame.v1.CardManagementService.ListDecks:output_type -> cardgame.v1.ListDecksResponse
+	17, // 33: cardgame.v1.CardManagementService.UpdateDeck:output_type -> cardgame.v1.UpdateDeckResponse
+	19, // 34: cardgame.v1.CardManagementService.DeleteDeck:output_type -> cardgame.v1.DeleteDeckResponse
+	25, // [25:35] is the sub-list for method output_type
+	15, // [15:25] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_card_management_proto_init() }
@@ -732,13 +1298,14 @@ func file_card_management_proto_init() {
 	file_card_management_proto_msgTypes[0].OneofWrappers = []any{}
 	file_card_management_proto_msgTypes[4].OneofWrappers = []any{}
 	file_card_management_proto_msgTypes[6].OneofWrappers = []any{}
+	file_card_management_proto_msgTypes[14].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_card_management_proto_rawDesc), len(file_card_management_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

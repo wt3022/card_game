@@ -10,7 +10,6 @@ import (
 
 	"card_game/internal/core/entity"
 	"card_game/internal/core/port"
-	"card_game/internal/infrastructure/repository"
 )
 
 // ========================================
@@ -20,7 +19,7 @@ import (
 // InitializeDefaultAdmin デフォルトの管理者ユーザーを初期化
 // 既に管理者ユーザーが存在する場合は何もしない
 func InitializeDefaultAdmin(
-	userRepo repository.UserRepository,
+	userRepo port.UserRepository,
 	passwordHasher port.PasswordHasher,
 	logger port.Logger,
 ) error {
@@ -35,7 +34,7 @@ func InitializeDefaultAdmin(
 	}
 
 	// エラーメッセージを確認して、ユーザーが見つからない場合は正常な動作として扱う
-	if err != nil && !strings.Contains(err.Error(), "user not found") {
+	if !strings.Contains(err.Error(), "user not found") {
 		// 予期しないエラーの場合のみログを出力
 		logger.Info("⚠️  Error checking admin user: %v", err)
 	}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"card_game/internal/core/entity"
+	"card_game/internal/core/port"
 	"card_game/internal/infrastructure/persistence/model"
 	"fmt"
 
@@ -9,14 +10,9 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// UserRepository ユーザーリポジトリインターフェース
-type UserRepository interface {
-	Create(user *entity.User) error
-	FindByID(id string) (*entity.User, error)
-	FindByUsername(username string) (*entity.User, error)
-	Update(user *entity.User) error
-	Delete(id string) error
-}
+// ========================================
+// ユーザーリポジトリ実装
+// ========================================
 
 // userRepository ユーザーリポジトリの実装
 type userRepository struct {
@@ -24,7 +20,7 @@ type userRepository struct {
 }
 
 // NewUserRepository 新しいユーザーリポジトリを作成
-func NewUserRepository(db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) port.UserRepository {
 	return &userRepository{db: db}
 }
 

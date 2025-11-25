@@ -199,25 +199,730 @@ func (GamePhase) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{2}
 }
 
+// カード効果タイプ
+type AtomicEffectType int32
+
+const (
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_UNSPECIFIED    AtomicEffectType = 0
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DEAL_DAMAGE    AtomicEffectType = 1
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DEAL_SPLASH    AtomicEffectType = 2
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_RESTORE_HP     AtomicEffectType = 3
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_RESTORE_MANA   AtomicEffectType = 4
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_FULL_RESTORE   AtomicEffectType = 5
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DRAW_CARD      AtomicEffectType = 6
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DISCARD_CARD   AtomicEffectType = 7
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_SEARCH_CARD    AtomicEffectType = 8
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_SHUFFLE_DECK   AtomicEffectType = 9
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_ATTACK  AtomicEffectType = 10
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE AtomicEffectType = 11
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_COST    AtomicEffectType = 12
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP  AtomicEffectType = 13
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_SUMMON_UNIT    AtomicEffectType = 14
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DESTROY_UNIT   AtomicEffectType = 15
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_RETURN_TO_HAND AtomicEffectType = 16
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_RETURN_TO_DECK AtomicEffectType = 17
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_DISABLE_UNIT   AtomicEffectType = 18
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_GRANT_TRAIT    AtomicEffectType = 19
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_REMOVE_TRAIT   AtomicEffectType = 20
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_GAIN_MANA      AtomicEffectType = 21
+	AtomicEffectType_ATOMIC_EFFECT_TYPE_REDUCE_COST    AtomicEffectType = 22
+)
+
+// Enum value maps for AtomicEffectType.
+var (
+	AtomicEffectType_name = map[int32]string{
+		0:  "ATOMIC_EFFECT_TYPE_UNSPECIFIED",
+		1:  "ATOMIC_EFFECT_TYPE_DEAL_DAMAGE",
+		2:  "ATOMIC_EFFECT_TYPE_DEAL_SPLASH",
+		3:  "ATOMIC_EFFECT_TYPE_RESTORE_HP",
+		4:  "ATOMIC_EFFECT_TYPE_RESTORE_MANA",
+		5:  "ATOMIC_EFFECT_TYPE_FULL_RESTORE",
+		6:  "ATOMIC_EFFECT_TYPE_DRAW_CARD",
+		7:  "ATOMIC_EFFECT_TYPE_DISCARD_CARD",
+		8:  "ATOMIC_EFFECT_TYPE_SEARCH_CARD",
+		9:  "ATOMIC_EFFECT_TYPE_SHUFFLE_DECK",
+		10: "ATOMIC_EFFECT_TYPE_MODIFY_ATTACK",
+		11: "ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE",
+		12: "ATOMIC_EFFECT_TYPE_MODIFY_COST",
+		13: "ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP",
+		14: "ATOMIC_EFFECT_TYPE_SUMMON_UNIT",
+		15: "ATOMIC_EFFECT_TYPE_DESTROY_UNIT",
+		16: "ATOMIC_EFFECT_TYPE_RETURN_TO_HAND",
+		17: "ATOMIC_EFFECT_TYPE_RETURN_TO_DECK",
+		18: "ATOMIC_EFFECT_TYPE_DISABLE_UNIT",
+		19: "ATOMIC_EFFECT_TYPE_GRANT_TRAIT",
+		20: "ATOMIC_EFFECT_TYPE_REMOVE_TRAIT",
+		21: "ATOMIC_EFFECT_TYPE_GAIN_MANA",
+		22: "ATOMIC_EFFECT_TYPE_REDUCE_COST",
+	}
+	AtomicEffectType_value = map[string]int32{
+		"ATOMIC_EFFECT_TYPE_UNSPECIFIED":    0,
+		"ATOMIC_EFFECT_TYPE_DEAL_DAMAGE":    1,
+		"ATOMIC_EFFECT_TYPE_DEAL_SPLASH":    2,
+		"ATOMIC_EFFECT_TYPE_RESTORE_HP":     3,
+		"ATOMIC_EFFECT_TYPE_RESTORE_MANA":   4,
+		"ATOMIC_EFFECT_TYPE_FULL_RESTORE":   5,
+		"ATOMIC_EFFECT_TYPE_DRAW_CARD":      6,
+		"ATOMIC_EFFECT_TYPE_DISCARD_CARD":   7,
+		"ATOMIC_EFFECT_TYPE_SEARCH_CARD":    8,
+		"ATOMIC_EFFECT_TYPE_SHUFFLE_DECK":   9,
+		"ATOMIC_EFFECT_TYPE_MODIFY_ATTACK":  10,
+		"ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE": 11,
+		"ATOMIC_EFFECT_TYPE_MODIFY_COST":    12,
+		"ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP":  13,
+		"ATOMIC_EFFECT_TYPE_SUMMON_UNIT":    14,
+		"ATOMIC_EFFECT_TYPE_DESTROY_UNIT":   15,
+		"ATOMIC_EFFECT_TYPE_RETURN_TO_HAND": 16,
+		"ATOMIC_EFFECT_TYPE_RETURN_TO_DECK": 17,
+		"ATOMIC_EFFECT_TYPE_DISABLE_UNIT":   18,
+		"ATOMIC_EFFECT_TYPE_GRANT_TRAIT":    19,
+		"ATOMIC_EFFECT_TYPE_REMOVE_TRAIT":   20,
+		"ATOMIC_EFFECT_TYPE_GAIN_MANA":      21,
+		"ATOMIC_EFFECT_TYPE_REDUCE_COST":    22,
+	}
+)
+
+func (x AtomicEffectType) Enum() *AtomicEffectType {
+	p := new(AtomicEffectType)
+	*p = x
+	return p
+}
+
+func (x AtomicEffectType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AtomicEffectType) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[3].Descriptor()
+}
+
+func (AtomicEffectType) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[3]
+}
+
+func (x AtomicEffectType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AtomicEffectType.Descriptor instead.
+func (AtomicEffectType) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{3}
+}
+
+// ターゲット対象タイプ
+type TargetType int32
+
+const (
+	TargetType_TARGET_TYPE_UNSPECIFIED       TargetType = 0
+	TargetType_TARGET_TYPE_SELF              TargetType = 1
+	TargetType_TARGET_TYPE_ENEMY_LEADER      TargetType = 2
+	TargetType_TARGET_TYPE_ALLY_LEADER       TargetType = 3
+	TargetType_TARGET_TYPE_ENEMY_UNIT        TargetType = 4
+	TargetType_TARGET_TYPE_ALLY_UNIT         TargetType = 5
+	TargetType_TARGET_TYPE_ALL_UNITS         TargetType = 6
+	TargetType_TARGET_TYPE_ALL_ENEMY_UNITS   TargetType = 7
+	TargetType_TARGET_TYPE_ALL_ALLY_UNITS    TargetType = 8
+	TargetType_TARGET_TYPE_RANDOM_ENEMY_UNIT TargetType = 9
+	TargetType_TARGET_TYPE_RANDOM_ALLY_UNIT  TargetType = 10
+)
+
+// Enum value maps for TargetType.
+var (
+	TargetType_name = map[int32]string{
+		0:  "TARGET_TYPE_UNSPECIFIED",
+		1:  "TARGET_TYPE_SELF",
+		2:  "TARGET_TYPE_ENEMY_LEADER",
+		3:  "TARGET_TYPE_ALLY_LEADER",
+		4:  "TARGET_TYPE_ENEMY_UNIT",
+		5:  "TARGET_TYPE_ALLY_UNIT",
+		6:  "TARGET_TYPE_ALL_UNITS",
+		7:  "TARGET_TYPE_ALL_ENEMY_UNITS",
+		8:  "TARGET_TYPE_ALL_ALLY_UNITS",
+		9:  "TARGET_TYPE_RANDOM_ENEMY_UNIT",
+		10: "TARGET_TYPE_RANDOM_ALLY_UNIT",
+	}
+	TargetType_value = map[string]int32{
+		"TARGET_TYPE_UNSPECIFIED":       0,
+		"TARGET_TYPE_SELF":              1,
+		"TARGET_TYPE_ENEMY_LEADER":      2,
+		"TARGET_TYPE_ALLY_LEADER":       3,
+		"TARGET_TYPE_ENEMY_UNIT":        4,
+		"TARGET_TYPE_ALLY_UNIT":         5,
+		"TARGET_TYPE_ALL_UNITS":         6,
+		"TARGET_TYPE_ALL_ENEMY_UNITS":   7,
+		"TARGET_TYPE_ALL_ALLY_UNITS":    8,
+		"TARGET_TYPE_RANDOM_ENEMY_UNIT": 9,
+		"TARGET_TYPE_RANDOM_ALLY_UNIT":  10,
+	}
+)
+
+func (x TargetType) Enum() *TargetType {
+	p := new(TargetType)
+	*p = x
+	return p
+}
+
+func (x TargetType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TargetType) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[4].Descriptor()
+}
+
+func (TargetType) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[4]
+}
+
+func (x TargetType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TargetType.Descriptor instead.
+func (TargetType) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{4}
+}
+
+// 効果チェーンノードタイプ
+type EffectChainNodeType int32
+
+const (
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED EffectChainNodeType = 0
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_THEN        EffectChainNodeType = 1 // 順次実行
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_AND         EffectChainNodeType = 2 // 並列実行
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_IF_ELSE     EffectChainNodeType = 3 // 条件分岐
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_REPEAT      EffectChainNodeType = 4 // 繰り返し
+	EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_FOREACH     EffectChainNodeType = 5 // 反復
+)
+
+// Enum value maps for EffectChainNodeType.
+var (
+	EffectChainNodeType_name = map[int32]string{
+		0: "EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED",
+		1: "EFFECT_CHAIN_NODE_TYPE_THEN",
+		2: "EFFECT_CHAIN_NODE_TYPE_AND",
+		3: "EFFECT_CHAIN_NODE_TYPE_IF_ELSE",
+		4: "EFFECT_CHAIN_NODE_TYPE_REPEAT",
+		5: "EFFECT_CHAIN_NODE_TYPE_FOREACH",
+	}
+	EffectChainNodeType_value = map[string]int32{
+		"EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED": 0,
+		"EFFECT_CHAIN_NODE_TYPE_THEN":        1,
+		"EFFECT_CHAIN_NODE_TYPE_AND":         2,
+		"EFFECT_CHAIN_NODE_TYPE_IF_ELSE":     3,
+		"EFFECT_CHAIN_NODE_TYPE_REPEAT":      4,
+		"EFFECT_CHAIN_NODE_TYPE_FOREACH":     5,
+	}
+)
+
+func (x EffectChainNodeType) Enum() *EffectChainNodeType {
+	p := new(EffectChainNodeType)
+	*p = x
+	return p
+}
+
+func (x EffectChainNodeType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EffectChainNodeType) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[5].Descriptor()
+}
+
+func (EffectChainNodeType) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[5]
+}
+
+func (x EffectChainNodeType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EffectChainNodeType.Descriptor instead.
+func (EffectChainNodeType) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{5}
+}
+
+// 原子効果
+type AtomicEffect struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          AtomicEffectType       `protobuf:"varint,2,opt,name=type,proto3,enum=cardgame.v1.AtomicEffectType" json:"type,omitempty"`
+	Target        *TargetSelector        `protobuf:"bytes,3,opt,name=target,proto3,oneof" json:"target,omitempty"`
+	Value         *int32                 `protobuf:"varint,4,opt,name=value,proto3,oneof" json:"value,omitempty"`
+	CardId        *string                `protobuf:"bytes,5,opt,name=card_id,json=cardId,proto3,oneof" json:"card_id,omitempty"`
+	Trait         *Trait                 `protobuf:"varint,6,opt,name=trait,proto3,enum=cardgame.v1.Trait,oneof" json:"trait,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AtomicEffect) Reset() {
+	*x = AtomicEffect{}
+	mi := &file_common_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AtomicEffect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AtomicEffect) ProtoMessage() {}
+
+func (x *AtomicEffect) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AtomicEffect.ProtoReflect.Descriptor instead.
+func (*AtomicEffect) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AtomicEffect) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *AtomicEffect) GetType() AtomicEffectType {
+	if x != nil {
+		return x.Type
+	}
+	return AtomicEffectType_ATOMIC_EFFECT_TYPE_UNSPECIFIED
+}
+
+func (x *AtomicEffect) GetTarget() *TargetSelector {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
+func (x *AtomicEffect) GetValue() int32 {
+	if x != nil && x.Value != nil {
+		return *x.Value
+	}
+	return 0
+}
+
+func (x *AtomicEffect) GetCardId() string {
+	if x != nil && x.CardId != nil {
+		return *x.CardId
+	}
+	return ""
+}
+
+func (x *AtomicEffect) GetTrait() Trait {
+	if x != nil && x.Trait != nil {
+		return *x.Trait
+	}
+	return Trait_TRAIT_UNSPECIFIED
+}
+
+// ターゲットセレクター
+type TargetSelector struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          TargetType             `protobuf:"varint,2,opt,name=type,proto3,enum=cardgame.v1.TargetType" json:"type,omitempty"`
+	Filter        *ConditionFilter       `protobuf:"bytes,3,opt,name=filter,proto3,oneof" json:"filter,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TargetSelector) Reset() {
+	*x = TargetSelector{}
+	mi := &file_common_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TargetSelector) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TargetSelector) ProtoMessage() {}
+
+func (x *TargetSelector) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TargetSelector.ProtoReflect.Descriptor instead.
+func (*TargetSelector) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TargetSelector) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *TargetSelector) GetType() TargetType {
+	if x != nil {
+		return x.Type
+	}
+	return TargetType_TARGET_TYPE_UNSPECIFIED
+}
+
+func (x *TargetSelector) GetFilter() *ConditionFilter {
+	if x != nil {
+		return x.Filter
+	}
+	return nil
+}
+
+// 条件フィルター
+type ConditionFilter struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	ConditionType string                 `protobuf:"bytes,2,opt,name=condition_type,json=conditionType,proto3" json:"condition_type,omitempty"` // "HAS_TRAIT", "ATTACK_RANGE", "DEFENSE_RANGE", etc.
+	Parameters    []string               `protobuf:"bytes,3,rep,name=parameters,proto3" json:"parameters,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConditionFilter) Reset() {
+	*x = ConditionFilter{}
+	mi := &file_common_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConditionFilter) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConditionFilter) ProtoMessage() {}
+
+func (x *ConditionFilter) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConditionFilter.ProtoReflect.Descriptor instead.
+func (*ConditionFilter) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ConditionFilter) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ConditionFilter) GetConditionType() string {
+	if x != nil {
+		return x.ConditionType
+	}
+	return ""
+}
+
+func (x *ConditionFilter) GetParameters() []string {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
+}
+
+// 効果チェーンノード
+type EffectChainNode struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          EffectChainNodeType    `protobuf:"varint,2,opt,name=type,proto3,enum=cardgame.v1.EffectChainNodeType" json:"type,omitempty"`
+	AtomicEffect  *AtomicEffect          `protobuf:"bytes,3,opt,name=atomic_effect,json=atomicEffect,proto3,oneof" json:"atomic_effect,omitempty"`
+	Next          *EffectChainNode       `protobuf:"bytes,4,opt,name=next,proto3,oneof" json:"next,omitempty"`                                         // THEN用
+	Children      []*EffectChainNode     `protobuf:"bytes,5,rep,name=children,proto3" json:"children,omitempty"`                                       // AND用
+	ThenNode      *EffectChainNode       `protobuf:"bytes,6,opt,name=then_node,json=thenNode,proto3,oneof" json:"then_node,omitempty"`                 // IF_ELSE用
+	ElseNode      *EffectChainNode       `protobuf:"bytes,7,opt,name=else_node,json=elseNode,proto3,oneof" json:"else_node,omitempty"`                 // IF_ELSE用
+	Condition     *ConditionFilter       `protobuf:"bytes,8,opt,name=condition,proto3,oneof" json:"condition,omitempty"`                               // IF_ELSE用
+	RepeatEffect  *EffectChainNode       `protobuf:"bytes,9,opt,name=repeat_effect,json=repeatEffect,proto3,oneof" json:"repeat_effect,omitempty"`     // REPEAT用
+	RepeatCount   *int32                 `protobuf:"varint,10,opt,name=repeat_count,json=repeatCount,proto3,oneof" json:"repeat_count,omitempty"`      // REPEAT用
+	ForeachEffect *EffectChainNode       `protobuf:"bytes,11,opt,name=foreach_effect,json=foreachEffect,proto3,oneof" json:"foreach_effect,omitempty"` // FOREACH用
+	ForeachTarget *TargetSelector        `protobuf:"bytes,12,opt,name=foreach_target,json=foreachTarget,proto3,oneof" json:"foreach_target,omitempty"` // FOREACH用
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EffectChainNode) Reset() {
+	*x = EffectChainNode{}
+	mi := &file_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EffectChainNode) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EffectChainNode) ProtoMessage() {}
+
+func (x *EffectChainNode) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EffectChainNode.ProtoReflect.Descriptor instead.
+func (*EffectChainNode) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *EffectChainNode) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *EffectChainNode) GetType() EffectChainNodeType {
+	if x != nil {
+		return x.Type
+	}
+	return EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED
+}
+
+func (x *EffectChainNode) GetAtomicEffect() *AtomicEffect {
+	if x != nil {
+		return x.AtomicEffect
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetNext() *EffectChainNode {
+	if x != nil {
+		return x.Next
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetChildren() []*EffectChainNode {
+	if x != nil {
+		return x.Children
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetThenNode() *EffectChainNode {
+	if x != nil {
+		return x.ThenNode
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetElseNode() *EffectChainNode {
+	if x != nil {
+		return x.ElseNode
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetCondition() *ConditionFilter {
+	if x != nil {
+		return x.Condition
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetRepeatEffect() *EffectChainNode {
+	if x != nil {
+		return x.RepeatEffect
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetRepeatCount() int32 {
+	if x != nil && x.RepeatCount != nil {
+		return *x.RepeatCount
+	}
+	return 0
+}
+
+func (x *EffectChainNode) GetForeachEffect() *EffectChainNode {
+	if x != nil {
+		return x.ForeachEffect
+	}
+	return nil
+}
+
+func (x *EffectChainNode) GetForeachTarget() *TargetSelector {
+	if x != nil {
+		return x.ForeachTarget
+	}
+	return nil
+}
+
+// 効果定義
+type EffectDefinition struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	RequireTarget bool                   `protobuf:"varint,2,opt,name=require_target,json=requireTarget,proto3" json:"require_target,omitempty"`
+	Root          *EffectChainNode       `protobuf:"bytes,3,opt,name=root,proto3,oneof" json:"root,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EffectDefinition) Reset() {
+	*x = EffectDefinition{}
+	mi := &file_common_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EffectDefinition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EffectDefinition) ProtoMessage() {}
+
+func (x *EffectDefinition) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EffectDefinition.ProtoReflect.Descriptor instead.
+func (*EffectDefinition) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *EffectDefinition) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *EffectDefinition) GetRequireTarget() bool {
+	if x != nil {
+		return x.RequireTarget
+	}
+	return false
+}
+
+func (x *EffectDefinition) GetRoot() *EffectChainNode {
+	if x != nil {
+		return x.Root
+	}
+	return nil
+}
+
+// カード効果
+type CardEffect struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	CardId        string                 `protobuf:"bytes,2,opt,name=card_id,json=cardId,proto3" json:"card_id,omitempty"`
+	Definitions   []*EffectDefinition    `protobuf:"bytes,3,rep,name=definitions,proto3" json:"definitions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CardEffect) Reset() {
+	*x = CardEffect{}
+	mi := &file_common_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CardEffect) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CardEffect) ProtoMessage() {}
+
+func (x *CardEffect) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CardEffect.ProtoReflect.Descriptor instead.
+func (*CardEffect) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CardEffect) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *CardEffect) GetCardId() string {
+	if x != nil {
+		return x.CardId
+	}
+	return ""
+}
+
+func (x *CardEffect) GetDefinitions() []*EffectDefinition {
+	if x != nil {
+		return x.Definitions
+	}
+	return nil
+}
+
 // カード
 type Card struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type           CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
-	Cost           int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
-	Attack         *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
-	Defense        *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
-	Effect         string                 `protobuf:"bytes,7,opt,name=effect,proto3" json:"effect,omitempty"`
-	Traits         []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
-	CardEffectJson string                 `protobuf:"bytes,9,opt,name=card_effect_json,json=cardEffectJson,proto3" json:"card_effect_json,omitempty"` // カード管理UI向けの効果定義JSON（編集用）
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type          CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
+	Cost          int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
+	Attack        *int32                 `protobuf:"varint,5,opt,name=attack,proto3,oneof" json:"attack,omitempty"`
+	Defense       *int32                 `protobuf:"varint,6,opt,name=defense,proto3,oneof" json:"defense,omitempty"`
+	Effect        string                 `protobuf:"bytes,7,opt,name=effect,proto3" json:"effect,omitempty"`
+	Traits        []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
+	CardEffect    *CardEffect            `protobuf:"bytes,9,opt,name=card_effect,json=cardEffect,proto3,oneof" json:"card_effect,omitempty"` // カード管理UI向けの効果定義(型安全)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Card) Reset() {
 	*x = Card{}
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_common_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -229,7 +934,7 @@ func (x *Card) String() string {
 func (*Card) ProtoMessage() {}
 
 func (x *Card) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[0]
+	mi := &file_common_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -242,7 +947,7 @@ func (x *Card) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Card.ProtoReflect.Descriptor instead.
 func (*Card) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{0}
+	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Card) GetId() string {
@@ -301,11 +1006,11 @@ func (x *Card) GetTraits() []Trait {
 	return nil
 }
 
-func (x *Card) GetCardEffectJson() string {
+func (x *Card) GetCardEffect() *CardEffect {
 	if x != nil {
-		return x.CardEffectJson
+		return x.CardEffect
 	}
-	return ""
+	return nil
 }
 
 // ユニット
@@ -329,7 +1034,7 @@ type Unit struct {
 
 func (x *Unit) Reset() {
 	*x = Unit{}
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -341,7 +1046,7 @@ func (x *Unit) String() string {
 func (*Unit) ProtoMessage() {}
 
 func (x *Unit) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[1]
+	mi := &file_common_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +1059,7 @@ func (x *Unit) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Unit.ProtoReflect.Descriptor instead.
 func (*Unit) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{1}
+	return file_common_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Unit) GetCardId() string {
@@ -462,7 +1167,7 @@ type Player struct {
 
 func (x *Player) Reset() {
 	*x = Player{}
-	mi := &file_common_proto_msgTypes[2]
+	mi := &file_common_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -474,7 +1179,7 @@ func (x *Player) String() string {
 func (*Player) ProtoMessage() {}
 
 func (x *Player) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[2]
+	mi := &file_common_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +1192,7 @@ func (x *Player) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Player.ProtoReflect.Descriptor instead.
 func (*Player) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{2}
+	return file_common_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Player) GetId() string {
@@ -594,7 +1299,7 @@ type GameState struct {
 
 func (x *GameState) Reset() {
 	*x = GameState{}
-	mi := &file_common_proto_msgTypes[3]
+	mi := &file_common_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -606,7 +1311,7 @@ func (x *GameState) String() string {
 func (*GameState) ProtoMessage() {}
 
 func (x *GameState) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[3]
+	mi := &file_common_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +1324,7 @@ func (x *GameState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameState.ProtoReflect.Descriptor instead.
 func (*GameState) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{3}
+	return file_common_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GameState) GetGameId() string {
@@ -715,7 +1420,7 @@ type GameEvent struct {
 
 func (x *GameEvent) Reset() {
 	*x = GameEvent{}
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -727,7 +1432,7 @@ func (x *GameEvent) String() string {
 func (*GameEvent) ProtoMessage() {}
 
 func (x *GameEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_common_proto_msgTypes[4]
+	mi := &file_common_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +1445,7 @@ func (x *GameEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameEvent.ProtoReflect.Descriptor instead.
 func (*GameEvent) Descriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{4}
+	return file_common_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GameEvent) GetGameId() string {
@@ -792,11 +1497,163 @@ func (x *GameEvent) GetTimestamp() *timestamppb.Timestamp {
 	return nil
 }
 
+// デッキ
+type Deck struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	CardIds       []string               `protobuf:"bytes,4,rep,name=card_ids,json=cardIds,proto3" json:"card_ids,omitempty"`
+	UserId        string                 `protobuf:"bytes,5,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Deck) Reset() {
+	*x = Deck{}
+	mi := &file_common_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Deck) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Deck) ProtoMessage() {}
+
+func (x *Deck) ProtoReflect() protoreflect.Message {
+	mi := &file_common_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Deck.ProtoReflect.Descriptor instead.
+func (*Deck) Descriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *Deck) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Deck) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Deck) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Deck) GetCardIds() []string {
+	if x != nil {
+		return x.CardIds
+	}
+	return nil
+}
+
+func (x *Deck) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *Deck) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Deck) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
 var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaa\x02\n" +
+	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9e\x02\n" +
+	"\fAtomicEffect\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x121\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x1d.cardgame.v1.AtomicEffectTypeR\x04type\x128\n" +
+	"\x06target\x18\x03 \x01(\v2\x1b.cardgame.v1.TargetSelectorH\x00R\x06target\x88\x01\x01\x12\x19\n" +
+	"\x05value\x18\x04 \x01(\x05H\x01R\x05value\x88\x01\x01\x12\x1c\n" +
+	"\acard_id\x18\x05 \x01(\tH\x02R\x06cardId\x88\x01\x01\x12-\n" +
+	"\x05trait\x18\x06 \x01(\x0e2\x12.cardgame.v1.TraitH\x03R\x05trait\x88\x01\x01B\t\n" +
+	"\a_targetB\b\n" +
+	"\x06_valueB\n" +
+	"\n" +
+	"\b_card_idB\b\n" +
+	"\x06_trait\"\x93\x01\n" +
+	"\x0eTargetSelector\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12+\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x17.cardgame.v1.TargetTypeR\x04type\x129\n" +
+	"\x06filter\x18\x03 \x01(\v2\x1c.cardgame.v1.ConditionFilterH\x00R\x06filter\x88\x01\x01B\t\n" +
+	"\a_filter\"h\n" +
+	"\x0fConditionFilter\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12%\n" +
+	"\x0econdition_type\x18\x02 \x01(\tR\rconditionType\x12\x1e\n" +
+	"\n" +
+	"parameters\x18\x03 \x03(\tR\n" +
+	"parameters\"\xdf\x06\n" +
+	"\x0fEffectChainNode\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x124\n" +
+	"\x04type\x18\x02 \x01(\x0e2 .cardgame.v1.EffectChainNodeTypeR\x04type\x12C\n" +
+	"\ratomic_effect\x18\x03 \x01(\v2\x19.cardgame.v1.AtomicEffectH\x00R\fatomicEffect\x88\x01\x01\x125\n" +
+	"\x04next\x18\x04 \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\x01R\x04next\x88\x01\x01\x128\n" +
+	"\bchildren\x18\x05 \x03(\v2\x1c.cardgame.v1.EffectChainNodeR\bchildren\x12>\n" +
+	"\tthen_node\x18\x06 \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\x02R\bthenNode\x88\x01\x01\x12>\n" +
+	"\telse_node\x18\a \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\x03R\belseNode\x88\x01\x01\x12?\n" +
+	"\tcondition\x18\b \x01(\v2\x1c.cardgame.v1.ConditionFilterH\x04R\tcondition\x88\x01\x01\x12F\n" +
+	"\rrepeat_effect\x18\t \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\x05R\frepeatEffect\x88\x01\x01\x12&\n" +
+	"\frepeat_count\x18\n" +
+	" \x01(\x05H\x06R\vrepeatCount\x88\x01\x01\x12H\n" +
+	"\x0eforeach_effect\x18\v \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\aR\rforeachEffect\x88\x01\x01\x12G\n" +
+	"\x0eforeach_target\x18\f \x01(\v2\x1b.cardgame.v1.TargetSelectorH\bR\rforeachTarget\x88\x01\x01B\x10\n" +
+	"\x0e_atomic_effectB\a\n" +
+	"\x05_nextB\f\n" +
+	"\n" +
+	"_then_nodeB\f\n" +
+	"\n" +
+	"_else_nodeB\f\n" +
+	"\n" +
+	"_conditionB\x10\n" +
+	"\x0e_repeat_effectB\x0f\n" +
+	"\r_repeat_countB\x11\n" +
+	"\x0f_foreach_effectB\x11\n" +
+	"\x0f_foreach_target\"\x89\x01\n" +
+	"\x10EffectDefinition\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12%\n" +
+	"\x0erequire_target\x18\x02 \x01(\bR\rrequireTarget\x125\n" +
+	"\x04root\x18\x03 \x01(\v2\x1c.cardgame.v1.EffectChainNodeH\x00R\x04root\x88\x01\x01B\a\n" +
+	"\x05_root\"v\n" +
+	"\n" +
+	"CardEffect\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\rR\x02id\x12\x17\n" +
+	"\acard_id\x18\x02 \x01(\tR\x06cardId\x12?\n" +
+	"\vdefinitions\x18\x03 \x03(\v2\x1d.cardgame.v1.EffectDefinitionR\vdefinitions\"\xcf\x02\n" +
 	"\x04Card\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -805,11 +1662,13 @@ const file_common_proto_rawDesc = "" +
 	"\x06attack\x18\x05 \x01(\x05H\x00R\x06attack\x88\x01\x01\x12\x1d\n" +
 	"\adefense\x18\x06 \x01(\x05H\x01R\adefense\x88\x01\x01\x12\x16\n" +
 	"\x06effect\x18\a \x01(\tR\x06effect\x12*\n" +
-	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12(\n" +
-	"\x10card_effect_json\x18\t \x01(\tR\x0ecardEffectJsonB\t\n" +
+	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12=\n" +
+	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x02R\n" +
+	"cardEffect\x88\x01\x01B\t\n" +
 	"\a_attackB\n" +
 	"\n" +
-	"\b_defense\"\xfd\x02\n" +
+	"\b_defenseB\x0e\n" +
+	"\f_card_effect\"\xfd\x02\n" +
 	"\x04Unit\x12\x17\n" +
 	"\acard_id\x18\x01 \x01(\tR\x06cardId\x12\x1f\n" +
 	"\vinstance_id\x18\x02 \x01(\tR\n" +
@@ -865,7 +1724,17 @@ const file_common_proto_rawDesc = "" +
 	"event_type\x18\x04 \x01(\tR\teventType\x12\x1b\n" +
 	"\tplayer_id\x18\x05 \x01(\tR\bplayerId\x12\x18\n" +
 	"\adetails\x18\x06 \x01(\tR\adetails\x128\n" +
-	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp*d\n" +
+	"\ttimestamp\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xf6\x01\n" +
+	"\x04Deck\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x19\n" +
+	"\bcard_ids\x18\x04 \x03(\tR\acardIds\x12\x17\n" +
+	"\auser_id\x18\x05 \x01(\tR\x06userId\x129\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*d\n" +
 	"\bCardType\x12\x19\n" +
 	"\x15CARD_TYPE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eCARD_TYPE_UNIT\x10\x01\x12\x13\n" +
@@ -887,7 +1756,53 @@ const file_common_proto_rawDesc = "" +
 	"\x0fGAME_PHASE_DRAW\x10\x02\x12\x1c\n" +
 	"\x18GAME_PHASE_RESOURCE_GAIN\x10\x03\x12\x13\n" +
 	"\x0fGAME_PHASE_MAIN\x10\x04\x12\x17\n" +
-	"\x13GAME_PHASE_TURN_END\x10\x05B0Z.card_game/api/gen/proto/cardgame/v1;cardgamev1b\x06proto3"
+	"\x13GAME_PHASE_TURN_END\x10\x05*\xdd\x06\n" +
+	"\x10AtomicEffectType\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_UNSPECIFIED\x10\x00\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_DEAL_DAMAGE\x10\x01\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_DEAL_SPLASH\x10\x02\x12!\n" +
+	"\x1dATOMIC_EFFECT_TYPE_RESTORE_HP\x10\x03\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_RESTORE_MANA\x10\x04\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_FULL_RESTORE\x10\x05\x12 \n" +
+	"\x1cATOMIC_EFFECT_TYPE_DRAW_CARD\x10\x06\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_DISCARD_CARD\x10\a\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_SEARCH_CARD\x10\b\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_SHUFFLE_DECK\x10\t\x12$\n" +
+	" ATOMIC_EFFECT_TYPE_MODIFY_ATTACK\x10\n" +
+	"\x12%\n" +
+	"!ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE\x10\v\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_MODIFY_COST\x10\f\x12$\n" +
+	" ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP\x10\r\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_SUMMON_UNIT\x10\x0e\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_DESTROY_UNIT\x10\x0f\x12%\n" +
+	"!ATOMIC_EFFECT_TYPE_RETURN_TO_HAND\x10\x10\x12%\n" +
+	"!ATOMIC_EFFECT_TYPE_RETURN_TO_DECK\x10\x11\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_DISABLE_UNIT\x10\x12\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_GRANT_TRAIT\x10\x13\x12#\n" +
+	"\x1fATOMIC_EFFECT_TYPE_REMOVE_TRAIT\x10\x14\x12 \n" +
+	"\x1cATOMIC_EFFECT_TYPE_GAIN_MANA\x10\x15\x12\"\n" +
+	"\x1eATOMIC_EFFECT_TYPE_REDUCE_COST\x10\x16*\xd2\x02\n" +
+	"\n" +
+	"TargetType\x12\x1b\n" +
+	"\x17TARGET_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
+	"\x10TARGET_TYPE_SELF\x10\x01\x12\x1c\n" +
+	"\x18TARGET_TYPE_ENEMY_LEADER\x10\x02\x12\x1b\n" +
+	"\x17TARGET_TYPE_ALLY_LEADER\x10\x03\x12\x1a\n" +
+	"\x16TARGET_TYPE_ENEMY_UNIT\x10\x04\x12\x19\n" +
+	"\x15TARGET_TYPE_ALLY_UNIT\x10\x05\x12\x19\n" +
+	"\x15TARGET_TYPE_ALL_UNITS\x10\x06\x12\x1f\n" +
+	"\x1bTARGET_TYPE_ALL_ENEMY_UNITS\x10\a\x12\x1e\n" +
+	"\x1aTARGET_TYPE_ALL_ALLY_UNITS\x10\b\x12!\n" +
+	"\x1dTARGET_TYPE_RANDOM_ENEMY_UNIT\x10\t\x12 \n" +
+	"\x1cTARGET_TYPE_RANDOM_ALLY_UNIT\x10\n" +
+	"*\xe9\x01\n" +
+	"\x13EffectChainNodeType\x12&\n" +
+	"\"EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bEFFECT_CHAIN_NODE_TYPE_THEN\x10\x01\x12\x1e\n" +
+	"\x1aEFFECT_CHAIN_NODE_TYPE_AND\x10\x02\x12\"\n" +
+	"\x1eEFFECT_CHAIN_NODE_TYPE_IF_ELSE\x10\x03\x12!\n" +
+	"\x1dEFFECT_CHAIN_NODE_TYPE_REPEAT\x10\x04\x12\"\n" +
+	"\x1eEFFECT_CHAIN_NODE_TYPE_FOREACH\x10\x05B0Z.card_game/api/gen/proto/cardgame/v1;cardgamev1b\x06proto3"
 
 var (
 	file_common_proto_rawDescOnce sync.Once
@@ -901,34 +1816,64 @@ func file_common_proto_rawDescGZIP() []byte {
 	return file_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_common_proto_goTypes = []any{
 	(CardType)(0),                 // 0: cardgame.v1.CardType
 	(Trait)(0),                    // 1: cardgame.v1.Trait
 	(GamePhase)(0),                // 2: cardgame.v1.GamePhase
-	(*Card)(nil),                  // 3: cardgame.v1.Card
-	(*Unit)(nil),                  // 4: cardgame.v1.Unit
-	(*Player)(nil),                // 5: cardgame.v1.Player
-	(*GameState)(nil),             // 6: cardgame.v1.GameState
-	(*GameEvent)(nil),             // 7: cardgame.v1.GameEvent
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(AtomicEffectType)(0),         // 3: cardgame.v1.AtomicEffectType
+	(TargetType)(0),               // 4: cardgame.v1.TargetType
+	(EffectChainNodeType)(0),      // 5: cardgame.v1.EffectChainNodeType
+	(*AtomicEffect)(nil),          // 6: cardgame.v1.AtomicEffect
+	(*TargetSelector)(nil),        // 7: cardgame.v1.TargetSelector
+	(*ConditionFilter)(nil),       // 8: cardgame.v1.ConditionFilter
+	(*EffectChainNode)(nil),       // 9: cardgame.v1.EffectChainNode
+	(*EffectDefinition)(nil),      // 10: cardgame.v1.EffectDefinition
+	(*CardEffect)(nil),            // 11: cardgame.v1.CardEffect
+	(*Card)(nil),                  // 12: cardgame.v1.Card
+	(*Unit)(nil),                  // 13: cardgame.v1.Unit
+	(*Player)(nil),                // 14: cardgame.v1.Player
+	(*GameState)(nil),             // 15: cardgame.v1.GameState
+	(*GameEvent)(nil),             // 16: cardgame.v1.GameEvent
+	(*Deck)(nil),                  // 17: cardgame.v1.Deck
+	(*timestamppb.Timestamp)(nil), // 18: google.protobuf.Timestamp
 }
 var file_common_proto_depIdxs = []int32{
-	0, // 0: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
-	1, // 1: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
-	1, // 2: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
-	4, // 3: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
-	3, // 4: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
-	5, // 5: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
-	5, // 6: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
-	2, // 7: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
-	8, // 8: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	3,  // 0: cardgame.v1.AtomicEffect.type:type_name -> cardgame.v1.AtomicEffectType
+	7,  // 1: cardgame.v1.AtomicEffect.target:type_name -> cardgame.v1.TargetSelector
+	1,  // 2: cardgame.v1.AtomicEffect.trait:type_name -> cardgame.v1.Trait
+	4,  // 3: cardgame.v1.TargetSelector.type:type_name -> cardgame.v1.TargetType
+	8,  // 4: cardgame.v1.TargetSelector.filter:type_name -> cardgame.v1.ConditionFilter
+	5,  // 5: cardgame.v1.EffectChainNode.type:type_name -> cardgame.v1.EffectChainNodeType
+	6,  // 6: cardgame.v1.EffectChainNode.atomic_effect:type_name -> cardgame.v1.AtomicEffect
+	9,  // 7: cardgame.v1.EffectChainNode.next:type_name -> cardgame.v1.EffectChainNode
+	9,  // 8: cardgame.v1.EffectChainNode.children:type_name -> cardgame.v1.EffectChainNode
+	9,  // 9: cardgame.v1.EffectChainNode.then_node:type_name -> cardgame.v1.EffectChainNode
+	9,  // 10: cardgame.v1.EffectChainNode.else_node:type_name -> cardgame.v1.EffectChainNode
+	8,  // 11: cardgame.v1.EffectChainNode.condition:type_name -> cardgame.v1.ConditionFilter
+	9,  // 12: cardgame.v1.EffectChainNode.repeat_effect:type_name -> cardgame.v1.EffectChainNode
+	9,  // 13: cardgame.v1.EffectChainNode.foreach_effect:type_name -> cardgame.v1.EffectChainNode
+	7,  // 14: cardgame.v1.EffectChainNode.foreach_target:type_name -> cardgame.v1.TargetSelector
+	9,  // 15: cardgame.v1.EffectDefinition.root:type_name -> cardgame.v1.EffectChainNode
+	10, // 16: cardgame.v1.CardEffect.definitions:type_name -> cardgame.v1.EffectDefinition
+	0,  // 17: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
+	1,  // 18: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
+	11, // 19: cardgame.v1.Card.card_effect:type_name -> cardgame.v1.CardEffect
+	1,  // 20: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
+	13, // 21: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
+	12, // 22: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
+	14, // 23: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
+	14, // 24: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
+	2,  // 25: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
+	18, // 26: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
+	18, // 27: cardgame.v1.Deck.created_at:type_name -> google.protobuf.Timestamp
+	18, // 28: cardgame.v1.Deck.updated_at:type_name -> google.protobuf.Timestamp
+	29, // [29:29] is the sub-list for method output_type
+	29, // [29:29] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }
@@ -937,14 +1882,18 @@ func file_common_proto_init() {
 		return
 	}
 	file_common_proto_msgTypes[0].OneofWrappers = []any{}
+	file_common_proto_msgTypes[1].OneofWrappers = []any{}
 	file_common_proto_msgTypes[3].OneofWrappers = []any{}
+	file_common_proto_msgTypes[4].OneofWrappers = []any{}
+	file_common_proto_msgTypes[6].OneofWrappers = []any{}
+	file_common_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   5,
+			NumEnums:      6,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

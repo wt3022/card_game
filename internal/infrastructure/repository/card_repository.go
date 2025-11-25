@@ -8,21 +8,11 @@ import (
 	"strings"
 
 	"card_game/internal/core/entity"
+	"card_game/internal/core/port"
 	"card_game/internal/infrastructure/persistence/model"
 
 	"gorm.io/gorm"
 )
-
-// CardRepository カードリポジトリインターフェース
-type CardRepository interface {
-	Create(card *entity.Card) error
-	FindByID(id string) (*entity.Card, error)
-	FindAll() ([]*entity.Card, error)
-	FindByType(cardType entity.CardType) ([]*entity.Card, error)
-	Update(card *entity.Card) error
-	Delete(id string) error
-	SaveCardEffect(cardID string, cardEffectModel *model.CardEffectModel) error
-}
 
 // cardRepository カードリポジトリの実装
 type cardRepository struct {
@@ -30,7 +20,7 @@ type cardRepository struct {
 }
 
 // NewCardRepository 新しいカードリポジトリを作成
-func NewCardRepository(db *gorm.DB) CardRepository {
+func NewCardRepository(db *gorm.DB) port.CardRepository {
 	return &cardRepository{db: db}
 }
 
@@ -103,7 +93,12 @@ func (r *cardRepository) attachCardEffect(card *entity.Card) error {
 }
 
 // SaveCardEffect CardEffectを保存（model構造を直接受け取る）
-func (r *cardRepository) SaveCardEffect(cardID string, cardEffectModel *model.CardEffectModel) error {
+func (r *cardRepository) SaveCardEffect(cardID string, cardEffectModelInterface interface{}) error {
+	cardEffectModel, ok := cardEffectModelInterface.(*model.CardEffectModel)
+	if !ok {
+		return fmt.Errorf("invalid card effect model type")
+	}
+
 	if cardEffectModel == nil || len(cardEffectModel.Definitions) == 0 {
 		// CardEffectが存在しない場合は既存のものを削除
 		if err := r.db.Where("card_id = ?", cardID).Delete(&model.CardEffectModel{}).Error; err != nil {
@@ -181,27 +176,26 @@ func (r *cardRepository) saveEffectChainNodeModel(node *model.EffectChainNodeMod
 	// ノードタイプに応じた具体テーブルに保存
 	switch node.Type {
 	case "THEN":
-		if node.Sequential != nil {
-			var nextID *uint
-			if node.Sequential.Next != nil {
-				nextNodeID, err := r.saveEffectChainNodeModel(node.Sequential.Next)
-				if err != nil {
-					return 0, err
-				}
-				nextID = &nextNodeID
+		var nextID *uint
+		if node.Sequential != nil && node.Sequential.Next != nil {
+			nextNodeID, err := r.saveEffectChainNodeModel(node.Sequential.Next)
+			if err != nil {
+				return 0, err
 			}
-			seqModel := &model.SequentialNodeModel{
-				NodeID: nodeModel.ID,
-				NextID: nextID,
-			}
-			if err := r.db.Create(seqModel).Error; err != nil {
-				return 0, fmt.Errorf("failed to create sequential node: %w", err)
-			}
+			nextID = &nextNodeID
+		}
+		// THENノードは必ずsequential_nodesテーブルにレコードを作成
+		seqModel := &model.SequentialNodeModel{
+			NodeID: nodeModel.ID,
+			NextID: nextID,
+		}
+		if err := r.db.Create(seqModel).Error; err != nil {
+			return 0, fmt.Errorf("failed to create sequential node: %w", err)
 		}
 	case "AND":
+		// Childrenを保存
+		var childIDs []uint
 		if node.Parallel != nil {
-			// Childrenを保存
-			var childIDs []uint
 			for _, child := range node.Parallel.Children {
 				if child != nil {
 					childID, err := r.saveEffectChainNodeModel(child)
@@ -211,34 +205,35 @@ func (r *cardRepository) saveEffectChainNodeModel(node *model.EffectChainNodeMod
 					childIDs = append(childIDs, childID)
 				}
 			}
+		}
 
-			// ParallelNextを保存
-			var parallelNextID *uint
-			if node.Parallel.ParallelNext != nil {
-				nextNodeID, err := r.saveEffectChainNodeModel(node.Parallel.ParallelNext)
-				if err != nil {
-					return 0, fmt.Errorf("failed to save parallel next node: %w", err)
-				}
-				parallelNextID = &nextNodeID
+		// ParallelNextを保存
+		var parallelNextID *uint
+		if node.Parallel != nil && node.Parallel.ParallelNext != nil {
+			nextNodeID, err := r.saveEffectChainNodeModel(node.Parallel.ParallelNext)
+			if err != nil {
+				return 0, fmt.Errorf("failed to save parallel next node: %w", err)
 			}
+			parallelNextID = &nextNodeID
+		}
 
-			parModel := &model.ParallelNodeModel{
-				NodeID:         nodeModel.ID,
-				ParallelNextID: parallelNextID,
-			}
-			if err := r.db.Create(parModel).Error; err != nil {
-				return 0, fmt.Errorf("failed to create parallel node: %w", err)
-			}
+		// ANDノードは必ずparallel_nodesテーブルにレコードを作成
+		parModel := &model.ParallelNodeModel{
+			NodeID:         nodeModel.ID,
+			ParallelNextID: parallelNextID,
+		}
+		if err := r.db.Create(parModel).Error; err != nil {
+			return 0, fmt.Errorf("failed to create parallel node: %w", err)
+		}
 
-			// 中間テーブルにChildrenを保存
-			for _, childID := range childIDs {
-				childModel := &model.ParallelNodeChildModel{
-					ParallelNodeID: nodeModel.ID,
-					ChildNodeID:    childID,
-				}
-				if err := r.db.Create(childModel).Error; err != nil {
-					return 0, fmt.Errorf("failed to create parallel node child: %w", err)
-				}
+		// 中間テーブルにChildrenを保存
+		for _, childID := range childIDs {
+			childModel := &model.ParallelNodeChildModel{
+				ParallelNodeID: nodeModel.ID,
+				ChildNodeID:    childID,
+			}
+			if err := r.db.Create(childModel).Error; err != nil {
+				return 0, fmt.Errorf("failed to create parallel node child: %w", err)
 			}
 		}
 	case "IF_ELSE":
@@ -724,6 +719,10 @@ func (r *cardRepository) loadSequentialNode(nodeID uint, atomicEffect *entity.At
 func (r *cardRepository) loadParallelNode(nodeID uint) (*entity.ParallelNode, error) {
 	var parModel model.ParallelNodeModel
 	if err := r.db.First(&parModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// レコードがない場合は空のParallelNodeを返す
+			return &entity.ParallelNode{Children: []*entity.EffectChainNode{}}, nil
+		}
 		return nil, fmt.Errorf("failed to load parallel node: %w", err)
 	}
 
@@ -936,4 +935,322 @@ func (r *cardRepository) loadCondition(id uint) (*entity.Condition, error) {
 		Operator: entity.ComparisonOperator(conditionModel.Operator),
 		Value:    conditionModel.Value,
 	}, nil
+}
+
+// LoadCardEffectModel CardEffectModelをロード（Protoへの変換用）
+func (r *cardRepository) LoadCardEffectModel(cardID string) (*model.CardEffectModel, error) {
+	var cardEffectModel model.CardEffectModel
+	if err := r.db.Where("card_id = ?", cardID).First(&cardEffectModel).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to load card effect model: %w", err)
+	}
+
+	// Definitionsをロード
+	definitions, err := r.loadEffectDefinitionModels(cardEffectModel.ID)
+	if err != nil {
+		return nil, err
+	}
+	cardEffectModel.Definitions = definitions
+
+	return &cardEffectModel, nil
+}
+
+// loadEffectDefinitionModels EffectDefinitionModelsをロード
+func (r *cardRepository) loadEffectDefinitionModels(cardEffectID uint) ([]model.EffectDefinitionModel, error) {
+	var definitionModels []model.EffectDefinitionModel
+	if err := r.db.Where("card_effect_id = ?", cardEffectID).Find(&definitionModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to load effect definition models: %w", err)
+	}
+
+	for i := range definitionModels {
+		if definitionModels[i].RootNodeID != nil {
+			rootNode, err := r.loadEffectChainNodeModel(*definitionModels[i].RootNodeID)
+			if err != nil {
+				return nil, err
+			}
+			definitionModels[i].Root = rootNode
+		}
+	}
+
+	return definitionModels, nil
+}
+
+// loadEffectChainNodeModel EffectChainNodeModelをロード
+func (r *cardRepository) loadEffectChainNodeModel(nodeID uint) (*model.EffectChainNodeModel, error) {
+	var nodeModel model.EffectChainNodeModel
+	if err := r.db.First(&nodeModel, nodeID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load effect chain node model: %w", err)
+	}
+
+	// AtomicEffectをロード
+	if nodeModel.AtomicEffectID != nil {
+		atomicEffect, err := r.loadAtomicEffectModel(*nodeModel.AtomicEffectID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.AtomicEffect = atomicEffect
+	}
+
+	// ノードタイプに応じた具体構造をロード
+	switch nodeModel.Type {
+	case "THEN":
+		seq, err := r.loadSequentialNodeModel(nodeModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.Sequential = seq
+	case "AND":
+		par, err := r.loadParallelNodeModel(nodeModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.Parallel = par
+	case "IF_ELSE":
+		ifElse, err := r.loadIfElseNodeModel(nodeModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.IfElse = ifElse
+	case "REPEAT":
+		repeat, err := r.loadRepeatNodeModel(nodeModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.Repeat = repeat
+	case "FOREACH":
+		forEach, err := r.loadForEachNodeModel(nodeModel.ID)
+		if err != nil {
+			return nil, err
+		}
+		nodeModel.ForEach = forEach
+	}
+
+	return &nodeModel, nil
+}
+
+// loadSequentialNodeModel SequentialNodeModelをロード
+func (r *cardRepository) loadSequentialNodeModel(nodeID uint) (*model.SequentialNodeModel, error) {
+	var seqModel model.SequentialNodeModel
+	if err := r.db.First(&seqModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &model.SequentialNodeModel{NodeID: nodeID}, nil
+		}
+		return nil, fmt.Errorf("failed to load sequential node model: %w", err)
+	}
+
+	if seqModel.NextID != nil {
+		nextNode, err := r.loadEffectChainNodeModel(*seqModel.NextID)
+		if err != nil {
+			return nil, err
+		}
+		seqModel.Next = nextNode
+	}
+
+	return &seqModel, nil
+}
+
+// loadParallelNodeModel ParallelNodeModelをロード
+func (r *cardRepository) loadParallelNodeModel(nodeID uint) (*model.ParallelNodeModel, error) {
+	var parModel model.ParallelNodeModel
+	if err := r.db.First(&parModel, "node_id = ?", nodeID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load parallel node model: %w", err)
+	}
+
+	// 子ノードをロード
+	var childRelations []model.ParallelNodeChildModel
+	if err := r.db.Where("parallel_node_id = ?", nodeID).Find(&childRelations).Error; err != nil {
+		return nil, fmt.Errorf("failed to load parallel node children: %w", err)
+	}
+
+	parModel.Children = make([]*model.EffectChainNodeModel, 0, len(childRelations))
+	for _, childRel := range childRelations {
+		childNode, err := r.loadEffectChainNodeModel(childRel.ChildNodeID)
+		if err != nil {
+			return nil, err
+		}
+		parModel.Children = append(parModel.Children, childNode)
+	}
+
+	if parModel.ParallelNextID != nil {
+		nextNode, err := r.loadEffectChainNodeModel(*parModel.ParallelNextID)
+		if err != nil {
+			return nil, err
+		}
+		parModel.ParallelNext = nextNode
+	}
+
+	return &parModel, nil
+}
+
+// loadIfElseNodeModel IfElseNodeModelをロード
+func (r *cardRepository) loadIfElseNodeModel(nodeID uint) (*model.IfElseNodeModel, error) {
+	var ifElseModel model.IfElseNodeModel
+	if err := r.db.First(&ifElseModel, "node_id = ?", nodeID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load if_else node model: %w", err)
+	}
+
+	// Conditionをロード
+	condition, err := r.loadConditionModel(ifElseModel.ConditionID)
+	if err != nil {
+		return nil, err
+	}
+	ifElseModel.Condition = condition
+
+	// Thenをロード
+	thenNode, err := r.loadEffectChainNodeModel(ifElseModel.ThenID)
+	if err != nil {
+		return nil, err
+	}
+	ifElseModel.Then = thenNode
+
+	// Elseをロード
+	if ifElseModel.ElseID != nil {
+		elseNode, err := r.loadEffectChainNodeModel(*ifElseModel.ElseID)
+		if err != nil {
+			return nil, err
+		}
+		ifElseModel.Else = elseNode
+	}
+
+	return &ifElseModel, nil
+}
+
+// loadRepeatNodeModel RepeatNodeModelをロード
+func (r *cardRepository) loadRepeatNodeModel(nodeID uint) (*model.RepeatNodeModel, error) {
+	var repeatModel model.RepeatNodeModel
+	if err := r.db.First(&repeatModel, "node_id = ?", nodeID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load repeat node model: %w", err)
+	}
+
+	repeatEffect, err := r.loadEffectChainNodeModel(repeatModel.RepeatEffectID)
+	if err != nil {
+		return nil, err
+	}
+	repeatModel.RepeatEffect = repeatEffect
+
+	return &repeatModel, nil
+}
+
+// loadForEachNodeModel ForEachNodeModelをロード
+func (r *cardRepository) loadForEachNodeModel(nodeID uint) (*model.ForEachNodeModel, error) {
+	var forEachModel model.ForEachNodeModel
+	if err := r.db.First(&forEachModel, "node_id = ?", nodeID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load for_each node model: %w", err)
+	}
+
+	// ForEachTargetをロード
+	target, err := r.loadTargetSelectorModel(forEachModel.ForEachTargetID)
+	if err != nil {
+		return nil, err
+	}
+	forEachModel.ForEachTarget = target
+
+	// ForEachEffectをロード
+	effectNode, err := r.loadEffectChainNodeModel(forEachModel.ForEachEffectID)
+	if err != nil {
+		return nil, err
+	}
+	forEachModel.ForEachEffect = effectNode
+
+	return &forEachModel, nil
+}
+
+// loadAtomicEffectModel AtomicEffectModelをロード
+func (r *cardRepository) loadAtomicEffectModel(id uint) (*model.AtomicEffectModel, error) {
+	var atomicModel model.AtomicEffectModel
+	if err := r.db.First(&atomicModel, id).Error; err != nil {
+		return nil, fmt.Errorf("failed to load atomic effect model: %w", err)
+	}
+
+	// Targetをロード
+	target, err := r.loadTargetSelectorModel(atomicModel.TargetID)
+	if err != nil {
+		return nil, err
+	}
+	atomicModel.Target = target
+
+	// Conditionをロード
+	if atomicModel.ConditionID != nil {
+		condition, err := r.loadConditionModel(*atomicModel.ConditionID)
+		if err != nil {
+			return nil, err
+		}
+		atomicModel.Condition = condition
+	}
+
+	return &atomicModel, nil
+}
+
+// loadTargetSelectorModel TargetSelectorModelをロード
+func (r *cardRepository) loadTargetSelectorModel(id uint) (*model.TargetSelectorModel, error) {
+	var selector model.TargetSelectorModel
+	if err := r.db.First(&selector, id).Error; err != nil {
+		return nil, fmt.Errorf("failed to load target selector model: %w", err)
+	}
+
+	// Filterをロード
+	if selector.FilterID != nil {
+		filter, err := r.loadTargetFilterModel(*selector.FilterID)
+		if err != nil {
+			return nil, err
+		}
+		selector.Filter = filter
+	}
+
+	return &selector, nil
+}
+
+// loadTargetFilterModel TargetFilterModelをロード
+func (r *cardRepository) loadTargetFilterModel(id uint) (*model.TargetFilterModel, error) {
+	var filterModel model.TargetFilterModel
+	if err := r.db.First(&filterModel, id).Error; err != nil {
+		return nil, fmt.Errorf("failed to load target filter model: %w", err)
+	}
+
+	// Traitsをロード
+	var traitModels []model.TargetFilterTraitModel
+	if err := r.db.Where("filter_id = ?", id).Find(&traitModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to load target filter traits: %w", err)
+	}
+
+	for _, traitModel := range traitModels {
+		if traitModel.IsHasTrait {
+			filterModel.HasTraits = append(filterModel.HasTraits, traitModel)
+		} else {
+			filterModel.LackTraits = append(filterModel.LackTraits, traitModel)
+		}
+	}
+
+	return &filterModel, nil
+}
+
+// loadConditionModel ConditionModelをロード
+func (r *cardRepository) loadConditionModel(id uint) (*model.ConditionModel, error) {
+	var conditionModel model.ConditionModel
+	if err := r.db.First(&conditionModel, id).Error; err != nil {
+		return nil, fmt.Errorf("failed to load condition model: %w", err)
+	}
+
+	return &conditionModel, nil
+}
+
+// GetCardEffectAsProto CardEffectをProto形式で取得
+func (r *cardRepository) GetCardEffectAsProto(cardID string) (interface{}, error) {
+	cardEffectModel, err := r.LoadCardEffectModel(cardID)
+	if err != nil {
+		return nil, err
+	}
+	if cardEffectModel == nil {
+		return nil, nil
+	}
+
+	// Model→Proto変換
+	cardEffectProto, err := CardEffectModelToProto(cardEffectModel)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert card effect to proto: %w", err)
+	}
+
+	return cardEffectProto, nil
 }

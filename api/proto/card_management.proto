@@ -13,6 +13,12 @@ service CardManagementService {
   rpc ListCards(ListCardsRequest) returns (ListCardsResponse);
   rpc UpdateCard(UpdateCardRequest) returns (UpdateCardResponse);
   rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse);
+  
+  rpc CreateDeck(CreateDeckRequest) returns (CreateDeckResponse);
+  rpc GetDeck(GetDeckRequest) returns (GetDeckResponse);
+  rpc ListDecks(ListDecksRequest) returns (ListDecksResponse);
+  rpc UpdateDeck(UpdateDeckRequest) returns (UpdateDeckResponse);
+  rpc DeleteDeck(DeleteDeckRequest) returns (DeleteDeckResponse);
 }
 
 // カード作成リクエスト
@@ -25,7 +31,7 @@ message CreateCardRequest {
   optional int32 defense = 6;
   string effect_text = 7;
   repeated Trait traits = 8;
-  string card_effect_json = 9; // CardEffectModelをJSON文字列として送信（model構造に合わせる）
+  optional CardEffect card_effect = 9; // CardEffectModel構造を型安全に送信
 }
 
 // カード作成レスポンス
@@ -63,7 +69,7 @@ message UpdateCardRequest {
   optional int32 defense = 6;
   string effect_text = 7;
   repeated Trait traits = 8;
-  string card_effect_json = 9; // CardEffectModelをJSON文字列として送信（model構造に合わせる）
+  optional CardEffect card_effect = 9; // CardEffectModel構造を型安全に送信
 }
 
 // カード更新レスポンス
@@ -78,6 +84,62 @@ message DeleteCardRequest {
 
 // カード削除レスポンス
 message DeleteCardResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// デッキ作成リクエスト
+message CreateDeckRequest {
+  string name = 1;
+  string description = 2;
+  repeated string card_ids = 3;
+}
+
+// デッキ作成レスポンス
+message CreateDeckResponse {
+  Deck deck = 1;
+}
+
+// デッキ取得リクエスト
+message GetDeckRequest {
+  string id = 1;
+}
+
+// デッキ取得レスポンス
+message GetDeckResponse {
+  Deck deck = 1;
+}
+
+// デッキ一覧リクエスト
+message ListDecksRequest {
+  optional string user_id = 1; // 指定された場合、そのユーザーのデッキのみ取得
+}
+
+// デッキ一覧レスポンス
+message ListDecksResponse {
+  repeated Deck decks = 1;
+}
+
+// デッキ更新リクエスト
+message UpdateDeckRequest {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string card_ids = 4;
+}
+
+// デッキ更新レスポンス
+message UpdateDeckResponse {
+  Deck deck = 1;
+}
+
+// デッキ削除リクエスト
+message DeleteDeckRequest {
+  string id = 1;
+}
+
+// デッキ削除レスポンス
+message DeleteDeckResponse {
   bool success = 1;
   string message = 2;
 }

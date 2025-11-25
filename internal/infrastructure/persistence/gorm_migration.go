@@ -114,6 +114,16 @@ func RunGormMigrations(db *gorm.DB, logger port.Logger) error {
 				return nil
 			},
 		},
+		{
+			version:     "009",
+			description: "Create decks and deck_cards tables",
+			migrateFunc: func(db *gorm.DB) error {
+				return db.AutoMigrate(
+					&model.DeckModel{},
+					&model.DeckCardModel{},
+				)
+			},
+		},
 	}
 
 	// 実行済みマイグレーションを取得

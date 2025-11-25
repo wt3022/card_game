@@ -1,8 +1,18 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CardManagementService } from '../../gen/card_management_connect'
 import type { Card, Trait } from '../../gen/common_pb'
-import { CardType, Trait as TraitEnum } from '../../gen/common_pb'
-import { createAuthenticatedClient } from '../../lib/auth'
+import {
+  AtomicEffect as ProtoAtomicEffect,
+  AtomicEffectType,
+  CardEffect,
+  CardType,
+  EffectChainNode as ProtoEffectChainNode,
+  EffectChainNodeType,
+  EffectDefinition,
+  TargetSelector as ProtoTargetSelector,
+  TargetType,
+  Trait as TraitEnum,
+} from '../../gen/common_pb'
+import { cardManagementClient } from '../../lib/api-client'
 import EffectNodeEditor from './EffectNodeEditor'
 import './CardEditor.css'
 
@@ -125,11 +135,12 @@ type BackendEffectNode = {
   for_each?: BackendForEachNode | null
 }
 
-interface BackendCardEffect {
-  definitions?: Array<{
-    root?: BackendEffectNode | null
-  }>
-}
+// TODO: 効果の保存機能実装時に使用
+// interface BackendCardEffect {
+//   definitions?: Array<{
+//     root?: BackendEffectNode | null
+//   }>
+// }
 
 // 特性名の日本語マッピング
 const traitNames: Record<TraitEnum, string> = {
@@ -228,7 +239,7 @@ export const createDefaultEffectNode = (
 interface CardEditorProps {
   card: Card | null
   isNewCardMode?: boolean
-  onSave: () => void
+  onSave: (cardId: string) => void
   onCancel: () => void
 }
 
@@ -254,7 +265,127 @@ export default function CardEditor({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const cardClient = createAuthenticatedClient(CardManagementService)
+  // protobuf TargetSelector を UI TargetSelector に変換
+  const convertProtoTargetToUI = useCallback(
+    (protoTarget?: ProtoTargetSelector): TargetSelector => {
+      if (!protoTarget) {
+        return {
+          type: 'Self',
+          count: 0,
+          random: false,
+          select_by_max: '',
+          select_by_min: '',
+          filter: null,
+        }
+      }
+      // TODO: filter の変換を実装
+      return {
+        type: TargetType[protoTarget.type] || 'Self',
+        count: 0,
+        random: false,
+        select_by_max: '',
+        select_by_min: '',
+        filter: null,
+      }
+    },
+    [],
+  )
+
+  // protobuf AtomicEffect を UI AtomicEffect に変換
+  const convertProtoAtomicToUI = useCallback(
+    (protoEffect?: ProtoAtomicEffect): AtomicEffect => {
+      if (!protoEffect) {
+        return createDefaultAtomicEffect()
+      }
+      return {
+        type: AtomicEffectType[protoEffect.type] || 'DEAL_DAMAGE',
+        value: protoEffect.value || 0,
+        multiplier: 1.0,
+        duration: null,
+        timing: 'Immediate',
+        target: convertProtoTargetToUI(protoEffect.target),
+        condition: null,
+        parameters: '{}',
+      }
+    },
+    [convertProtoTargetToUI],
+  )
+
+  // protobuf EffectChainNode を UI EffectChainNode に変換
+  const convertProtoNodeToUI = useCallback(
+    (protoNode?: ProtoEffectChainNode): EffectChainNode | null => {
+      if (!protoNode) return null
+
+      const nodeType = EffectChainNodeType[protoNode.type] as EffectNodeType
+
+      switch (nodeType) {
+        case 'THEN':
+          return {
+            type: 'THEN',
+            atomic_effect: convertProtoAtomicToUI(protoNode.atomicEffect),
+            sequential: {
+              next_id: null,
+              next: convertProtoNodeToUI(protoNode.next),
+            },
+          }
+        case 'AND':
+          return {
+            type: 'AND',
+            parallel: {
+              children:
+                protoNode.children
+                  ?.map((child: ProtoEffectChainNode) =>
+                    convertProtoNodeToUI(child),
+                  )
+                  .filter((node): node is EffectChainNode => node !== null) ||
+                [],
+              parallel_next: null,
+            },
+          }
+        case 'IF_ELSE':
+          // TODO: condition の変換を実装
+          return {
+            type: 'IF_ELSE',
+            if_else: {
+              condition: {
+                type: 'PLAYER_HP',
+                operator: 'GREATER_THAN',
+                value: 0,
+              },
+              thenNode:
+                convertProtoNodeToUI(protoNode.thenNode) ||
+                createDefaultEffectNode('THEN'),
+              elseNode: convertProtoNodeToUI(protoNode.elseNode),
+            },
+          }
+        case 'REPEAT':
+          return {
+            type: 'REPEAT',
+            repeat: {
+              repeat_effect:
+                convertProtoNodeToUI(protoNode.repeatEffect) ||
+                createDefaultEffectNode('THEN'),
+              count: protoNode.repeatCount || 1,
+            },
+          }
+        case 'FOREACH':
+          return {
+            type: 'FOREACH',
+            for_each: {
+              for_each_effect:
+                convertProtoNodeToUI(protoNode.foreachEffect) ||
+                createDefaultEffectNode('THEN'),
+              for_each_target: convertProtoTargetToUI(
+                protoNode.foreachTarget,
+              ),
+            },
+          }
+        default:
+          return null
+      }
+    },
+    [convertProtoAtomicToUI, convertProtoTargetToUI],
+  )
 
   const normalizeTargetSelector = useCallback(
     (selector?: BackendTargetSelector | null): TargetSelector => ({
@@ -440,16 +571,17 @@ export default function CardEditor({
       let hasEffect = false
       let effectRoot: EffectChainNode | null = null
 
-      if (card.cardEffectJson) {
+      // cardEffectからエフェクトデータを読み込む
+      if (card.cardEffect) {
         try {
-          const parsed = JSON.parse(card.cardEffectJson) as BackendCardEffect
-          const definition = parsed?.definitions?.[0]
+          // CardEffectオブジェクトからエフェクトノードを変換
+          const definition = card.cardEffect.definitions?.[0]
           if (definition?.root) {
             hasEffect = true
-            effectRoot = convertNodeFromBackend(definition.root)
+            effectRoot = convertProtoNodeToUI(definition.root)
           }
         } catch (err) {
-          console.error('Failed to parse card effect json', err)
+          console.error('Failed to parse card effect', err)
         }
       }
 
@@ -479,25 +611,121 @@ export default function CardEditor({
         effectRoot: null,
       })
     }
-  }, [card, isNewCardMode, convertNodeFromBackend])
+  }, [card, isNewCardMode, convertProtoNodeToUI])
 
-  const buildCardEffectJson = (): string => {
+  // EffectChainNode → ProtoEffectChainNode変換
+  const convertNodeToProto = useCallback(
+    (node: EffectChainNode): ProtoEffectChainNode | undefined => {
+      // ノードタイプをproto enumに変換
+      const getProtoNodeType = (type: EffectNodeType): EffectChainNodeType => {
+        const typeMap: Record<EffectNodeType, EffectChainNodeType> = {
+          THEN: EffectChainNodeType.THEN,
+          AND: EffectChainNodeType.AND,
+          IF_ELSE: EffectChainNodeType.IF_ELSE,
+          REPEAT: EffectChainNodeType.REPEAT,
+          FOREACH: EffectChainNodeType.FOREACH,
+        }
+        return typeMap[type] || EffectChainNodeType.UNSPECIFIED
+      }
+
+      const protoNode = new ProtoEffectChainNode({
+        id: 0, // バックエンドで自動生成
+        type: getProtoNodeType(node.type),
+      })
+
+      // AtomicEffectの変換
+      if (node.atomic_effect) {
+        // 文字列をenumに変換（簡易実装：完全な変換は後で実装）
+        const effectType = (AtomicEffectType as  any)[
+          node.atomic_effect.type
+        ] as AtomicEffectType | undefined
+
+        const targetType = node.atomic_effect.target
+          ? ((TargetType as any)[
+              node.atomic_effect.target.type
+            ] as TargetType | undefined)
+          : undefined
+
+        protoNode.atomicEffect = new ProtoAtomicEffect({
+          id: 0, // バックエンドで自動生成
+          type: effectType ?? AtomicEffectType.UNSPECIFIED,
+          value: node.atomic_effect.value,
+          target: node.atomic_effect.target
+            ? new ProtoTargetSelector({
+                id: 0,
+                type: targetType ?? TargetType.UNSPECIFIED,
+                // maxCount/minCountなど、protoで定義されているフィールドのみ使用
+                // filter: TODO 必要に応じて実装
+              })
+            : undefined,
+        })
+      }
+
+      // THENノードの場合
+      if (node.sequential?.next) {
+        protoNode.next = convertNodeToProto(node.sequential.next)
+      }
+
+      // ANDノードの場合
+      if (node.parallel?.children) {
+        protoNode.children = node.parallel.children
+          .map((child) => convertNodeToProto(child))
+          .filter(
+            (child): child is ProtoEffectChainNode => child !== undefined,
+          )
+      }
+
+      // IF_ELSEノードの場合
+      if (node.if_else) {
+        protoNode.thenNode = convertNodeToProto(node.if_else.thenNode)
+        if (node.if_else.elseNode) {
+          protoNode.elseNode = convertNodeToProto(node.if_else.elseNode)
+        }
+        // condition: TODO 必要に応じて実装
+      }
+
+      // REPEATノードの場合
+      if (node.repeat) {
+        protoNode.repeatEffect = convertNodeToProto(node.repeat.repeat_effect)
+        protoNode.repeatCount = node.repeat.count
+      }
+
+      // FOREACHノードの場合
+      if (node.for_each) {
+        protoNode.foreachEffect = convertNodeToProto(
+          node.for_each.for_each_effect,
+        )
+        // foreachTarget: TODO 必要に応じて実装
+      }
+
+      return protoNode
+    },
+    [],
+  )
+
+  // CardEffect protobuf型への変換
+  const buildCardEffect = useCallback((): CardEffect | undefined => {
     if (!formData.hasEffect || !formData.effectRoot) {
-      return ''
+      return undefined
     }
 
-    // model構造に合わせたCardEffectModelを構築
-    const cardEffectModel = {
+    const protoRoot = convertNodeToProto(formData.effectRoot)
+    if (!protoRoot) {
+      return undefined
+    }
+
+    return new CardEffect({
+      id: 0, // バックエンドで自動生成
+      cardId: formData.id,
       definitions: [
-        {
-          require_target: false, // TODO: ルートノードから判定
-          root: convertNodeForBackend(formData.effectRoot),
-        },
+        new EffectDefinition({
+          id: 0, // バックエンドで自動生成
+          requireTarget: false, // TODO: UIから設定できるようにする
+          root: protoRoot,
+        }),
       ],
-    }
-
-    return JSON.stringify(cardEffectModel)
-  }
+    })
+  }, [formData.hasEffect, formData.effectRoot, formData.id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -505,10 +733,13 @@ export default function CardEditor({
     setError(null)
 
     try {
-      const cardEffectJson = buildCardEffectJson()
+      // CardEffect protobuf型に変換
+      const cardEffect = buildCardEffect()
+      let savedCardId: string
+
       if (card) {
         // 更新
-        await cardClient.updateCard({
+        const response = await cardManagementClient.updateCard({
           id: formData.id,
           name: formData.name,
           type: formData.type,
@@ -517,11 +748,12 @@ export default function CardEditor({
           defense: formData.defense,
           effectText: '', // 効果テキストは自動生成されるため空文字列を送信
           traits: formData.traits,
-          cardEffectJson,
+          cardEffect,
         })
+        savedCardId = response.card?.id || formData.id
       } else {
         // 作成
-        await cardClient.createCard({
+        const response = await cardManagementClient.createCard({
           id: formData.id,
           name: formData.name,
           type: formData.type,
@@ -530,10 +762,12 @@ export default function CardEditor({
           defense: formData.defense,
           effectText: '', // 効果テキストは自動生成されるため空文字列を送信
           traits: formData.traits,
-          cardEffectJson,
+          cardEffect,
         })
+        savedCardId = response.card?.id || formData.id
       }
-      onSave()
+
+      onSave(savedCardId)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '保存に失敗しました')
     } finally {

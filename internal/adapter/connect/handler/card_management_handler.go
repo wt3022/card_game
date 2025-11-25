@@ -2,8 +2,6 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"connectrpc.com/connect"
 
@@ -12,7 +10,8 @@ import (
 	"card_game/internal/adapter/converter"
 	"card_game/internal/application/service"
 	"card_game/internal/core/entity"
-	"card_game/internal/infrastructure/persistence/model"
+	"card_game/internal/core/port"
+	"card_game/internal/infrastructure/repository"
 )
 
 // ========================================
@@ -22,12 +21,16 @@ import (
 // CardManagementConnectHandler Connect-Go用のカード管理サービスハンドラー
 type CardManagementConnectHandler struct {
 	cardService *service.CardService
+	deckService *service.DeckService
+	cardRepo    port.CardRepository
 }
 
 // NewCardManagementConnectHandler 新しいCardManagementConnectHandlerを作成
-func NewCardManagementConnectHandler(cardService *service.CardService) *CardManagementConnectHandler {
+func NewCardManagementConnectHandler(cardService *service.CardService, deckService *service.DeckService, cardRepo port.CardRepository) *CardManagementConnectHandler {
 	return &CardManagementConnectHandler{
 		cardService: cardService,
+		deckService: deckService,
+		cardRepo:    cardRepo,
 	}
 }
 
@@ -50,13 +53,13 @@ func (h *CardManagementConnectHandler) CreateCard(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// CardEffectをmodel構造で保存
-	if req.Msg.GetCardEffectJson() != "" {
-		cardEffectModel := &model.CardEffectModel{}
-		if err := json.Unmarshal([]byte(req.Msg.GetCardEffectJson()), cardEffectModel); err != nil {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("failed to unmarshal card effect: %w", err))
+	// CardEffectを保存(protoから変換)
+	if req.Msg.CardEffect != nil {
+		cardEffectModel, err := repository.CardEffectFromProtoToModel(req.Msg.CardEffect)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := h.cardService.SaveCardEffect(card.ID, cardEffectModel); err != nil {
+		if err := h.cardRepo.SaveCardEffect(card.ID, cardEffectModel); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
@@ -86,6 +89,12 @@ func (h *CardManagementConnectHandler) GetCard(
 
 	// エンティティからprotoに変換
 	protoCard := converter.CardToProto(card)
+
+	// CardEffectをProto形式でロード
+	cardEffectProto, err := h.loadAndConvertCardEffect(cardID)
+	if err == nil && cardEffectProto != nil {
+		protoCard.CardEffect = cardEffectProto
+	}
 
 	resp := &pbv1.GetCardResponse{
 		Card: protoCard,
@@ -118,6 +127,11 @@ func (h *CardManagementConnectHandler) ListCards(
 	protoCards := make([]*pbv1.Card, len(cards))
 	for i, card := range cards {
 		protoCards[i] = converter.CardToProto(card)
+		// CardEffectをProto形式でロード
+		cardEffectProto, err := h.loadAndConvertCardEffect(card.ID)
+		if err == nil && cardEffectProto != nil {
+			protoCards[i].CardEffect = cardEffectProto
+		}
 	}
 
 	resp := &pbv1.ListCardsResponse{
@@ -143,13 +157,13 @@ func (h *CardManagementConnectHandler) UpdateCard(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// CardEffectをmodel構造で保存
-	if req.Msg.GetCardEffectJson() != "" {
-		cardEffectModel := &model.CardEffectModel{}
-		if err := json.Unmarshal([]byte(req.Msg.GetCardEffectJson()), cardEffectModel); err != nil {
-			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("failed to unmarshal card effect: %w", err))
+	// CardEffectを保存(protoから変換)
+	if req.Msg.CardEffect != nil {
+		cardEffectModel, err := repository.CardEffectFromProtoToModel(req.Msg.CardEffect)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := h.cardService.SaveCardEffect(card.ID, cardEffectModel); err != nil {
+		if err := h.cardRepo.SaveCardEffect(card.ID, cardEffectModel); err != nil {
 			return nil, connect.NewError(connect.CodeInternal, err)
 		}
 	}
@@ -213,16 +227,7 @@ func (h *CardManagementConnectHandler) protoToCard(msg *pbv1.CreateCardRequest) 
 		card.Defense = &defense
 	}
 
-	// CardEffectをJSONから復元（model構造に直接Unmarshal）
-	if msg.GetCardEffectJson() != "" {
-		cardEffectModel := &model.CardEffectModel{}
-		if err := json.Unmarshal([]byte(msg.GetCardEffectJson()), cardEffectModel); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal card effect: %w", err)
-		}
-		// modelからentityに変換（将来実装）
-		// 現在はmodel構造を直接使用
-		card.CardEffect = nil // TODO: modelからentityに変換
-	}
+	// CardEffectはハンドラーで直接Modelに変換して保存するため、ここでは設定しない
 
 	return card, nil
 }
@@ -256,16 +261,124 @@ func (h *CardManagementConnectHandler) protoToCardForUpdate(msg *pbv1.UpdateCard
 		card.Defense = &defense
 	}
 
-	// CardEffectをJSONから復元（model構造に直接Unmarshal）
-	if msg.GetCardEffectJson() != "" {
-		cardEffectModel := &model.CardEffectModel{}
-		if err := json.Unmarshal([]byte(msg.GetCardEffectJson()), cardEffectModel); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal card effect: %w", err)
-		}
-		// modelからentityに変換（将来実装）
-		// 現在はmodel構造を直接使用
-		card.CardEffect = nil // TODO: modelからentityに変換
-	}
+	// CardEffectはハンドラーで直接Modelに変換して保存するため、ここでは設定しない
 
 	return card, nil
+}
+
+// loadAndConvertCardEffect CardEffectModelをロードしてProtoに変換
+func (h *CardManagementConnectHandler) loadAndConvertCardEffect(cardID string) (*pbv1.CardEffect, error) {
+	cardEffectProtoInterface, err := h.cardRepo.GetCardEffectAsProto(cardID)
+	if err != nil {
+		return nil, err
+	}
+	if cardEffectProtoInterface == nil {
+		return nil, nil
+	}
+
+	// 型アサーション
+	cardEffectProto, ok := cardEffectProtoInterface.(*pbv1.CardEffect)
+	if !ok {
+		return nil, nil
+	}
+
+	return cardEffectProto, nil
+}
+
+// ========================================
+// デッキ管理エンドポイント
+// ========================================
+
+// CreateDeck デッキを作成
+func (h *CardManagementConnectHandler) CreateDeck(
+	ctx context.Context,
+	req *connect.Request[pbv1.CreateDeckRequest],
+) (*connect.Response[pbv1.CreateDeckResponse], error) {
+	// 認証情報からユーザーIDを取得
+	userID := "admin" // TODO: Interceptorから認証情報を取得する実装に変更
+
+	deck, err := h.deckService.CreateDeck(ctx, req.Msg.Name, req.Msg.Description, userID, req.Msg.CardIds)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	deckProto := converter.DeckToProto(deck)
+	return connect.NewResponse(&pbv1.CreateDeckResponse{
+		Deck: deckProto,
+	}), nil
+}
+
+// GetDeck デッキを取得
+func (h *CardManagementConnectHandler) GetDeck(
+	ctx context.Context,
+	req *connect.Request[pbv1.GetDeckRequest],
+) (*connect.Response[pbv1.GetDeckResponse], error) {
+	deck, err := h.deckService.GetDeck(ctx, req.Msg.Id)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeNotFound, err)
+	}
+
+	deckProto := converter.DeckToProto(deck)
+	return connect.NewResponse(&pbv1.GetDeckResponse{
+		Deck: deckProto,
+	}), nil
+}
+
+// ListDecks デッキ一覧を取得
+func (h *CardManagementConnectHandler) ListDecks(
+	ctx context.Context,
+	req *connect.Request[pbv1.ListDecksRequest],
+) (*connect.Response[pbv1.ListDecksResponse], error) {
+	var decks []*entity.Deck
+	var err error
+
+	if req.Msg.UserId != nil && *req.Msg.UserId != "" {
+		decks, err = h.deckService.ListDecksByUser(ctx, *req.Msg.UserId)
+	} else {
+		decks, err = h.deckService.ListAllDecks(ctx)
+	}
+
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	deckProtos := make([]*pbv1.Deck, len(decks))
+	for i, deck := range decks {
+		deckProtos[i] = converter.DeckToProto(deck)
+	}
+
+	return connect.NewResponse(&pbv1.ListDecksResponse{
+		Decks: deckProtos,
+	}), nil
+}
+
+// UpdateDeck デッキを更新
+func (h *CardManagementConnectHandler) UpdateDeck(
+	ctx context.Context,
+	req *connect.Request[pbv1.UpdateDeckRequest],
+) (*connect.Response[pbv1.UpdateDeckResponse], error) {
+	deck, err := h.deckService.UpdateDeck(ctx, req.Msg.Id, req.Msg.Name, req.Msg.Description, req.Msg.CardIds)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	deckProto := converter.DeckToProto(deck)
+	return connect.NewResponse(&pbv1.UpdateDeckResponse{
+		Deck: deckProto,
+	}), nil
+}
+
+// DeleteDeck デッキを削除
+func (h *CardManagementConnectHandler) DeleteDeck(
+	ctx context.Context,
+	req *connect.Request[pbv1.DeleteDeckRequest],
+) (*connect.Response[pbv1.DeleteDeckResponse], error) {
+	if err := h.deckService.DeleteDeck(ctx, req.Msg.Id); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	return connect.NewResponse(&pbv1.DeleteDeckResponse{
+		Success: true,
+		Message: "Deck deleted successfully",
+	}), nil
 }

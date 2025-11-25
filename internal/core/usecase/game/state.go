@@ -35,9 +35,6 @@ type State struct {
 
 // NewState は新しいゲーム状態を作成
 func NewState(gameID string, player1, player2 *entity.Player, logger port.Logger) *State {
-	if logger == nil {
-		logger = port.NewConsoleLogger()
-	}
 	return &State{
 		GameID:          gameID,
 		Player1:         player1,

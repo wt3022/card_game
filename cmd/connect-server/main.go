@@ -12,9 +12,9 @@ import (
 	"card_game/api/gen/proto/cardgame/v1/cardgamev1connect"
 	"card_game/internal/adapter/connect/handler"
 	"card_game/internal/adapter/connect/interceptor"
-	"card_game/internal/adapter/jwt"
 	"card_game/internal/application/service"
-	"card_game/internal/core/port"
+	"card_game/internal/infrastructure/auth"
+	"card_game/internal/infrastructure/logger"
 	"card_game/internal/infrastructure/persistence"
 	"card_game/internal/infrastructure/repository"
 
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// ロガーを初期化
-	logger := port.NewConsoleLogger()
+	logger := logger.NewConsoleLogger()
 
 	// データベース接続
 	dbConfig := persistence.NewDBConfig()
@@ -66,28 +66,30 @@ func main() {
 	log.Println("✅ GORM Migrations completed")
 
 	// JWTプロバイダーを初期化
-	tokenProvider, err := jwt.NewJWTProvider()
+	tokenProvider, err := auth.NewJWTProvider()
 	if err != nil {
 		log.Fatalf("Failed to initialize JWT provider: %v", err)
 	}
 
 	// パスワードハッシャーを初期化
-	passwordHasher := jwt.NewPasswordHasher()
+	passwordHasher := auth.NewPasswordHasher()
 
-	// リポジトリを初期化（GORMを使用）
+	// リポジトリを初期化(GORMを使用)
 	userRepo := repository.NewUserRepository(gormDB)
 	cardRepo := repository.NewCardRepository(gormDB)
+	deckRepo := repository.NewDeckRepository(gormDB)
 
-	// 初期管理者ユーザーを作成（存在しない場合）
+	// 初期管理者ユーザーを作成(存在しない場合)
 	if err := service.InitializeDefaultAdmin(userRepo, passwordHasher, logger); err != nil {
 		log.Printf("⚠️  Failed to initialize default admin user: %v", err)
-		// エラーでも続行（既に存在する場合など）
+		// エラーでも続行(既に存在する場合など)
 	}
 
 	// サービスを初期化
 	gameService := service.NewGameService(logger)
 	authService := service.NewAuthService(userRepo, tokenProvider, passwordHasher, logger)
 	cardService := service.NewCardService(cardRepo, logger)
+	deckService := service.NewDeckService(deckRepo, cardRepo, logger)
 
 	// 認証インターセプターを作成
 	authInterceptor := interceptor.NewAuthInterceptorFunc(tokenProvider)
@@ -95,7 +97,7 @@ func main() {
 	// Connect-Goハンドラーを初期化
 	gameHandler := handler.NewGameConnectHandler(gameService)
 	authHandler := handler.NewAuthConnectHandler(authService)
-	cardManagementHandler := handler.NewCardManagementConnectHandler(cardService)
+	cardManagementHandler := handler.NewCardManagementConnectHandler(cardService, deckService, cardRepo)
 
 	// マルチプレクサを作成
 	mux := http.NewServeMux()

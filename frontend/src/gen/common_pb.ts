@@ -3,15 +3,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type {
-  BinaryReadOptions,
-  FieldList,
-  JsonReadOptions,
-  JsonValue,
-  PartialMessage,
-  PlainMessage,
-} from '@bufbuild/protobuf'
-import { Message, proto3, Timestamp } from '@bufbuild/protobuf'
+import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * カードタイプ
@@ -40,12 +33,12 @@ export enum CardType {
   LEADER = 3,
 }
 // Retrieve enum metadata with: proto3.getEnumType(CardType)
-proto3.util.setEnumType(CardType, 'cardgame.v1.CardType', [
-  { no: 0, name: 'CARD_TYPE_UNSPECIFIED' },
-  { no: 1, name: 'CARD_TYPE_UNIT' },
-  { no: 2, name: 'CARD_TYPE_SPELL' },
-  { no: 3, name: 'CARD_TYPE_LEADER' },
-])
+proto3.util.setEnumType(CardType, "cardgame.v1.CardType", [
+  { no: 0, name: "CARD_TYPE_UNSPECIFIED" },
+  { no: 1, name: "CARD_TYPE_UNIT" },
+  { no: 2, name: "CARD_TYPE_SPELL" },
+  { no: 3, name: "CARD_TYPE_LEADER" },
+]);
 
 /**
  * 特性
@@ -108,16 +101,16 @@ export enum Trait {
   UNTARGETABLE = 7,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Trait)
-proto3.util.setEnumType(Trait, 'cardgame.v1.Trait', [
-  { no: 0, name: 'TRAIT_UNSPECIFIED' },
-  { no: 1, name: 'TRAIT_RUSH' },
-  { no: 2, name: 'TRAIT_CHARGE' },
-  { no: 3, name: 'TRAIT_WINDFURY' },
-  { no: 4, name: 'TRAIT_PIERCE' },
-  { no: 5, name: 'TRAIT_GUARDIAN' },
-  { no: 6, name: 'TRAIT_EFFECT_SHIELD' },
-  { no: 7, name: 'TRAIT_UNTARGETABLE' },
-])
+proto3.util.setEnumType(Trait, "cardgame.v1.Trait", [
+  { no: 0, name: "TRAIT_UNSPECIFIED" },
+  { no: 1, name: "TRAIT_RUSH" },
+  { no: 2, name: "TRAIT_CHARGE" },
+  { no: 3, name: "TRAIT_WINDFURY" },
+  { no: 4, name: "TRAIT_PIERCE" },
+  { no: 5, name: "TRAIT_GUARDIAN" },
+  { no: 6, name: "TRAIT_EFFECT_SHIELD" },
+  { no: 7, name: "TRAIT_UNTARGETABLE" },
+]);
 
 /**
  * ゲームフェイズ
@@ -156,14 +149,692 @@ export enum GamePhase {
   TURN_END = 5,
 }
 // Retrieve enum metadata with: proto3.getEnumType(GamePhase)
-proto3.util.setEnumType(GamePhase, 'cardgame.v1.GamePhase', [
-  { no: 0, name: 'GAME_PHASE_UNSPECIFIED' },
-  { no: 1, name: 'GAME_PHASE_TURN_START' },
-  { no: 2, name: 'GAME_PHASE_DRAW' },
-  { no: 3, name: 'GAME_PHASE_RESOURCE_GAIN' },
-  { no: 4, name: 'GAME_PHASE_MAIN' },
-  { no: 5, name: 'GAME_PHASE_TURN_END' },
-])
+proto3.util.setEnumType(GamePhase, "cardgame.v1.GamePhase", [
+  { no: 0, name: "GAME_PHASE_UNSPECIFIED" },
+  { no: 1, name: "GAME_PHASE_TURN_START" },
+  { no: 2, name: "GAME_PHASE_DRAW" },
+  { no: 3, name: "GAME_PHASE_RESOURCE_GAIN" },
+  { no: 4, name: "GAME_PHASE_MAIN" },
+  { no: 5, name: "GAME_PHASE_TURN_END" },
+]);
+
+/**
+ * カード効果タイプ
+ *
+ * @generated from enum cardgame.v1.AtomicEffectType
+ */
+export enum AtomicEffectType {
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DEAL_DAMAGE = 1;
+   */
+  DEAL_DAMAGE = 1,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DEAL_SPLASH = 2;
+   */
+  DEAL_SPLASH = 2,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_RESTORE_HP = 3;
+   */
+  RESTORE_HP = 3,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_RESTORE_MANA = 4;
+   */
+  RESTORE_MANA = 4,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_FULL_RESTORE = 5;
+   */
+  FULL_RESTORE = 5,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DRAW_CARD = 6;
+   */
+  DRAW_CARD = 6,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DISCARD_CARD = 7;
+   */
+  DISCARD_CARD = 7,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_SEARCH_CARD = 8;
+   */
+  SEARCH_CARD = 8,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_SHUFFLE_DECK = 9;
+   */
+  SHUFFLE_DECK = 9,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_MODIFY_ATTACK = 10;
+   */
+  MODIFY_ATTACK = 10,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE = 11;
+   */
+  MODIFY_DEFENSE = 11,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_MODIFY_COST = 12;
+   */
+  MODIFY_COST = 12,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP = 13;
+   */
+  MODIFY_MAX_HP = 13,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_SUMMON_UNIT = 14;
+   */
+  SUMMON_UNIT = 14,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DESTROY_UNIT = 15;
+   */
+  DESTROY_UNIT = 15,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_RETURN_TO_HAND = 16;
+   */
+  RETURN_TO_HAND = 16,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_RETURN_TO_DECK = 17;
+   */
+  RETURN_TO_DECK = 17,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_DISABLE_UNIT = 18;
+   */
+  DISABLE_UNIT = 18,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_GRANT_TRAIT = 19;
+   */
+  GRANT_TRAIT = 19,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_REMOVE_TRAIT = 20;
+   */
+  REMOVE_TRAIT = 20,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_GAIN_MANA = 21;
+   */
+  GAIN_MANA = 21,
+
+  /**
+   * @generated from enum value: ATOMIC_EFFECT_TYPE_REDUCE_COST = 22;
+   */
+  REDUCE_COST = 22,
+}
+// Retrieve enum metadata with: proto3.getEnumType(AtomicEffectType)
+proto3.util.setEnumType(AtomicEffectType, "cardgame.v1.AtomicEffectType", [
+  { no: 0, name: "ATOMIC_EFFECT_TYPE_UNSPECIFIED" },
+  { no: 1, name: "ATOMIC_EFFECT_TYPE_DEAL_DAMAGE" },
+  { no: 2, name: "ATOMIC_EFFECT_TYPE_DEAL_SPLASH" },
+  { no: 3, name: "ATOMIC_EFFECT_TYPE_RESTORE_HP" },
+  { no: 4, name: "ATOMIC_EFFECT_TYPE_RESTORE_MANA" },
+  { no: 5, name: "ATOMIC_EFFECT_TYPE_FULL_RESTORE" },
+  { no: 6, name: "ATOMIC_EFFECT_TYPE_DRAW_CARD" },
+  { no: 7, name: "ATOMIC_EFFECT_TYPE_DISCARD_CARD" },
+  { no: 8, name: "ATOMIC_EFFECT_TYPE_SEARCH_CARD" },
+  { no: 9, name: "ATOMIC_EFFECT_TYPE_SHUFFLE_DECK" },
+  { no: 10, name: "ATOMIC_EFFECT_TYPE_MODIFY_ATTACK" },
+  { no: 11, name: "ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE" },
+  { no: 12, name: "ATOMIC_EFFECT_TYPE_MODIFY_COST" },
+  { no: 13, name: "ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP" },
+  { no: 14, name: "ATOMIC_EFFECT_TYPE_SUMMON_UNIT" },
+  { no: 15, name: "ATOMIC_EFFECT_TYPE_DESTROY_UNIT" },
+  { no: 16, name: "ATOMIC_EFFECT_TYPE_RETURN_TO_HAND" },
+  { no: 17, name: "ATOMIC_EFFECT_TYPE_RETURN_TO_DECK" },
+  { no: 18, name: "ATOMIC_EFFECT_TYPE_DISABLE_UNIT" },
+  { no: 19, name: "ATOMIC_EFFECT_TYPE_GRANT_TRAIT" },
+  { no: 20, name: "ATOMIC_EFFECT_TYPE_REMOVE_TRAIT" },
+  { no: 21, name: "ATOMIC_EFFECT_TYPE_GAIN_MANA" },
+  { no: 22, name: "ATOMIC_EFFECT_TYPE_REDUCE_COST" },
+]);
+
+/**
+ * ターゲット対象タイプ
+ *
+ * @generated from enum cardgame.v1.TargetType
+ */
+export enum TargetType {
+  /**
+   * @generated from enum value: TARGET_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_SELF = 1;
+   */
+  SELF = 1,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ENEMY_LEADER = 2;
+   */
+  ENEMY_LEADER = 2,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ALLY_LEADER = 3;
+   */
+  ALLY_LEADER = 3,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ENEMY_UNIT = 4;
+   */
+  ENEMY_UNIT = 4,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ALLY_UNIT = 5;
+   */
+  ALLY_UNIT = 5,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ALL_UNITS = 6;
+   */
+  ALL_UNITS = 6,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ALL_ENEMY_UNITS = 7;
+   */
+  ALL_ENEMY_UNITS = 7,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_ALL_ALLY_UNITS = 8;
+   */
+  ALL_ALLY_UNITS = 8,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_RANDOM_ENEMY_UNIT = 9;
+   */
+  RANDOM_ENEMY_UNIT = 9,
+
+  /**
+   * @generated from enum value: TARGET_TYPE_RANDOM_ALLY_UNIT = 10;
+   */
+  RANDOM_ALLY_UNIT = 10,
+}
+// Retrieve enum metadata with: proto3.getEnumType(TargetType)
+proto3.util.setEnumType(TargetType, "cardgame.v1.TargetType", [
+  { no: 0, name: "TARGET_TYPE_UNSPECIFIED" },
+  { no: 1, name: "TARGET_TYPE_SELF" },
+  { no: 2, name: "TARGET_TYPE_ENEMY_LEADER" },
+  { no: 3, name: "TARGET_TYPE_ALLY_LEADER" },
+  { no: 4, name: "TARGET_TYPE_ENEMY_UNIT" },
+  { no: 5, name: "TARGET_TYPE_ALLY_UNIT" },
+  { no: 6, name: "TARGET_TYPE_ALL_UNITS" },
+  { no: 7, name: "TARGET_TYPE_ALL_ENEMY_UNITS" },
+  { no: 8, name: "TARGET_TYPE_ALL_ALLY_UNITS" },
+  { no: 9, name: "TARGET_TYPE_RANDOM_ENEMY_UNIT" },
+  { no: 10, name: "TARGET_TYPE_RANDOM_ALLY_UNIT" },
+]);
+
+/**
+ * 効果チェーンノードタイプ
+ *
+ * @generated from enum cardgame.v1.EffectChainNodeType
+ */
+export enum EffectChainNodeType {
+  /**
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * 順次実行
+   *
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_THEN = 1;
+   */
+  THEN = 1,
+
+  /**
+   * 並列実行
+   *
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_AND = 2;
+   */
+  AND = 2,
+
+  /**
+   * 条件分岐
+   *
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_IF_ELSE = 3;
+   */
+  IF_ELSE = 3,
+
+  /**
+   * 繰り返し
+   *
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_REPEAT = 4;
+   */
+  REPEAT = 4,
+
+  /**
+   * 反復
+   *
+   * @generated from enum value: EFFECT_CHAIN_NODE_TYPE_FOREACH = 5;
+   */
+  FOREACH = 5,
+}
+// Retrieve enum metadata with: proto3.getEnumType(EffectChainNodeType)
+proto3.util.setEnumType(EffectChainNodeType, "cardgame.v1.EffectChainNodeType", [
+  { no: 0, name: "EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED" },
+  { no: 1, name: "EFFECT_CHAIN_NODE_TYPE_THEN" },
+  { no: 2, name: "EFFECT_CHAIN_NODE_TYPE_AND" },
+  { no: 3, name: "EFFECT_CHAIN_NODE_TYPE_IF_ELSE" },
+  { no: 4, name: "EFFECT_CHAIN_NODE_TYPE_REPEAT" },
+  { no: 5, name: "EFFECT_CHAIN_NODE_TYPE_FOREACH" },
+]);
+
+/**
+ * 原子効果
+ *
+ * @generated from message cardgame.v1.AtomicEffect
+ */
+export class AtomicEffect extends Message<AtomicEffect> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: cardgame.v1.AtomicEffectType type = 2;
+   */
+  type = AtomicEffectType.UNSPECIFIED;
+
+  /**
+   * @generated from field: optional cardgame.v1.TargetSelector target = 3;
+   */
+  target?: TargetSelector;
+
+  /**
+   * @generated from field: optional int32 value = 4;
+   */
+  value?: number;
+
+  /**
+   * @generated from field: optional string card_id = 5;
+   */
+  cardId?: string;
+
+  /**
+   * @generated from field: optional cardgame.v1.Trait trait = 6;
+   */
+  trait?: Trait;
+
+  constructor(data?: PartialMessage<AtomicEffect>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.AtomicEffect";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(AtomicEffectType) },
+    { no: 3, name: "target", kind: "message", T: TargetSelector, opt: true },
+    { no: 4, name: "value", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 5, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 6, name: "trait", kind: "enum", T: proto3.getEnumType(Trait), opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AtomicEffect {
+    return new AtomicEffect().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AtomicEffect {
+    return new AtomicEffect().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AtomicEffect {
+    return new AtomicEffect().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: AtomicEffect | PlainMessage<AtomicEffect> | undefined, b: AtomicEffect | PlainMessage<AtomicEffect> | undefined): boolean {
+    return proto3.util.equals(AtomicEffect, a, b);
+  }
+}
+
+/**
+ * ターゲットセレクター
+ *
+ * @generated from message cardgame.v1.TargetSelector
+ */
+export class TargetSelector extends Message<TargetSelector> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: cardgame.v1.TargetType type = 2;
+   */
+  type = TargetType.UNSPECIFIED;
+
+  /**
+   * @generated from field: optional cardgame.v1.ConditionFilter filter = 3;
+   */
+  filter?: ConditionFilter;
+
+  constructor(data?: PartialMessage<TargetSelector>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.TargetSelector";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(TargetType) },
+    { no: 3, name: "filter", kind: "message", T: ConditionFilter, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TargetSelector {
+    return new TargetSelector().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TargetSelector {
+    return new TargetSelector().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TargetSelector {
+    return new TargetSelector().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TargetSelector | PlainMessage<TargetSelector> | undefined, b: TargetSelector | PlainMessage<TargetSelector> | undefined): boolean {
+    return proto3.util.equals(TargetSelector, a, b);
+  }
+}
+
+/**
+ * 条件フィルター
+ *
+ * @generated from message cardgame.v1.ConditionFilter
+ */
+export class ConditionFilter extends Message<ConditionFilter> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * "HAS_TRAIT", "ATTACK_RANGE", "DEFENSE_RANGE", etc.
+   *
+   * @generated from field: string condition_type = 2;
+   */
+  conditionType = "";
+
+  /**
+   * @generated from field: repeated string parameters = 3;
+   */
+  parameters: string[] = [];
+
+  constructor(data?: PartialMessage<ConditionFilter>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.ConditionFilter";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "condition_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "parameters", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ConditionFilter {
+    return new ConditionFilter().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ConditionFilter {
+    return new ConditionFilter().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ConditionFilter {
+    return new ConditionFilter().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ConditionFilter | PlainMessage<ConditionFilter> | undefined, b: ConditionFilter | PlainMessage<ConditionFilter> | undefined): boolean {
+    return proto3.util.equals(ConditionFilter, a, b);
+  }
+}
+
+/**
+ * 効果チェーンノード
+ *
+ * @generated from message cardgame.v1.EffectChainNode
+ */
+export class EffectChainNode extends Message<EffectChainNode> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: cardgame.v1.EffectChainNodeType type = 2;
+   */
+  type = EffectChainNodeType.UNSPECIFIED;
+
+  /**
+   * @generated from field: optional cardgame.v1.AtomicEffect atomic_effect = 3;
+   */
+  atomicEffect?: AtomicEffect;
+
+  /**
+   * THEN用
+   *
+   * @generated from field: optional cardgame.v1.EffectChainNode next = 4;
+   */
+  next?: EffectChainNode;
+
+  /**
+   * AND用
+   *
+   * @generated from field: repeated cardgame.v1.EffectChainNode children = 5;
+   */
+  children: EffectChainNode[] = [];
+
+  /**
+   * IF_ELSE用
+   *
+   * @generated from field: optional cardgame.v1.EffectChainNode then_node = 6;
+   */
+  thenNode?: EffectChainNode;
+
+  /**
+   * IF_ELSE用
+   *
+   * @generated from field: optional cardgame.v1.EffectChainNode else_node = 7;
+   */
+  elseNode?: EffectChainNode;
+
+  /**
+   * IF_ELSE用
+   *
+   * @generated from field: optional cardgame.v1.ConditionFilter condition = 8;
+   */
+  condition?: ConditionFilter;
+
+  /**
+   * REPEAT用
+   *
+   * @generated from field: optional cardgame.v1.EffectChainNode repeat_effect = 9;
+   */
+  repeatEffect?: EffectChainNode;
+
+  /**
+   * REPEAT用
+   *
+   * @generated from field: optional int32 repeat_count = 10;
+   */
+  repeatCount?: number;
+
+  /**
+   * FOREACH用
+   *
+   * @generated from field: optional cardgame.v1.EffectChainNode foreach_effect = 11;
+   */
+  foreachEffect?: EffectChainNode;
+
+  /**
+   * FOREACH用
+   *
+   * @generated from field: optional cardgame.v1.TargetSelector foreach_target = 12;
+   */
+  foreachTarget?: TargetSelector;
+
+  constructor(data?: PartialMessage<EffectChainNode>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.EffectChainNode";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(EffectChainNodeType) },
+    { no: 3, name: "atomic_effect", kind: "message", T: AtomicEffect, opt: true },
+    { no: 4, name: "next", kind: "message", T: EffectChainNode, opt: true },
+    { no: 5, name: "children", kind: "message", T: EffectChainNode, repeated: true },
+    { no: 6, name: "then_node", kind: "message", T: EffectChainNode, opt: true },
+    { no: 7, name: "else_node", kind: "message", T: EffectChainNode, opt: true },
+    { no: 8, name: "condition", kind: "message", T: ConditionFilter, opt: true },
+    { no: 9, name: "repeat_effect", kind: "message", T: EffectChainNode, opt: true },
+    { no: 10, name: "repeat_count", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 11, name: "foreach_effect", kind: "message", T: EffectChainNode, opt: true },
+    { no: 12, name: "foreach_target", kind: "message", T: TargetSelector, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EffectChainNode {
+    return new EffectChainNode().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EffectChainNode {
+    return new EffectChainNode().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EffectChainNode {
+    return new EffectChainNode().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: EffectChainNode | PlainMessage<EffectChainNode> | undefined, b: EffectChainNode | PlainMessage<EffectChainNode> | undefined): boolean {
+    return proto3.util.equals(EffectChainNode, a, b);
+  }
+}
+
+/**
+ * 効果定義
+ *
+ * @generated from message cardgame.v1.EffectDefinition
+ */
+export class EffectDefinition extends Message<EffectDefinition> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: bool require_target = 2;
+   */
+  requireTarget = false;
+
+  /**
+   * @generated from field: optional cardgame.v1.EffectChainNode root = 3;
+   */
+  root?: EffectChainNode;
+
+  constructor(data?: PartialMessage<EffectDefinition>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.EffectDefinition";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "require_target", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "root", kind: "message", T: EffectChainNode, opt: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EffectDefinition {
+    return new EffectDefinition().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EffectDefinition {
+    return new EffectDefinition().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EffectDefinition {
+    return new EffectDefinition().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: EffectDefinition | PlainMessage<EffectDefinition> | undefined, b: EffectDefinition | PlainMessage<EffectDefinition> | undefined): boolean {
+    return proto3.util.equals(EffectDefinition, a, b);
+  }
+}
+
+/**
+ * カード効果
+ *
+ * @generated from message cardgame.v1.CardEffect
+ */
+export class CardEffect extends Message<CardEffect> {
+  /**
+   * @generated from field: uint32 id = 1;
+   */
+  id = 0;
+
+  /**
+   * @generated from field: string card_id = 2;
+   */
+  cardId = "";
+
+  /**
+   * @generated from field: repeated cardgame.v1.EffectDefinition definitions = 3;
+   */
+  definitions: EffectDefinition[] = [];
+
+  constructor(data?: PartialMessage<CardEffect>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.CardEffect";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
+    { no: 2, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "definitions", kind: "message", T: EffectDefinition, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CardEffect {
+    return new CardEffect().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CardEffect {
+    return new CardEffect().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CardEffect {
+    return new CardEffect().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CardEffect | PlainMessage<CardEffect> | undefined, b: CardEffect | PlainMessage<CardEffect> | undefined): boolean {
+    return proto3.util.equals(CardEffect, a, b);
+  }
+}
 
 /**
  * カード
@@ -174,118 +845,83 @@ export class Card extends Message<Card> {
   /**
    * @generated from field: string id = 1;
    */
-  id = ''
+  id = "";
 
   /**
    * @generated from field: string name = 2;
    */
-  name = ''
+  name = "";
 
   /**
    * @generated from field: cardgame.v1.CardType type = 3;
    */
-  type = CardType.UNSPECIFIED
+  type = CardType.UNSPECIFIED;
 
   /**
    * @generated from field: int32 cost = 4;
    */
-  cost = 0
+  cost = 0;
 
   /**
    * @generated from field: optional int32 attack = 5;
    */
-  attack?: number
+  attack?: number;
 
   /**
    * @generated from field: optional int32 defense = 6;
    */
-  defense?: number
+  defense?: number;
 
   /**
    * @generated from field: string effect = 7;
    */
-  effect = ''
+  effect = "";
 
   /**
    * @generated from field: repeated cardgame.v1.Trait traits = 8;
    */
-  traits: Trait[] = []
+  traits: Trait[] = [];
 
   /**
-   * カード管理UI向けの効果定義JSON（編集用）
+   * カード管理UI向けの効果定義(型安全)
    *
-   * @generated from field: string card_effect_json = 9;
+   * @generated from field: optional cardgame.v1.CardEffect card_effect = 9;
    */
-  cardEffectJson = ''
+  cardEffect?: CardEffect;
 
   constructor(data?: PartialMessage<Card>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.Card'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.Card";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'name', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'type', kind: 'enum', T: proto3.getEnumType(CardType) },
-    { no: 4, name: 'cost', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    {
-      no: 5,
-      name: 'attack',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-      opt: true,
-    },
-    {
-      no: 6,
-      name: 'defense',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-      opt: true,
-    },
-    { no: 7, name: 'effect', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 8,
-      name: 'traits',
-      kind: 'enum',
-      T: proto3.getEnumType(Trait),
-      repeated: true,
-    },
-    {
-      no: 9,
-      name: 'card_effect_json',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-  ])
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "type", kind: "enum", T: proto3.getEnumType(CardType) },
+    { no: 4, name: "cost", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "attack", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 6, name: "defense", kind: "scalar", T: 5 /* ScalarType.INT32 */, opt: true },
+    { no: 7, name: "effect", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 8, name: "traits", kind: "enum", T: proto3.getEnumType(Trait), repeated: true },
+    { no: 9, name: "card_effect", kind: "message", T: CardEffect, opt: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): Card {
-    return new Card().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {
+    return new Card().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): Card {
-    return new Card().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Card {
+    return new Card().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): Card {
-    return new Card().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Card {
+    return new Card().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: Card | PlainMessage<Card> | undefined,
-    b: Card | PlainMessage<Card> | undefined,
-  ): boolean {
-    return proto3.util.equals(Card, a, b)
+  static equals(a: Card | PlainMessage<Card> | undefined, b: Card | PlainMessage<Card> | undefined): boolean {
+    return proto3.util.equals(Card, a, b);
   }
 }
 
@@ -298,139 +934,101 @@ export class Unit extends Message<Unit> {
   /**
    * @generated from field: string card_id = 1;
    */
-  cardId = ''
+  cardId = "";
 
   /**
    * @generated from field: string instance_id = 2;
    */
-  instanceId = ''
+  instanceId = "";
 
   /**
    * @generated from field: string name = 3;
    */
-  name = ''
+  name = "";
 
   /**
    * @generated from field: int32 cost = 4;
    */
-  cost = 0
+  cost = 0;
 
   /**
    * @generated from field: int32 attack = 5;
    */
-  attack = 0
+  attack = 0;
 
   /**
    * @generated from field: int32 defense = 6;
    */
-  defense = 0
+  defense = 0;
 
   /**
    * @generated from field: int32 current_defense = 7;
    */
-  currentDefense = 0
+  currentDefense = 0;
 
   /**
    * @generated from field: repeated cardgame.v1.Trait traits = 8;
    */
-  traits: Trait[] = []
+  traits: Trait[] = [];
 
   /**
    * @generated from field: string effect = 9;
    */
-  effect = ''
+  effect = "";
 
   /**
    * 残り攻撃回数（Windfury対応）
    *
    * @generated from field: int32 attacks_remaining = 10;
    */
-  attacksRemaining = 0
+  attacksRemaining = 0;
 
   /**
    * @generated from field: bool summoned_this_turn = 11;
    */
-  summonedThisTurn = false
+  summonedThisTurn = false;
 
   /**
    * @generated from field: string owner_id = 12;
    */
-  ownerId = ''
+  ownerId = "";
 
   constructor(data?: PartialMessage<Unit>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.Unit'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.Unit";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'card_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 2,
-      name: 'instance_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-    { no: 3, name: 'name', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: 'cost', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    { no: 5, name: 'attack', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    { no: 6, name: 'defense', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    {
-      no: 7,
-      name: 'current_defense',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    {
-      no: 8,
-      name: 'traits',
-      kind: 'enum',
-      T: proto3.getEnumType(Trait),
-      repeated: true,
-    },
-    { no: 9, name: 'effect', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 10,
-      name: 'attacks_remaining',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    {
-      no: 11,
-      name: 'summoned_this_turn',
-      kind: 'scalar',
-      T: 8 /* ScalarType.BOOL */,
-    },
-    { no: 12, name: 'owner_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "instance_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "cost", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "attack", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "defense", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "current_defense", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "traits", kind: "enum", T: proto3.getEnumType(Trait), repeated: true },
+    { no: 9, name: "effect", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 10, name: "attacks_remaining", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 11, name: "summoned_this_turn", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 12, name: "owner_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): Unit {
-    return new Unit().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Unit {
+    return new Unit().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): Unit {
-    return new Unit().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Unit {
+    return new Unit().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): Unit {
-    return new Unit().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Unit {
+    return new Unit().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: Unit | PlainMessage<Unit> | undefined,
-    b: Unit | PlainMessage<Unit> | undefined,
-  ): boolean {
-    return proto3.util.equals(Unit, a, b)
+  static equals(a: Unit | PlainMessage<Unit> | undefined, b: Unit | PlainMessage<Unit> | undefined): boolean {
+    return proto3.util.equals(Unit, a, b);
   }
 }
 
@@ -443,133 +1041,101 @@ export class Player extends Message<Player> {
   /**
    * @generated from field: string id = 1;
    */
-  id = ''
+  id = "";
 
   /**
    * @generated from field: string name = 2;
    */
-  name = ''
+  name = "";
 
   /**
    * @generated from field: int32 hp = 3;
    */
-  hp = 0
+  hp = 0;
 
   /**
    * @generated from field: int32 max_hp = 4;
    */
-  maxHp = 0
+  maxHp = 0;
 
   /**
    * @generated from field: int32 current_turn_mana = 5;
    */
-  currentTurnMana = 0
+  currentTurnMana = 0;
 
   /**
    * @generated from field: int32 current_recovery_mana = 6;
    */
-  currentRecoveryMana = 0
+  currentRecoveryMana = 0;
 
   /**
    * @generated from field: int32 hand_count = 7;
    */
-  handCount = 0
+  handCount = 0;
 
   /**
    * @generated from field: int32 deck_count = 8;
    */
-  deckCount = 0
+  deckCount = 0;
 
   /**
    * @generated from field: int32 graveyard_count = 9;
    */
-  graveyardCount = 0
+  graveyardCount = 0;
 
   /**
    * @generated from field: repeated cardgame.v1.Unit field = 10;
    */
-  field: Unit[] = []
+  field: Unit[] = [];
 
   /**
    * @generated from field: int32 time_remaining_seconds = 11;
    */
-  timeRemainingSeconds = 0
+  timeRemainingSeconds = 0;
 
   /**
    * 自分のプレイヤーの場合のみ含まれる
    *
    * @generated from field: repeated cardgame.v1.Card hand = 12;
    */
-  hand: Card[] = []
+  hand: Card[] = [];
 
   constructor(data?: PartialMessage<Player>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.Player'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.Player";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'name', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'hp', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    { no: 4, name: 'max_hp', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    {
-      no: 5,
-      name: 'current_turn_mana',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    {
-      no: 6,
-      name: 'current_recovery_mana',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    { no: 7, name: 'hand_count', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    { no: 8, name: 'deck_count', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    {
-      no: 9,
-      name: 'graveyard_count',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    { no: 10, name: 'field', kind: 'message', T: Unit, repeated: true },
-    {
-      no: 11,
-      name: 'time_remaining_seconds',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    { no: 12, name: 'hand', kind: 'message', T: Card, repeated: true },
-  ])
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "hp", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "max_hp", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: "current_turn_mana", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "current_recovery_mana", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 7, name: "hand_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "deck_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "graveyard_count", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "field", kind: "message", T: Unit, repeated: true },
+    { no: 11, name: "time_remaining_seconds", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 12, name: "hand", kind: "message", T: Card, repeated: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): Player {
-    return new Player().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Player {
+    return new Player().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): Player {
-    return new Player().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Player {
+    return new Player().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): Player {
-    return new Player().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Player {
+    return new Player().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: Player | PlainMessage<Player> | undefined,
-    b: Player | PlainMessage<Player> | undefined,
-  ): boolean {
-    return proto3.util.equals(Player, a, b)
+  static equals(a: Player | PlainMessage<Player> | undefined, b: Player | PlainMessage<Player> | undefined): boolean {
+    return proto3.util.equals(Player, a, b);
   }
 }
 
@@ -582,140 +1148,97 @@ export class GameState extends Message<GameState> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: cardgame.v1.Player player1 = 2;
    */
-  player1?: Player
+  player1?: Player;
 
   /**
    * @generated from field: cardgame.v1.Player player2 = 3;
    */
-  player2?: Player
+  player2?: Player;
 
   /**
    * @generated from field: string current_player_id = 4;
    */
-  currentPlayerId = ''
+  currentPlayerId = "";
 
   /**
    * @generated from field: int32 current_turn = 5;
    */
-  currentTurn = 0
+  currentTurn = 0;
 
   /**
    * @generated from field: cardgame.v1.GamePhase current_phase = 6;
    */
-  currentPhase = GamePhase.UNSPECIFIED
+  currentPhase = GamePhase.UNSPECIFIED;
 
   /**
    * @generated from field: bool is_game_over = 7;
    */
-  isGameOver = false
+  isGameOver = false;
 
   /**
    * @generated from field: optional string winner_id = 8;
    */
-  winnerId?: string
+  winnerId?: string;
 
   /**
    * @generated from field: bool is_draw = 9;
    */
-  isDraw = false
+  isDraw = false;
 
   /**
    * プレイヤー1がマリガンを完了したか
    *
    * @generated from field: bool player1_mulligan_done = 10;
    */
-  player1MulliganDone = false
+  player1MulliganDone = false;
 
   /**
    * プレイヤー2がマリガンを完了したか
    *
    * @generated from field: bool player2_mulligan_done = 11;
    */
-  player2MulliganDone = false
+  player2MulliganDone = false;
 
   constructor(data?: PartialMessage<GameState>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GameState'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GameState";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player1', kind: 'message', T: Player },
-    { no: 3, name: 'player2', kind: 'message', T: Player },
-    {
-      no: 4,
-      name: 'current_player_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-    {
-      no: 5,
-      name: 'current_turn',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-    {
-      no: 6,
-      name: 'current_phase',
-      kind: 'enum',
-      T: proto3.getEnumType(GamePhase),
-    },
-    { no: 7, name: 'is_game_over', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    {
-      no: 8,
-      name: 'winner_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-      opt: true,
-    },
-    { no: 9, name: 'is_draw', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    {
-      no: 10,
-      name: 'player1_mulligan_done',
-      kind: 'scalar',
-      T: 8 /* ScalarType.BOOL */,
-    },
-    {
-      no: 11,
-      name: 'player2_mulligan_done',
-      kind: 'scalar',
-      T: 8 /* ScalarType.BOOL */,
-    },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player1", kind: "message", T: Player },
+    { no: 3, name: "player2", kind: "message", T: Player },
+    { no: 4, name: "current_player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "current_turn", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 6, name: "current_phase", kind: "enum", T: proto3.getEnumType(GamePhase) },
+    { no: 7, name: "is_game_over", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "winner_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+    { no: 9, name: "is_draw", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 10, name: "player1_mulligan_done", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 11, name: "player2_mulligan_done", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GameState {
-    return new GameState().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GameState {
+    return new GameState().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GameState {
-    return new GameState().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GameState {
+    return new GameState().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GameState {
-    return new GameState().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GameState {
+    return new GameState().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GameState | PlainMessage<GameState> | undefined,
-    b: GameState | PlainMessage<GameState> | undefined,
-  ): boolean {
-    return proto3.util.equals(GameState, a, b)
+  static equals(a: GameState | PlainMessage<GameState> | undefined, b: GameState | PlainMessage<GameState> | undefined): boolean {
+    return proto3.util.equals(GameState, a, b);
   }
 }
 
@@ -728,80 +1251,144 @@ export class GameEvent extends Message<GameEvent> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: int32 turn = 2;
    */
-  turn = 0
+  turn = 0;
 
   /**
    * @generated from field: string phase = 3;
    */
-  phase = ''
+  phase = "";
 
   /**
    * @generated from field: string event_type = 4;
    */
-  eventType = ''
+  eventType = "";
 
   /**
    * @generated from field: string player_id = 5;
    */
-  playerId = ''
+  playerId = "";
 
   /**
    * @generated from field: string details = 6;
    */
-  details = ''
+  details = "";
 
   /**
    * @generated from field: google.protobuf.Timestamp timestamp = 7;
    */
-  timestamp?: Timestamp
+  timestamp?: Timestamp;
 
   constructor(data?: PartialMessage<GameEvent>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GameEvent'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GameEvent";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'turn', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: 'phase', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: 'event_type', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: 'details', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 7, name: 'timestamp', kind: 'message', T: Timestamp },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "turn", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: "phase", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "event_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "details", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "timestamp", kind: "message", T: Timestamp },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GameEvent {
-    return new GameEvent().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GameEvent {
+    return new GameEvent().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GameEvent {
-    return new GameEvent().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GameEvent {
+    return new GameEvent().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GameEvent {
-    return new GameEvent().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GameEvent {
+    return new GameEvent().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GameEvent | PlainMessage<GameEvent> | undefined,
-    b: GameEvent | PlainMessage<GameEvent> | undefined,
-  ): boolean {
-    return proto3.util.equals(GameEvent, a, b)
+  static equals(a: GameEvent | PlainMessage<GameEvent> | undefined, b: GameEvent | PlainMessage<GameEvent> | undefined): boolean {
+    return proto3.util.equals(GameEvent, a, b);
   }
 }
+
+/**
+ * デッキ
+ *
+ * @generated from message cardgame.v1.Deck
+ */
+export class Deck extends Message<Deck> {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  /**
+   * @generated from field: string name = 2;
+   */
+  name = "";
+
+  /**
+   * @generated from field: string description = 3;
+   */
+  description = "";
+
+  /**
+   * @generated from field: repeated string card_ids = 4;
+   */
+  cardIds: string[] = [];
+
+  /**
+   * @generated from field: string user_id = 5;
+   */
+  userId = "";
+
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 6;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 7;
+   */
+  updatedAt?: Timestamp;
+
+  constructor(data?: PartialMessage<Deck>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.Deck";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "card_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 5, name: "user_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "created_at", kind: "message", T: Timestamp },
+    { no: 7, name: "updated_at", kind: "message", T: Timestamp },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Deck {
+    return new Deck().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Deck {
+    return new Deck().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Deck {
+    return new Deck().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Deck | PlainMessage<Deck> | undefined, b: Deck | PlainMessage<Deck> | undefined): boolean {
+    return proto3.util.equals(Deck, a, b);
+  }
+}
+

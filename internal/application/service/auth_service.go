@@ -6,7 +6,6 @@ import (
 
 	"card_game/internal/core/entity"
 	"card_game/internal/core/port"
-	"card_game/internal/infrastructure/repository"
 )
 
 // ========================================
@@ -15,7 +14,7 @@ import (
 
 // AuthService 認証ビジネスロジック
 type AuthService struct {
-	userRepo       repository.UserRepository
+	userRepo       port.UserRepository
 	tokenProvider  port.TokenProvider
 	passwordHasher port.PasswordHasher
 	logger         port.Logger
@@ -23,7 +22,7 @@ type AuthService struct {
 
 // NewAuthService 新しい認証サービスを作成
 func NewAuthService(
-	userRepo repository.UserRepository,
+	userRepo port.UserRepository,
 	tokenProvider port.TokenProvider,
 	passwordHasher port.PasswordHasher,
 	logger port.Logger,

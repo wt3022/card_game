@@ -1,192 +1,99 @@
 import { useEffect, useState } from 'react'
-import type { GameState } from '../gen/common_pb'
-import { Trait } from '../gen/common_pb'
-import { gameClient } from '../lib/api-client'
+import { MESSAGE_DISPLAY_DURATION, TRAIT_LABELS } from '../constants/game'
+import { useGameActions } from '../hooks/useGameActions'
+import { useGameState } from '../hooks/useGameState'
+import type { GameBoardProps } from '../types/components'
+import {
+  isCurrentPlayerTurn as checkIsCurrentPlayerTurn,
+  getCurrentPlayer,
+  getOpponent,
+  isMyUnit,
+} from '../utils/gameHelpers'
 import PlayerInfo from './PlayerInfo'
 import UnitCard from './UnitCard'
 import './GameBoard.css'
 
-interface GameBoardProps {
-  gameState: GameState
-  currentPlayerId: string
-  onGameStateUpdate: (gameState: GameState) => void
-}
-
 export default function GameBoard({
-  gameState,
+  gameState: initialGameState,
   currentPlayerId,
   onGameStateUpdate,
 }: GameBoardProps) {
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
 
-  // デバッグ: gameStateの内容を確認
-  console.log('GameBoard - gameState:', gameState)
-  console.log('GameBoard - currentPlayerId:', currentPlayerId)
-  console.log('GameBoard - player1:', gameState.player1)
-  console.log('GameBoard - player2:', gameState.player2)
+  // ゲーム状態の購読と管理
+  const { gameState: liveGameState } = useGameState(
+    initialGameState.gameId,
+    currentPlayerId,
+  )
 
-  const isCurrentPlayerTurn = gameState.currentPlayerId === currentPlayerId
-  const currentPlayer =
-    gameState.player1?.id === currentPlayerId
-      ? gameState.player1
-      : gameState.player2
-  const opponent =
-    gameState.player1?.id === currentPlayerId
-      ? gameState.player2
-      : gameState.player1
+  // 最新のゲーム状態を使用（リアルタイム更新があればそれを、なければ初期状態を使用）
+  const gameState = liveGameState || initialGameState
 
-  console.log('GameBoard - currentPlayer:', currentPlayer)
-  console.log('GameBoard - opponent:', opponent)
+  // ゲームアクション
+  const { playCard, executeAttack, endTurn, message, clearMessage } =
+    useGameActions(gameState.gameId, currentPlayerId, onGameStateUpdate)
 
-  // 特性ラベル
-  const traitLabels: Record<number, string> = {
-    [Trait.RUSH]: '疾走',
-    [Trait.CHARGE]: '突進',
-    [Trait.WINDFURY]: '疾風',
-    [Trait.PIERCE]: '貫通',
-    [Trait.GUARDIAN]: '守護',
-    [Trait.EFFECT_SHIELD]: '効果盾',
-    [Trait.UNTARGETABLE]: '対象不可',
-  }
+  // 状態の取得
+  const isCurrentPlayerTurn = checkIsCurrentPlayerTurn(
+    gameState,
+    currentPlayerId,
+  )
+  const currentPlayer = getCurrentPlayer(gameState, currentPlayerId)
+  const opponent = getOpponent(gameState, currentPlayerId)
 
-  // メッセージを表示してから消す
+  // メッセージを自動で消す
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => setMessage(null), 3000)
+      const timer = setTimeout(clearMessage, MESSAGE_DISPLAY_DURATION)
       return () => clearTimeout(timer)
     }
-  }, [message])
+  }, [message, clearMessage])
 
-  // リアルタイム更新: StreamGameEventsを購読（サーバーサイドストリーミング）
+  // ゲーム状態が更新されたら親に通知
   useEffect(() => {
-    let abortController: AbortController | null = null
-    let isActive = true
-
-    const subscribeToEvents = async () => {
-      try {
-        console.log('Subscribing to game events for gameId:', gameState.gameId)
-
-        abortController = new AbortController()
-
-        // サーバーサイドストリーミングでイベントを購読
-        const stream = gameClient.streamGameEvents(
-          {
-            gameId: gameState.gameId,
-            playerId: currentPlayerId,
-          },
-          { signal: abortController.signal },
-        )
-
-        // イベントを受信
-        for await (const response of stream) {
-          if (!isActive) break
-
-          console.log('Received game event:', response)
-
-          if (response.gameState) {
-            onGameStateUpdate(response.gameState)
-
-            // イベント詳細があれば表示
-            if (response.event?.details) {
-              setMessage(response.event.details)
-            }
-          }
-        }
-      } catch (err: unknown) {
-        if (isActive && err instanceof Error && err.name !== 'AbortError') {
-          console.error('Stream error:', err)
-          // エラー時は再接続を試みる
-          setTimeout(() => {
-            if (isActive) {
-              subscribeToEvents()
-            }
-          }, 3000)
-        }
-      }
+    if (liveGameState) {
+      onGameStateUpdate(liveGameState)
     }
+  }, [liveGameState, onGameStateUpdate])
 
-    subscribeToEvents()
-
-    return () => {
-      isActive = false
-      if (abortController) {
-        abortController.abort()
-      }
-    }
-  }, [gameState.gameId, currentPlayerId, onGameStateUpdate])
-
-  const handleEndTurn = async () => {
-    try {
-      const response = await gameClient.endTurn({
-        gameId: gameState.gameId,
-        playerId: currentPlayerId,
-      })
-
-      if (response.success && response.gameState) {
-        onGameStateUpdate(response.gameState)
-        setMessage(response.message)
-        setSelectedCardId(null)
-        setSelectedUnitId(null)
-      }
-    } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : 'ターン終了に失敗しました',
-      )
-    }
-  }
-
+  /**
+   * カードプレイのハンドラー
+   */
   const handlePlayCard = async (cardId: string, targetId?: string) => {
-    try {
-      const response = await gameClient.playCard({
-        gameId: gameState.gameId,
-        playerId: currentPlayerId,
-        cardId,
-        targetId,
-      })
-
-      if (response.success && response.gameState) {
-        onGameStateUpdate(response.gameState)
-        setMessage(response.message)
-        setSelectedCardId(null)
-      } else {
-        setMessage(response.message || 'カードのプレイに失敗しました')
-      }
-    } catch (err) {
-      setMessage(
-        err instanceof Error ? err.message : 'カードのプレイに失敗しました',
-      )
+    const success = await playCard(cardId, targetId)
+    if (success) {
+      setSelectedCardId(null)
     }
   }
 
+  /**
+   * 攻撃のハンドラー
+   */
   const handleAttack = async (attackerId: string, targetId?: string) => {
-    try {
-      const response = await gameClient.executeAttack({
-        gameId: gameState.gameId,
-        playerId: currentPlayerId,
-        attackerId,
-        targetId,
-      })
-
-      if (response.success && response.gameState) {
-        onGameStateUpdate(response.gameState)
-        setMessage(response.message)
-        setSelectedUnitId(null)
-      } else {
-        setMessage(response.message || '攻撃に失敗しました')
-      }
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : '攻撃に失敗しました')
+    const success = await executeAttack(attackerId, targetId)
+    if (success) {
+      setSelectedUnitId(null)
     }
   }
 
+  /**
+   * ターン終了のハンドラー
+   */
+  const handleEndTurn = async () => {
+    await endTurn()
+    setSelectedCardId(null)
+    setSelectedUnitId(null)
+  }
+
+  /**
+   * ユニットクリックのハンドラー
+   */
   const handleUnitClick = (unitId: string) => {
     if (!isCurrentPlayerTurn) return
 
     // 自分のユニットをクリックした場合
-    const isMyUnit = currentPlayer?.field.some((u) => u.instanceId === unitId)
-    if (isMyUnit) {
+    if (isMyUnit(currentPlayer, unitId)) {
       setSelectedUnitId(unitId === selectedUnitId ? null : unitId)
       setSelectedCardId(null)
     }
@@ -196,12 +103,15 @@ export default function GameBoard({
     }
   }
 
+  /**
+   * 相手プレイヤーへの直接攻撃
+   */
   const handleOpponentPlayerClick = () => {
     if (!isCurrentPlayerTurn || !selectedUnitId) return
-    // プレイヤーへの直接攻撃
     handleAttack(selectedUnitId)
   }
 
+  // ゲーム終了時の表示
   if (gameState.isGameOver) {
     return (
       <div className="game-over">
@@ -237,7 +147,6 @@ export default function GameBoard({
               key={unit.instanceId}
               unit={unit}
               onClick={() => {
-                // カード選択中ならカード使用の対象として渡す
                 if (selectedCardId) {
                   handlePlayCard(selectedCardId, unit.instanceId)
                   setSelectedCardId(null)
@@ -276,7 +185,6 @@ export default function GameBoard({
               key={unit.instanceId}
               unit={unit}
               onClick={() => {
-                // カード選択中ならカード使用の対象として渡す（自分のユニットにも対応）
                 if (selectedCardId) {
                   handlePlayCard(selectedCardId, unit.instanceId)
                   setSelectedCardId(null)
@@ -324,7 +232,6 @@ export default function GameBoard({
               >
                 <div className="card-cost">{card.cost}</div>
                 <div className="card-name">{card.name}</div>
-                {/* 魔法カードやユニットカードの効果説明を表示 */}
                 {card.effect && (
                   <div className="card-effect">{card.effect}</div>
                 )}
@@ -338,7 +245,7 @@ export default function GameBoard({
                   <div className="card-traits">
                     {card.traits.map((trait) => (
                       <span key={trait} className="trait-badge-small">
-                        {traitLabels[trait] || trait}
+                        {TRAIT_LABELS[trait] || trait}
                       </span>
                     ))}
                   </div>

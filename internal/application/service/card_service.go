@@ -5,8 +5,6 @@ import (
 
 	"card_game/internal/core/entity"
 	"card_game/internal/core/port"
-	"card_game/internal/infrastructure/persistence/model"
-	"card_game/internal/infrastructure/repository"
 )
 
 // ========================================
@@ -15,13 +13,13 @@ import (
 
 // CardService カード管理ビジネスロジック
 type CardService struct {
-	cardRepo repository.CardRepository
+	cardRepo port.CardRepository
 	logger   port.Logger
 }
 
 // NewCardService 新しいカード管理サービスを作成
 func NewCardService(
-	cardRepo repository.CardRepository,
+	cardRepo port.CardRepository,
 	logger port.Logger,
 ) *CardService {
 	return &CardService{
@@ -118,8 +116,8 @@ func (s *CardService) DeleteCard(id string) error {
 	return nil
 }
 
-// SaveCardEffect カード効果を保存（model構造を直接受け取る）
-func (s *CardService) SaveCardEffect(cardID string, cardEffectModel *model.CardEffectModel) error {
+// SaveCardEffect カード効果を保存（抽象化されたインターフェースを使用）
+func (s *CardService) SaveCardEffect(cardID string, cardEffectModel interface{}) error {
 	if err := s.cardRepo.SaveCardEffect(cardID, cardEffectModel); err != nil {
 		return fmt.Errorf("failed to save card effect: %w", err)
 	}
