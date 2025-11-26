@@ -3,8 +3,29 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateCardRequest, CreateCardResponse, CreateDeckRequest, CreateDeckResponse, DeleteCardRequest, DeleteCardResponse, DeleteDeckRequest, DeleteDeckResponse, GetCardRequest, GetCardResponse, GetDeckRequest, GetDeckResponse, ListCardsRequest, ListCardsResponse, ListDecksRequest, ListDecksResponse, UpdateCardRequest, UpdateCardResponse, UpdateDeckRequest, UpdateDeckResponse } from "./card_management_pb.js";
-import { MethodKind } from "@bufbuild/protobuf";
+import { MethodKind } from '@bufbuild/protobuf'
+import {
+  CreateCardRequest,
+  CreateCardResponse,
+  CreateDeckRequest,
+  CreateDeckResponse,
+  DeleteCardRequest,
+  DeleteCardResponse,
+  DeleteDeckRequest,
+  DeleteDeckResponse,
+  GetCardRequest,
+  GetCardResponse,
+  GetDeckRequest,
+  GetDeckResponse,
+  ListCardsRequest,
+  ListCardsResponse,
+  ListDecksRequest,
+  ListDecksResponse,
+  UpdateCardRequest,
+  UpdateCardResponse,
+  UpdateDeckRequest,
+  UpdateDeckResponse,
+} from './card_management_pb.js'
 
 /**
  * カード管理サービス
@@ -12,13 +33,13 @@ import { MethodKind } from "@bufbuild/protobuf";
  * @generated from service cardgame.v1.CardManagementService
  */
 export const CardManagementService = {
-  typeName: "cardgame.v1.CardManagementService",
+  typeName: 'cardgame.v1.CardManagementService',
   methods: {
     /**
      * @generated from rpc cardgame.v1.CardManagementService.CreateCard
      */
     createCard: {
-      name: "CreateCard",
+      name: 'CreateCard',
       I: CreateCardRequest,
       O: CreateCardResponse,
       kind: MethodKind.Unary,
@@ -27,7 +48,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.GetCard
      */
     getCard: {
-      name: "GetCard",
+      name: 'GetCard',
       I: GetCardRequest,
       O: GetCardResponse,
       kind: MethodKind.Unary,
@@ -36,7 +57,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.ListCards
      */
     listCards: {
-      name: "ListCards",
+      name: 'ListCards',
       I: ListCardsRequest,
       O: ListCardsResponse,
       kind: MethodKind.Unary,
@@ -45,7 +66,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.UpdateCard
      */
     updateCard: {
-      name: "UpdateCard",
+      name: 'UpdateCard',
       I: UpdateCardRequest,
       O: UpdateCardResponse,
       kind: MethodKind.Unary,
@@ -54,7 +75,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.DeleteCard
      */
     deleteCard: {
-      name: "DeleteCard",
+      name: 'DeleteCard',
       I: DeleteCardRequest,
       O: DeleteCardResponse,
       kind: MethodKind.Unary,
@@ -63,7 +84,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.CreateDeck
      */
     createDeck: {
-      name: "CreateDeck",
+      name: 'CreateDeck',
       I: CreateDeckRequest,
       O: CreateDeckResponse,
       kind: MethodKind.Unary,
@@ -72,7 +93,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.GetDeck
      */
     getDeck: {
-      name: "GetDeck",
+      name: 'GetDeck',
       I: GetDeckRequest,
       O: GetDeckResponse,
       kind: MethodKind.Unary,
@@ -81,7 +102,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.ListDecks
      */
     listDecks: {
-      name: "ListDecks",
+      name: 'ListDecks',
       I: ListDecksRequest,
       O: ListDecksResponse,
       kind: MethodKind.Unary,
@@ -90,7 +111,7 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.UpdateDeck
      */
     updateDeck: {
-      name: "UpdateDeck",
+      name: 'UpdateDeck',
       I: UpdateDeckRequest,
       O: UpdateDeckResponse,
       kind: MethodKind.Unary,
@@ -99,11 +120,10 @@ export const CardManagementService = {
      * @generated from rpc cardgame.v1.CardManagementService.DeleteDeck
      */
     deleteDeck: {
-      name: "DeleteDeck",
+      name: 'DeleteDeck',
       I: DeleteDeckRequest,
       O: DeleteDeckResponse,
       kind: MethodKind.Unary,
     },
-  }
-} as const;
-
+  },
+} as const

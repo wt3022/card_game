@@ -15,6 +15,23 @@ import (
 	"card_game/internal/infrastructure/event"
 )
 
+// セキュリティコンポーネントのインターフェース
+type RateLimiter interface {
+	CheckLimit(playerID string, action string) error
+	Reset(playerID string)
+}
+
+type StateValidator interface {
+	RecordState(gameID string, state *game.State)
+	ValidateState(gameID string, state *game.State) error
+}
+
+type CheatDetector interface {
+	DetectImpossibleTiming(playerID string, action string, lastActionTime time.Time)
+	DetectImpossibleAction(playerID string, action string, reason string)
+	GetSuspiciousPlayers(threshold int) []string
+}
+
 // GameSession はゲームセッションを表す構造体
 type GameSession struct {
 	State           *game.State
@@ -30,6 +47,10 @@ type GameService struct {
 	deckService      *DeckService
 	logger           port.Logger
 	waitingPlayers   []*MatchmakingPlayer
+	// セキュリティコンポーネント
+	rateLimiter    RateLimiter
+	stateValidator StateValidator
+	cheatDetector  CheatDetector
 }
 
 func (s *GameService) MarkPlayerDisconnected(gameID string, playerID string) {
@@ -126,6 +147,29 @@ func NewGameService(deckService *DeckService, logger port.Logger) *GameService {
 		deckService:      deckService,
 		logger:           logger,
 		waitingPlayers:   []*MatchmakingPlayer{},
+		rateLimiter:      nil,
+		stateValidator:   nil,
+		cheatDetector:    nil,
+	}
+}
+
+// NewGameServiceWithSecurity セキュリティコンポーネント付きでGameServiceを作成
+func NewGameServiceWithSecurity(
+	deckService *DeckService,
+	logger port.Logger,
+	rateLimiter RateLimiter,
+	stateValidator StateValidator,
+	cheatDetector CheatDetector,
+) *GameService {
+	return &GameService{
+		games:            make(map[string]*GameSession),
+		eventBroadcaster: event.NewBroadcaster(),
+		deckService:      deckService,
+		logger:           logger,
+		waitingPlayers:   []*MatchmakingPlayer{},
+		rateLimiter:      rateLimiter,
+		stateValidator:   stateValidator,
+		cheatDetector:    cheatDetector,
 	}
 }
 
@@ -245,6 +289,14 @@ func (s *GameService) PerformMulligan(ctx context.Context, gameID string, player
 	// プレイヤーのアクティビティを更新
 	player.LastActivityAt = time.Now()
 
+	// レート制限チェック
+	if s.rateLimiter != nil {
+		if err := s.rateLimiter.CheckLimit(playerID, "PerformMulligan"); err != nil {
+			s.logger.Info("レート制限超過: %s - %v", playerID, err)
+			return entity.NewErrRateLimitExceeded()
+		}
+	}
+
 	// すでにマリガン済みかチェック
 	if state.IsMulliganDone(playerID) {
 		return entity.NewErrInvalidState("mulligan", "マリガンは既に完了しています")
@@ -340,7 +392,21 @@ func (s *GameService) PlayCard(ctx context.Context, gameID string, playerID stri
 	}
 
 	// プレイヤーのアクティビティを更新
+	lastActivity := player.LastActivityAt
 	player.LastActivityAt = time.Now()
+
+	// レート制限チェック
+	if s.rateLimiter != nil {
+		if err := s.rateLimiter.CheckLimit(playerID, "PlayCard"); err != nil {
+			s.logger.Info("レート制限超過: %s - %v", playerID, err)
+			return entity.NewErrRateLimitExceeded()
+		}
+	}
+
+	// チート検出: 不可能なタイミング
+	if s.cheatDetector != nil {
+		s.cheatDetector.DetectImpossibleTiming(playerID, "PlayCard", lastActivity)
+	}
 
 	// アクションの妥当性を検証
 	if err := state.ValidateAction(playerID); err != nil {
@@ -441,8 +507,24 @@ func (s *GameService) ExecuteAttack(ctx context.Context, gameID string, attacker
 
 	// プレイヤーのアクティビティを更新
 	player := state.GetPlayerByID(attackerPlayerID)
-	if player != nil {
-		player.LastActivityAt = time.Now()
+	if player == nil {
+		return nil, entity.NewErrNotFound("player", attackerPlayerID)
+	}
+
+	lastActivity := player.LastActivityAt
+	player.LastActivityAt = time.Now()
+
+	// レート制限チェック
+	if s.rateLimiter != nil {
+		if err := s.rateLimiter.CheckLimit(attackerPlayerID, "ExecuteAttack"); err != nil {
+			s.logger.Info("レート制限超過: %s - %v", attackerPlayerID, err)
+			return nil, entity.NewErrRateLimitExceeded()
+		}
+	}
+
+	// チート検出: 不可能なタイミング
+	if s.cheatDetector != nil {
+		s.cheatDetector.DetectImpossibleTiming(attackerPlayerID, "ExecuteAttack", lastActivity)
 	}
 
 	// アクションの妥当性を検証

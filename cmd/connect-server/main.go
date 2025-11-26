@@ -15,8 +15,10 @@ import (
 	"card_game/internal/application/service"
 	"card_game/internal/infrastructure/auth"
 	"card_game/internal/infrastructure/logger"
+	"card_game/internal/infrastructure/middleware"
 	"card_game/internal/infrastructure/persistence"
 	"card_game/internal/infrastructure/repository"
+	"card_game/internal/infrastructure/security"
 
 	"connectrpc.com/connect"
 	"github.com/joho/godotenv"
@@ -84,11 +86,18 @@ func main() {
 		log.Printf("⚠️  デフォルト管理者ユーザーの初期化に失敗しました: %v", err)
 	}
 
+	// セキュリティコンポーネントを初期化
+	rateLimiter := middleware.NewRateLimiter()
+	rateLimiter.StartCleanupRoutine()
+	stateValidator := security.NewStateValidator()
+	cheatDetector := security.NewCheatDetector()
+	log.Println("✅ セキュリティコンポーネント初期化完了")
+
 	// サービスを初期化
 	authService := service.NewAuthService(userRepo, tokenProvider, passwordHasher, logger)
 	cardService := service.NewCardService(cardRepo, logger)
 	deckService := service.NewDeckService(deckRepo, cardRepo, logger)
-	gameService := service.NewGameService(deckService, logger)
+	gameService := service.NewGameServiceWithSecurity(deckService, logger, rateLimiter, stateValidator, cheatDetector)
 
 	// 認証インターセプターを作成
 	authInterceptor := interceptor.NewAuthInterceptorFunc(tokenProvider)
@@ -182,6 +191,14 @@ func corsMiddleware(next http.Handler) http.Handler {
 		// Private Network Access (PNA) を許可するヘッダ
 		// Chrome/Edge等で https → localhost への通信に必要
 		w.Header().Set("Access-Control-Allow-Private-Network", "true")
+
+		// セキュリティヘッダー
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		// Strict-Transport-Security は HTTPS 環境でのみ有効
+		// w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 
 		// プリフライトリクエストの処理
 		if r.Method == http.MethodOptions {

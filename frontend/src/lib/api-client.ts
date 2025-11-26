@@ -19,13 +19,15 @@ const getAuthToken = (): string | null => {
 }
 
 /**
- * 認証エラーコードの定義
+ * エラーコードの定義
  */
 const AUTH_ERROR_CODES = [
   'unauthenticated',
   'permission_denied',
   'invalid_argument',
 ] as const
+
+const RATE_LIMIT_ERROR_CODES = ['resource_exhausted', 'unavailable'] as const
 
 /**
  * 認証トークンのバリデーション
@@ -51,6 +53,8 @@ const authInterceptor: Interceptor = (next) => async (req) => {
     console.warn('無効な認証トークンを検出しました。クリアします。')
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_info')
+    sessionStorage.removeItem('auth_token')
+    sessionStorage.removeItem('user_info')
   }
 
   try {
@@ -67,14 +71,25 @@ const authInterceptor: Interceptor = (next) => async (req) => {
       error.message?.includes('token is expired') ||
       error.message?.includes('invalid token')
 
+    const isRateLimitError =
+      error.code &&
+      RATE_LIMIT_ERROR_CODES.includes(
+        error.code as (typeof RATE_LIMIT_ERROR_CODES)[number],
+      )
+
     if (isAuthError) {
       console.error('認証エラー:', error.message)
       localStorage.removeItem('auth_token')
       localStorage.removeItem('user_info')
+      sessionStorage.removeItem('auth_token')
+      sessionStorage.removeItem('user_info')
       // リダイレクトの前に少し待機（ユーザーがエラーを認識できるように）
       setTimeout(() => {
         window.location.href = '/'
       }, 1000)
+    } else if (isRateLimitError) {
+      console.warn('レート制限超過:', error.message)
+      // レート制限エラーはリトライ可能なのでリダイレクトしない
     }
     throw error
   }

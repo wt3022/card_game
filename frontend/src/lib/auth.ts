@@ -10,6 +10,11 @@ const MAX_USERNAME_LENGTH = 50
 const MIN_PASSWORD_LENGTH = 8
 const MAX_PASSWORD_LENGTH = 128
 
+// ストレージの選択：sessionStorageを優先（タブ閉じで自動削除）
+// 環境変数でlocalStorageを使うか選択可能
+const USE_SESSION_STORAGE = import.meta.env.VITE_USE_SESSION_STORAGE !== 'false'
+const storage = USE_SESSION_STORAGE ? sessionStorage : localStorage
+
 /**
  * ユーザー情報の型定義
  */
@@ -33,29 +38,34 @@ export class AuthError extends Error {
  * トークンを取得
  */
 export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY)
+  return storage.getItem(TOKEN_KEY)
 }
 
 /**
  * トークンを保存
  */
 export const setToken = (token: string): void => {
-  localStorage.setItem(TOKEN_KEY, token)
+  storage.setItem(TOKEN_KEY, token)
 }
 
 /**
  * トークンを削除
  */
 export const removeToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(USER_KEY)
+  storage.removeItem(TOKEN_KEY)
+  storage.removeItem(USER_KEY)
+  // フォールバック: localStorageからも削除
+  if (USE_SESSION_STORAGE) {
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USER_KEY)
+  }
 }
 
 /**
  * ユーザー情報を取得
  */
 export const getUserInfo = (): UserInfo | null => {
-  const userStr = localStorage.getItem(USER_KEY)
+  const userStr = storage.getItem(USER_KEY)
   if (!userStr) return null
   try {
     return JSON.parse(userStr)
@@ -68,7 +78,7 @@ export const getUserInfo = (): UserInfo | null => {
  * ユーザー情報を保存
  */
 export const setUserInfo = (userInfo: UserInfo): void => {
-  localStorage.setItem(USER_KEY, JSON.stringify(userInfo))
+  storage.setItem(USER_KEY, JSON.stringify(userInfo))
 }
 
 /**

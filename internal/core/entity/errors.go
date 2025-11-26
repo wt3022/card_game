@@ -47,6 +47,9 @@ const (
 
 	// 内部エラー
 	ErrorCodeInternal ErrorCode = "INTERNAL_ERROR" // 内部エラー
+
+	// セキュリティ関連
+	ErrorCodeRateLimitExceeded ErrorCode = "RATE_LIMIT_EXCEEDED" // レート制限超過
 )
 
 // ErrorCategory エラーカテゴリ（エラーハンドリングで使用）
@@ -59,6 +62,7 @@ const (
 	ErrorCategoryPrecondition ErrorCategory = "PRECONDITION"  // 412相当（ターン外、マナ不足、ゲーム終了後など）
 	ErrorCategoryConflict     ErrorCategory = "CONFLICT"      // 409相当（既に存在など）
 	ErrorCategoryInternal     ErrorCategory = "INTERNAL"      // 500相当（内部エラー）
+	ErrorCategorySecurity     ErrorCategory = "SECURITY"      // 429/403相当（レート制限、不正検出など）
 )
 
 // ========================================
@@ -417,4 +421,30 @@ func NewErrInvalidDeck(field, reason string) DomainError {
 		Field:  field,
 		Reason: reason,
 	}
+}
+
+// ========================================
+// レート制限エラー
+// ========================================
+
+type ErrRateLimitExceeded struct{}
+
+func (e *ErrRateLimitExceeded) Error() string {
+	return "rate limit exceeded"
+}
+
+func (e *ErrRateLimitExceeded) Code() ErrorCode {
+	return ErrorCodeRateLimitExceeded
+}
+
+func (e *ErrRateLimitExceeded) Category() ErrorCategory {
+	return ErrorCategorySecurity
+}
+
+func (e *ErrRateLimitExceeded) IsRetryable() bool {
+	return true
+}
+
+func NewErrRateLimitExceeded() DomainError {
+	return &ErrRateLimitExceeded{}
 }
