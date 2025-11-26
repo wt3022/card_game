@@ -45,19 +45,12 @@ func (g *State) ExecuteDrawPhase(player *entity.Player) {
 	// カードをドロー
 	card, err := player.DrawCard()
 	if err != nil {
-		// デッキ切れの場合、ファティーグダメージ
-		fatigueDamage := calculateFatigueDamage(g.CurrentTurn)
-		g.logger.Info("%s: デッキ切れ！ファティーグダメージ %d を受ける", player.Name, fatigueDamage)
-		player.TakeDamage(fatigueDamage)
-		g.AddLog(player.ID, "ドローフェイズ", fmt.Sprintf("デッキ切れ: %d ダメージ", fatigueDamage))
-
-		// HPチェック
-		if player.HP <= 0 {
-			g.logger.Error("%s: HPが0になり敗北", player.Name)
-			g.IsGameOver = true
-			opponent := g.GetOpponent(player.ID)
-			g.WinnerID = &opponent.ID
-		}
+		// デッキ切れの場合、即敗北
+		g.logger.Info("%s: デッキ切れ！敗北", player.Name)
+		g.IsGameOver = true
+		opponent := g.GetOpponent(player.ID)
+		g.WinnerID = &opponent.ID
+		g.AddLog(player.ID, "ドローフェイズ", "デッキ切れにより敗北")
 		return
 	}
 

@@ -49,3 +49,6 @@ temp/
 
 volumes/
 .env
+
+# build binary
+main

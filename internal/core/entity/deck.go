@@ -6,12 +6,8 @@ import (
 )
 
 const (
-	// DeckSize デッキの推奨枚数
+	// DeckSize デッキの枚数（固定）
 	DeckSize = 40
-	// MinDeckSize デッキの最小枚数
-	MinDeckSize = 30
-	// MaxDeckSize デッキの最大枚数
-	MaxDeckSize = 60
 	// MaxCardCopies 同じカードの最大枚数
 	MaxCardCopies = 3
 	// MaxDeckNameLength デッキ名の最大長
@@ -76,12 +72,9 @@ func (d *Deck) Validate() error {
 		return NewErrInvalidDeck("cards", "デッキにカードが含まれていません")
 	}
 
-	// デッキの枚数は30〜60枚（推奨は40枚）
-	if len(d.CardIDs) < MinDeckSize {
-		return NewErrInvalidDeck("cards", fmt.Sprintf("デッキは最低%d枚必要です", MinDeckSize))
-	}
-	if len(d.CardIDs) > MaxDeckSize {
-		return NewErrInvalidDeck("cards", fmt.Sprintf("デッキは最大%d枚までです", MaxDeckSize))
+	// デッキの枚数は40枚固定
+	if len(d.CardIDs) != DeckSize {
+		return NewErrInvalidDeck("cards", fmt.Sprintf("デッキはちょうど%d枚である必要があります", DeckSize))
 	}
 
 	// 同じカードの枚数チェック
