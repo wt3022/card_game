@@ -38,6 +38,18 @@ enum GamePhase {
   GAME_PHASE_TURN_END = 5;
 }
 
+// 効果発動タイミング
+enum EffectTiming {
+  EFFECT_TIMING_UNSPECIFIED = 0;
+  EFFECT_TIMING_IMMEDIATE = 1;      // 即座に発動
+  EFFECT_TIMING_ON_SUMMON = 2;      // 召喚時
+  EFFECT_TIMING_ON_DESTROY = 3;     // 破壊時
+  EFFECT_TIMING_ON_ATTACK = 4;      // 攻撃時
+  EFFECT_TIMING_ON_DAMAGED = 5;     // ダメージを受けた時
+  EFFECT_TIMING_TURN_START = 6;     // ターン開始時
+  EFFECT_TIMING_TURN_END = 7;       // ターン終了時
+}
+
 // カード効果タイプ
 enum AtomicEffectType {
   ATOMIC_EFFECT_TYPE_UNSPECIFIED = 0;
@@ -98,6 +110,7 @@ message AtomicEffect {
   optional int32 value = 4;
   optional string card_id = 5;
   optional Trait trait = 6;
+  EffectTiming timing = 7;  // 発動タイミング
 }
 
 // ターゲットセレクター
@@ -187,6 +200,8 @@ message Player {
   repeated Unit field = 10;
   int32 time_remaining_seconds = 11;
   repeated Card hand = 12;  // 自分のプレイヤーの場合のみ含まれる
+  bool is_connected = 13;  // 接続状態
+  google.protobuf.Timestamp last_activity_at = 14;  // 最後のアクティビティ時刻
 }
 
 // ゲーム状態

@@ -361,6 +361,35 @@ func GetErrorCategory(err error) ErrorCategory {
 	return ErrorCategoryInternal
 }
 
+// ErrInvalidInput 無効な入力エラー（汎用バリデーションエラー）
+type ErrInvalidInput struct {
+	Field  string
+	Reason string
+}
+
+func (e *ErrInvalidInput) Error() string {
+	return fmt.Sprintf("invalid input %s: %s", e.Field, e.Reason)
+}
+
+func (e *ErrInvalidInput) Code() ErrorCode {
+	return ErrorCodeInvalidResource
+}
+
+func (e *ErrInvalidInput) Category() ErrorCategory {
+	return ErrorCategoryValidation
+}
+
+func (e *ErrInvalidInput) IsRetryable() bool {
+	return false
+}
+
+func NewErrInvalidInput(field, reason string) DomainError {
+	return &ErrInvalidInput{
+		Field:  field,
+		Reason: reason,
+	}
+}
+
 // ErrInvalidDeck 無効なデッキエラー
 type ErrInvalidDeck struct {
 	Field  string

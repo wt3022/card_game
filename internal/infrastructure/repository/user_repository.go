@@ -58,7 +58,7 @@ func toGormUser(user *entity.User) *model.UserModel {
 func (r *userRepository) Create(user *entity.User) error {
 	userModel := toGormUser(user)
 	if err := r.db.Create(userModel).Error; err != nil {
-		return fmt.Errorf("failed to create user: %w", err)
+		return fmt.Errorf("ユーザーの作成に失敗しました: %w", err)
 	}
 	return nil
 }
@@ -68,9 +68,9 @@ func (r *userRepository) FindByID(id string) (*entity.User, error) {
 	var userModel model.UserModel
 	if err := r.db.First(&userModel, "id = ?", id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("user not found: %w", err)
+			return nil, fmt.Errorf("ユーザーが見つかりません: %w", err)
 		}
-		return nil, fmt.Errorf("failed to find user by id: %w", err)
+		return nil, fmt.Errorf("IDによるユーザー検索に失敗しました: %w", err)
 	}
 	return toEntityUser(&userModel), nil
 }
@@ -85,9 +85,9 @@ func (r *userRepository) FindByUsername(username string) (*entity.User, error) {
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("user not found: %w", err)
+			return nil, fmt.Errorf("ユーザーが見つかりません: %w", err)
 		}
-		return nil, fmt.Errorf("failed to find user by username: %w", err)
+		return nil, fmt.Errorf("ユーザー名によるユーザー検索に失敗しました: %w", err)
 	}
 	return toEntityUser(&userModel), nil
 }
@@ -96,7 +96,7 @@ func (r *userRepository) FindByUsername(username string) (*entity.User, error) {
 func (r *userRepository) Update(user *entity.User) error {
 	userModel := toGormUser(user)
 	if err := r.db.Save(userModel).Error; err != nil {
-		return fmt.Errorf("failed to update user: %w", err)
+		return fmt.Errorf("ユーザーの更新に失敗しました: %w", err)
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (r *userRepository) Update(user *entity.User) error {
 // Delete ユーザーを削除
 func (r *userRepository) Delete(id string) error {
 	if err := r.db.Delete(&model.UserModel{}, "id = ?", id).Error; err != nil {
-		return fmt.Errorf("failed to delete user: %w", err)
+		return fmt.Errorf("ユーザーの削除に失敗しました: %w", err)
 	}
 	return nil
 }

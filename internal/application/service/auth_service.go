@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 
 	"card_game/internal/core/entity"
@@ -37,21 +36,26 @@ func NewAuthService(
 
 // Login ログイン処理
 func (s *AuthService) Login(username, password string) (*entity.LoginResponse, error) {
+	// 入力バリデーション
+	if err := entity.ValidateUsername(username); err != nil {
+		return nil, fmt.Errorf("認証情報が無効です")
+	}
+
 	// ユーザーを検索
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, fmt.Errorf("認証情報が無効です")
 	}
 
-	// パスワードを検証
+	// パスワードを検証（検証はpasswordHasher内で行われる）
 	if err := s.passwordHasher.VerifyPassword(user.PasswordHash, password); err != nil {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, fmt.Errorf("認証情報が無効です")
 	}
 
 	// JWTトークンを生成
 	token, err := s.tokenProvider.GenerateToken(user.ID, user.Username, string(user.Role))
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate token: %w", err)
+		return nil, fmt.Errorf("トークンの生成に失敗しました: %w", err)
 	}
 
 	return &entity.LoginResponse{
@@ -69,16 +73,24 @@ func (s *AuthService) ValidateToken(tokenString string) (*port.JWTClaims, error)
 
 // CreateUser ユーザーを作成（管理者用）
 func (s *AuthService) CreateUser(username, password string, role entity.UserRole) (*entity.User, error) {
+	// 入力バリデーション
+	if err := entity.ValidateUsername(username); err != nil {
+		return nil, err
+	}
+	if err := entity.ValidateUserRole(role); err != nil {
+		return nil, err
+	}
+
 	// 既存ユーザーをチェック
 	_, err := s.userRepo.FindByUsername(username)
 	if err == nil {
-		return nil, errors.New("username already exists")
+		return nil, entity.NewErrAlreadyExists("user", username)
 	}
 
-	// パスワードをハッシュ化
+	// パスワードをハッシュ化（検証はpasswordHasher内で行われる）
 	passwordHash, err := s.passwordHasher.HashPassword(password)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return nil, fmt.Errorf("パスワードのハッシュ化に失敗しました: %w", err)
 	}
 
 	// ユーザーIDを生成（簡易版、実際はUUID等を使用）
@@ -92,7 +104,7 @@ func (s *AuthService) CreateUser(username, password string, role entity.UserRole
 	}
 
 	if err := s.userRepo.Create(user); err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		return nil, fmt.Errorf("ユーザーの作成に失敗しました: %w", err)
 	}
 
 	return user, nil

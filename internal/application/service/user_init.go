@@ -29,7 +29,7 @@ func InitializeDefaultAdmin(
 	_, err := userRepo.FindByUsername(adminUsername)
 	if err == nil {
 		// 既に存在する
-		logger.Info("Admin user already exists: %s", adminUsername)
+		logger.Info("管理者ユーザーは既に存在します: %s", adminUsername)
 		return nil
 	}
 
@@ -42,13 +42,13 @@ func InitializeDefaultAdmin(
 	// 管理者ユーザーが存在しない場合、作成
 	adminPassword := getEnv("ADMIN_PASSWORD", "admin123")
 	if adminPassword == "admin123" {
-		logger.Info("⚠️  Using default admin password. Please change it in production!")
+		logger.Info("⚠️  デフォルトの管理者パスワードを使用しています。本番環境では変更してください！")
 	}
 
 	// パスワードをハッシュ化
 	passwordHash, err := passwordHasher.HashPassword(adminPassword)
 	if err != nil {
-		return fmt.Errorf("failed to hash admin password: %w", err)
+		return fmt.Errorf("管理者パスワードのハッシュ化に失敗しました: %w", err)
 	}
 
 	// ユーザーIDを生成（UUID）
@@ -64,10 +64,10 @@ func InitializeDefaultAdmin(
 	}
 
 	if err := userRepo.Create(user); err != nil {
-		return fmt.Errorf("failed to create admin user: %w", err)
+		return fmt.Errorf("管理者ユーザーの作成に失敗しました: %w", err)
 	}
 
-	logger.Info("✅ Created default admin user: %s (ID: %s)", adminUsername, userID)
+	logger.Info("✅ デフォルト管理者ユーザーを作成しました: %s (ID: %s)", adminUsername, userID)
 	return nil
 }
 

@@ -18,14 +18,27 @@
 }
 
 .player-info-compact.attack-target {
-  border: 2px solid #f44336;
+  border: 3px solid #f44336;
   box-shadow: 0 2px 12px rgba(244, 67, 54, 0.4);
   cursor: pointer;
+  animation: attackTargetPulse 1.5s ease-in-out infinite;
+  transition: all 0.3s ease;
+}
+
+@keyframes attackTargetPulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 12px rgba(244, 67, 54, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(244, 67, 54, 0.7);
+  }
 }
 
 .player-info-compact.attack-target:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.5);
+  box-shadow: 0 6px 24px rgba(244, 67, 54, 0.6);
+  animation: none;
 }
 
 .player-name-compact {

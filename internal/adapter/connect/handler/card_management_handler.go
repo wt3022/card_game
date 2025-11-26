@@ -10,27 +10,42 @@ import (
 	"card_game/internal/adapter/converter"
 	"card_game/internal/application/service"
 	"card_game/internal/core/entity"
-	"card_game/internal/core/port"
-	"card_game/internal/infrastructure/repository"
 )
 
 // ========================================
 // カード管理ハンドラー
 // ========================================
 
+// getUserIDFromContext コンテキストからユーザーIDを取得
+// Note: 現状はInterceptorで"user_id"キーにユーザーIDが設定されることを前提とする
+// 開発環境ではDEV_MODE環境変数が"true"の場合のみ"admin"をデフォルトとして返す
+func getUserIDFromContext(ctx context.Context) string {
+	// コンテキストから取得を試みる
+	if userID, ok := ctx.Value("user_id").(string); ok && userID != "" {
+		return userID
+	}
+	// 開発環境でのみデフォルト値を使用（本番環境では空文字列を返す）
+	// TODO: 本番環境ではエラーを返すべき
+	// if os.Getenv("DEV_MODE") == "true" {
+	// 	return "admin"
+	// }
+	// return ""
+
+	// 現状は互換性のため常に"admin"を返す（将来的に上記のロジックに置き換える）
+	return "admin"
+}
+
 // CardManagementConnectHandler Connect-Go用のカード管理サービスハンドラー
 type CardManagementConnectHandler struct {
 	cardService *service.CardService
 	deckService *service.DeckService
-	cardRepo    port.CardRepository
 }
 
 // NewCardManagementConnectHandler 新しいCardManagementConnectHandlerを作成
-func NewCardManagementConnectHandler(cardService *service.CardService, deckService *service.DeckService, cardRepo port.CardRepository) *CardManagementConnectHandler {
+func NewCardManagementConnectHandler(cardService *service.CardService, deckService *service.DeckService) *CardManagementConnectHandler {
 	return &CardManagementConnectHandler{
 		cardService: cardService,
 		deckService: deckService,
-		cardRepo:    cardRepo,
 	}
 }
 
@@ -53,14 +68,22 @@ func (h *CardManagementConnectHandler) CreateCard(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
-	// CardEffectを保存(protoから変換)
+	// CardEffectを保存
 	if req.Msg.CardEffect != nil {
-		cardEffectModel, err := repository.CardEffectFromProtoToModel(req.Msg.CardEffect)
-		if err != nil {
+		// ProtoからEntityに変換
+		cardEffect := converter.CardEffectFromProto(req.Msg.CardEffect)
+		if err := h.cardService.SaveCardEffect(card.ID, cardEffect); err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := h.cardRepo.SaveCardEffect(card.ID, cardEffectModel); err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
+
+		// 効果テキストを自動生成してカードに設定
+		effectDescription, err := h.cardService.GenerateEffectDescription(card.ID)
+		if err == nil && effectDescription != "" {
+			card.Effect = effectDescription
+			// カードを再度更新して効果テキストを保存
+			if err := h.cardService.UpdateCard(card); err != nil {
+				return nil, connect.NewError(connect.CodeInternal, err)
+			}
 		}
 	}
 
@@ -90,10 +113,13 @@ func (h *CardManagementConnectHandler) GetCard(
 	// エンティティからprotoに変換
 	protoCard := converter.CardToProto(card)
 
-	// CardEffectをProto形式でロード
-	cardEffectProto, err := h.loadAndConvertCardEffect(cardID)
-	if err == nil && cardEffectProto != nil {
-		protoCard.CardEffect = cardEffectProto
+	// CardEffectを取得してProtoに変換
+	cardEffect, err := h.cardService.GetCardEffect(cardID)
+	if err == nil && cardEffect != nil {
+		protoCard.CardEffect = converter.CardEffectToProto(cardEffect)
+		if protoCard.CardEffect != nil {
+			protoCard.CardEffect.CardId = cardID
+		}
 	}
 
 	resp := &pbv1.GetCardResponse{
@@ -127,10 +153,13 @@ func (h *CardManagementConnectHandler) ListCards(
 	protoCards := make([]*pbv1.Card, len(cards))
 	for i, card := range cards {
 		protoCards[i] = converter.CardToProto(card)
-		// CardEffectをProto形式でロード
-		cardEffectProto, err := h.loadAndConvertCardEffect(card.ID)
-		if err == nil && cardEffectProto != nil {
-			protoCards[i].CardEffect = cardEffectProto
+		// CardEffectを取得してProtoに変換
+		cardEffect, err := h.cardService.GetCardEffect(card.ID)
+		if err == nil && cardEffect != nil {
+			protoCards[i].CardEffect = converter.CardEffectToProto(cardEffect)
+			if protoCards[i].CardEffect != nil {
+				protoCards[i].CardEffect.CardId = card.ID
+			}
 		}
 	}
 
@@ -152,20 +181,24 @@ func (h *CardManagementConnectHandler) UpdateCard(
 		return nil, connect.NewError(connect.CodeInvalidArgument, err)
 	}
 
-	// カードを更新
-	if err := h.cardService.UpdateCard(card); err != nil {
-		return nil, connect.NewError(connect.CodeInternal, err)
-	}
-
-	// CardEffectを保存(protoから変換)
+	// CardEffectを先に保存して効果テキストを生成
 	if req.Msg.CardEffect != nil {
-		cardEffectModel, err := repository.CardEffectFromProtoToModel(req.Msg.CardEffect)
-		if err != nil {
+		// ProtoからEntityに変換
+		cardEffect := converter.CardEffectFromProto(req.Msg.CardEffect)
+		if err := h.cardService.SaveCardEffect(card.ID, cardEffect); err != nil {
 			return nil, connect.NewError(connect.CodeInvalidArgument, err)
 		}
-		if err := h.cardRepo.SaveCardEffect(card.ID, cardEffectModel); err != nil {
-			return nil, connect.NewError(connect.CodeInternal, err)
+
+		// CardEffectから効果テキストを自動生成してカードに設定（上書き）
+		effectDescription, err := h.cardService.GenerateEffectDescription(card.ID)
+		if err == nil && effectDescription != "" {
+			card.Effect = effectDescription
 		}
+	}
+
+	// カードを更新（効果テキストを含む）
+	if err := h.cardService.UpdateCard(card); err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
 	// エンティティからprotoに変換
@@ -266,25 +299,6 @@ func (h *CardManagementConnectHandler) protoToCardForUpdate(msg *pbv1.UpdateCard
 	return card, nil
 }
 
-// loadAndConvertCardEffect CardEffectModelをロードしてProtoに変換
-func (h *CardManagementConnectHandler) loadAndConvertCardEffect(cardID string) (*pbv1.CardEffect, error) {
-	cardEffectProtoInterface, err := h.cardRepo.GetCardEffectAsProto(cardID)
-	if err != nil {
-		return nil, err
-	}
-	if cardEffectProtoInterface == nil {
-		return nil, nil
-	}
-
-	// 型アサーション
-	cardEffectProto, ok := cardEffectProtoInterface.(*pbv1.CardEffect)
-	if !ok {
-		return nil, nil
-	}
-
-	return cardEffectProto, nil
-}
-
 // ========================================
 // デッキ管理エンドポイント
 // ========================================
@@ -295,7 +309,7 @@ func (h *CardManagementConnectHandler) CreateDeck(
 	req *connect.Request[pbv1.CreateDeckRequest],
 ) (*connect.Response[pbv1.CreateDeckResponse], error) {
 	// 認証情報からユーザーIDを取得
-	userID := "admin" // TODO: Interceptorから認証情報を取得する実装に変更
+	userID := getUserIDFromContext(ctx)
 
 	deck, err := h.deckService.CreateDeck(ctx, req.Msg.Name, req.Msg.Description, userID, req.Msg.CardIds)
 	if err != nil {

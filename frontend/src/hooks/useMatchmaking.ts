@@ -19,7 +19,8 @@ export const useMatchmaking = () => {
   const [isMatchmaking, setIsMatchmaking] = useState(false)
   const [matchmakingStatus, setMatchmakingStatus] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
-  const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const [abortController, setAbortController] =
+    useState<AbortController | null>(null)
 
   /**
    * マッチングに参加
@@ -28,6 +29,7 @@ export const useMatchmaking = () => {
     async (
       playerName: string,
       onMatched: (gameState: GameState, playerId: string) => void,
+      deckId?: string,
     ) => {
       if (!playerName.trim()) {
         setError('名前を入力してください')
@@ -42,19 +44,20 @@ export const useMatchmaking = () => {
       const controller = new AbortController()
       setAbortController(controller)
 
-      console.log('Joining matchmaking:', { playerId, playerName })
+      console.log('マッチング参加:', { playerId, playerName, deckId })
 
       try {
         const stream = gameClient.joinMatchmaking(
           {
             playerId,
             playerName,
+            deckId: deckId || undefined,
           },
-          { signal: controller.signal }
+          { signal: controller.signal },
         )
 
         for await (const response of stream) {
-          console.log('Matchmaking response:', response)
+          console.log('マッチングレスポンス:', response)
 
           switch (response.status) {
             case MatchmakingStatus.WAITING:
@@ -83,20 +86,22 @@ export const useMatchmaking = () => {
               return
           }
         }
-      } catch (err: any) {
+      } catch (err) {
         // キャンセルによるエラーかチェック
-        const isCanceled = err.name === 'AbortError' || 
-                          err.code === 'canceled' || 
-                          err.message?.includes('aborted') ||
-                          err.message?.includes('canceled')
-        
+        const error = err as { name?: string; code?: string; message?: string }
+        const isCanceled =
+          error.name === 'AbortError' ||
+          error.code === 'canceled' ||
+          error.message?.includes('aborted') ||
+          error.message?.includes('canceled')
+
         if (!isCanceled) {
-          console.error('Matchmaking error:', err)
+          console.error('マッチングエラー:', err)
           setError(
             err instanceof Error ? err.message : 'マッチングに失敗しました',
           )
         } else {
-          console.log('Matchmaking canceled by user')
+          console.log('ユーザーによりマッチングがキャンセルされました')
         }
         setIsMatchmaking(false)
         setAbortController(null)

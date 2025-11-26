@@ -25,7 +25,7 @@ export const useMulligan = () => {
         })
 
         for await (const response of stream) {
-          console.log('Game event:', response)
+          console.log('ゲームイベント:', response)
 
           // ターン開始イベントでゲームを開始
           if (
@@ -38,7 +38,7 @@ export const useMulligan = () => {
           }
         }
       } catch (err) {
-        console.error('Stream error:', err)
+        console.error('ストリームエラー:', err)
         setError('ゲーム開始に失敗しました')
       }
     },
@@ -62,7 +62,7 @@ export const useMulligan = () => {
           cardIds: selectedCardIds,
         })
 
-        console.log('Mulligan response:', response)
+        console.log('マリガンレスポンス:', response)
 
         if (response.success && response.gameState) {
           const bothDone =
@@ -89,7 +89,7 @@ export const useMulligan = () => {
                 onComplete(response.gameState)
               }
             } catch (err) {
-              console.error('GetGameState error:', err)
+              console.error('ゲーム状態取得エラー:', err)
               onComplete(response.gameState)
             }
           } else {
@@ -101,7 +101,7 @@ export const useMulligan = () => {
           setError(response.message || 'マリガンに失敗しました')
         }
       } catch (err) {
-        console.error('Mulligan error:', err)
+        console.error('マリガンエラー:', err)
         setError(err instanceof Error ? err.message : 'マリガンに失敗しました')
       }
     },

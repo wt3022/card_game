@@ -16,14 +16,29 @@ export const useGameState = (
    * ゲームイベントのリアルタイム購読
    */
   useEffect(() => {
-    if (!gameId || !currentPlayerId) return
+    console.log(
+      'useGameState useEffectがトリガーされました - gameId:',
+      gameId,
+      'currentPlayerId:',
+      currentPlayerId,
+    )
+
+    if (!gameId || !currentPlayerId) {
+      console.log('❌ 購読をスキップ - gameIdまたはcurrentPlayerIdがありません')
+      return
+    }
 
     let abortController: AbortController | null = null
     let isActive = true
 
     const subscribeToEvents = async () => {
       try {
-        console.log('Subscribing to game events for gameId:', gameId)
+        console.log(
+          '🔌 ゲームイベントを購読中 gameId:',
+          gameId,
+          'playerId:',
+          currentPlayerId,
+        )
 
         abortController = new AbortController()
 
@@ -35,18 +50,28 @@ export const useGameState = (
           { signal: abortController.signal },
         )
 
+        console.log('✅ ストリームが正常に作成されました')
+
         for await (const response of stream) {
           if (!isActive) break
 
-          console.log('Received game event:', response)
+          console.log('ゲームイベント受信:', response)
 
           if (response.gameState) {
+            console.log(
+              'Player1 接続状態:',
+              response.gameState.player1?.isConnected,
+            )
+            console.log(
+              'Player2 接続状態:',
+              response.gameState.player2?.isConnected,
+            )
             setGameState(response.gameState)
           }
         }
       } catch (err: unknown) {
         if (isActive && err instanceof Error && err.name !== 'AbortError') {
-          console.error('Stream error:', err)
+          console.error('ストリームエラー:', err)
           setError(err.message)
           // エラー時は再接続を試みる
           setTimeout(() => {
@@ -61,6 +86,7 @@ export const useGameState = (
     subscribeToEvents()
 
     return () => {
+      console.log('🔌 ゲームイベント購読をクリーンアップ中')
       isActive = false
       if (abortController) {
         abortController.abort()

@@ -126,6 +126,12 @@ func (p *Processor) executeRepeat(node *entity.EffectChainNode, ctx *ExecutionCo
 		return fmt.Errorf("invalid repeat node: count must be positive")
 	}
 
+	// 無限ループ防止：上限100回
+	const maxRepeatCount = 100
+	if repeat.Count > maxRepeatCount {
+		return fmt.Errorf("repeat count exceeds maximum limit of %d", maxRepeatCount)
+	}
+
 	// 指定回数繰り返し実行
 	for i := 0; i < repeat.Count; i++ {
 		if err := p.executeNode(repeat.Effect, ctx); err != nil {
@@ -146,6 +152,12 @@ func (p *Processor) executeForEach(node *entity.EffectChainNode, ctx *ExecutionC
 	// 対象を解決
 	targets := p.resolveTargets(forEach.Target, ctx)
 
+	// 無限ループ防止：上限100回
+	const maxForEachCount = 100
+	if len(targets) > maxForEachCount {
+		return fmt.Errorf("foreach target count exceeds maximum limit of %d", maxForEachCount)
+	}
+
 	// 各対象に対して実行
 	for range targets {
 		// 各対象用の新しいコンテキスト
@@ -162,7 +174,25 @@ func (p *Processor) executeForEach(node *entity.EffectChainNode, ctx *ExecutionC
 	return nil
 }
 
-// 選択: プレイヤーが選択肢から選択（未実装）
+// 選択: プレイヤーが選択肢から選択
+// Note: 現状はランダム選択として実装。将来的にはプレイヤーの入力を受け取る仕組みが必要
 func (p *Processor) executeChoice(node *entity.EffectChainNode, ctx *ExecutionContext) error {
-	return fmt.Errorf("choice operator is not implemented yet")
+	choice, ok := node.GetChoice()
+	if !ok || choice == nil {
+		return fmt.Errorf("invalid choice node: node is nil or type mismatch")
+	}
+
+	if len(choice.Options) == 0 {
+		return fmt.Errorf("invalid choice node: no options available")
+	}
+
+	// 暫定実装: 最初の選択肢を実行
+	// TODO: プレイヤーの選択を受け取る仕組みを実装
+	selectedOption := choice.Options[0]
+
+	if err := p.executeNode(selectedOption, ctx); err != nil {
+		return err
+	}
+
+	return nil
 }

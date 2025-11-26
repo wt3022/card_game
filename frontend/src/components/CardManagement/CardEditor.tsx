@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Card, Trait } from '../../gen/common_pb'
 import {
-  AtomicEffect as ProtoAtomicEffect,
   AtomicEffectType,
   CardEffect,
   CardType,
-  EffectChainNode as ProtoEffectChainNode,
   EffectChainNodeType,
   EffectDefinition,
+  AtomicEffect as ProtoAtomicEffect,
+  EffectChainNode as ProtoEffectChainNode,
   TargetSelector as ProtoTargetSelector,
   TargetType,
   Trait as TraitEnum,
@@ -375,9 +375,7 @@ export default function CardEditor({
               for_each_effect:
                 convertProtoNodeToUI(protoNode.foreachEffect) ||
                 createDefaultEffectNode('THEN'),
-              for_each_target: convertProtoTargetToUI(
-                protoNode.foreachTarget,
-              ),
+              for_each_target: convertProtoTargetToUI(protoNode.foreachTarget),
             },
           }
         default:
@@ -433,8 +431,8 @@ export default function CardEditor({
     [normalizeTargetSelector],
   )
 
-  // フロントエンドの型（thenNode/elseNode）をバックエンドの型（then/else）に変換
-  const convertNodeForBackend = (
+  // フロントエンドの型(thenNode/elseNode)をバックエンドの型(then/else)に変換
+  const _convertNodeForBackend = (
     node: EffectChainNode,
   ): Record<string, unknown> => {
     const converted: Record<string, unknown> = {
@@ -449,7 +447,7 @@ export default function CardEditor({
       converted.sequential = {
         next_id: node.sequential.next_id,
         next: node.sequential.next
-          ? convertNodeForBackend(node.sequential.next)
+          ? _convertNodeForBackend(node.sequential.next)
           : null,
       }
     }
@@ -457,10 +455,10 @@ export default function CardEditor({
     if (node.parallel) {
       converted.parallel = {
         children: node.parallel.children.map((child) =>
-          convertNodeForBackend(child),
+          _convertNodeForBackend(child),
         ),
         parallel_next: node.parallel.parallel_next
-          ? convertNodeForBackend(node.parallel.parallel_next)
+          ? _convertNodeForBackend(node.parallel.parallel_next)
           : null,
       }
     }
@@ -469,23 +467,23 @@ export default function CardEditor({
       converted.if_else = {
         condition: node.if_else.condition,
         // biome-ignore lint/suspicious/noThenProperty: バックエンドのJSON構造に合わせる必要があるため
-        then: convertNodeForBackend(node.if_else.thenNode),
+        then: _convertNodeForBackend(node.if_else.thenNode),
         else: node.if_else.elseNode
-          ? convertNodeForBackend(node.if_else.elseNode)
+          ? _convertNodeForBackend(node.if_else.elseNode)
           : null,
       }
     }
 
     if (node.repeat) {
       converted.repeat = {
-        repeat_effect: convertNodeForBackend(node.repeat.repeat_effect),
+        repeat_effect: _convertNodeForBackend(node.repeat.repeat_effect),
         count: node.repeat.count,
       }
     }
 
     if (node.for_each) {
       converted.for_each = {
-        for_each_effect: convertNodeForBackend(node.for_each.for_each_effect),
+        for_each_effect: _convertNodeForBackend(node.for_each.for_each_effect),
         for_each_target: node.for_each.for_each_target,
       }
     }
@@ -581,7 +579,7 @@ export default function CardEditor({
             effectRoot = convertProtoNodeToUI(definition.root)
           }
         } catch (err) {
-          console.error('Failed to parse card effect', err)
+          console.error('カード効果のパースに失敗', err)
         }
       }
 
@@ -635,13 +633,13 @@ export default function CardEditor({
 
       // AtomicEffectの変換
       if (node.atomic_effect) {
-        // 文字列をenumに変換（簡易実装：完全な変換は後で実装）
-        const effectType = (AtomicEffectType as  any)[
-          node.atomic_effect.type
-        ] as AtomicEffectType | undefined
+        // 文字列をenumに変換(簡易実装:完全な変換は後で実装)
+        const effectType = (
+          AtomicEffectType as unknown as Record<string, AtomicEffectType>
+        )[node.atomic_effect.type] as AtomicEffectType | undefined
 
         const targetType = node.atomic_effect.target
-          ? ((TargetType as any)[
+          ? ((TargetType as unknown as Record<string, TargetType>)[
               node.atomic_effect.target.type
             ] as TargetType | undefined)
           : undefined
@@ -670,9 +668,7 @@ export default function CardEditor({
       if (node.parallel?.children) {
         protoNode.children = node.parallel.children
           .map((child) => convertNodeToProto(child))
-          .filter(
-            (child): child is ProtoEffectChainNode => child !== undefined,
-          )
+          .filter((child): child is ProtoEffectChainNode => child !== undefined)
       }
 
       // IF_ELSEノードの場合
@@ -725,7 +721,7 @@ export default function CardEditor({
         }),
       ],
     })
-  }, [formData.hasEffect, formData.effectRoot, formData.id])
+  }, [formData.hasEffect, formData.effectRoot, formData.id, convertNodeToProto])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

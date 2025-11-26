@@ -27,16 +27,76 @@ type GameService struct {
 	mu               sync.RWMutex
 	games            map[string]*GameSession
 	eventBroadcaster *event.Broadcaster
+	deckService      *DeckService
 	logger           port.Logger
 	waitingPlayers   []*MatchmakingPlayer
 }
 
 func (s *GameService) MarkPlayerDisconnected(gameID string, playerID string) {
-	// 現状は何もしない（将来の拡張用）
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	session, exists := s.games[gameID]
+	if !exists {
+		return
+	}
+
+	state := session.State
+	player := state.GetPlayerByID(playerID)
+	if player == nil {
+		return
+	}
+
+	// プレイヤーを切断状態に設定
+	player.IsConnected = false
+	player.LastActivityAt = time.Now()
+
+	s.logger.Info("プレイヤー %s がゲーム %s から切断されました", playerID, gameID)
+
+	// 切断イベントをブロードキャスト
+	s.logger.Info("📡 %s のプレイヤー切断イベントをゲーム %s にブロードキャスト中", player.Name, gameID)
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "player_disconnected",
+		Message:   fmt.Sprintf("プレイヤー %s が切断されました", player.Name),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		State:     state,
+	})
 }
 
 func (s *GameService) MarkPlayerConnected(gameID string, playerID string) error {
-	// 現状は何もしない（将来の拡張用）
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	session, exists := s.games[gameID]
+	if !exists {
+		return entity.NewErrNotFound("game", gameID)
+	}
+
+	state := session.State
+	player := state.GetPlayerByID(playerID)
+	if player == nil {
+		return entity.NewErrNotFound("player", playerID)
+	}
+
+	// プレイヤーを接続状態に設定
+	player.IsConnected = true
+	player.LastActivityAt = time.Now()
+
+	s.logger.Info("プレイヤー %s がゲーム %s に接続しました", playerID, gameID)
+
+	// 接続イベントをブロードキャスト
+	s.logger.Info("📡 %s のプレイヤー接続イベントをゲーム %s にブロードキャスト中", player.Name, gameID)
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "player_connected",
+		Message:   fmt.Sprintf("プレイヤー %s が接続しました", player.Name),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		State:     state,
+	})
+
 	return nil
 }
 
@@ -44,6 +104,7 @@ func (s *GameService) MarkPlayerConnected(gameID string, playerID string) error 
 type MatchmakingPlayer struct {
 	PlayerID   string
 	PlayerName string
+	DeckID     string // 使用するデッキID（空の場合はfixtureデッキ）
 	JoinedAt   time.Time
 	NotifyChan chan *MatchResult
 }
@@ -58,17 +119,18 @@ type MatchResult struct {
 }
 
 // NewGameService は新しいGameServiceを作成
-func NewGameService(logger port.Logger) *GameService {
+func NewGameService(deckService *DeckService, logger port.Logger) *GameService {
 	return &GameService{
 		games:            make(map[string]*GameSession),
 		eventBroadcaster: event.NewBroadcaster(),
+		deckService:      deckService,
 		logger:           logger,
 		waitingPlayers:   []*MatchmakingPlayer{},
 	}
 }
 
 // CreateGame は新しいゲームセッションを作成
-func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player2ID, player2Name string) error {
+func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player1DeckID, player2ID, player2Name, player2DeckID string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -76,9 +138,35 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player2I
 		return entity.NewErrAlreadyExists("game", gameID)
 	}
 
-	// デッキを生成
-	player1Deck := fixturedeck.GenerateSampleDeck(player1ID)
-	player2Deck := fixturedeck.GenerateSampleDeck(player2ID)
+	// デッキを取得(指定がない場合はfixtureデッキを使用)
+	var player1Deck, player2Deck []entity.Card
+	if player1DeckID != "" {
+		// DBからデッキを取得
+		deck, err := s.deckService.GetDeck(context.Background(), player1DeckID)
+		if err != nil {
+			s.logger.Error("プレイヤー1のデッキ取得に失敗: %v (fixtureを使用)", err)
+			player1Deck = fixturedeck.GenerateSampleDeck(player1ID)
+		} else {
+			player1Deck = s.convertDeckToCards(deck, player1ID)
+			s.logger.Info("プレイヤー1のデッキID: %s をDBから取得", player1DeckID)
+		}
+	} else {
+		player1Deck = fixturedeck.GenerateSampleDeck(player1ID)
+	}
+
+	if player2DeckID != "" {
+		// DBからデッキを取得
+		deck, err := s.deckService.GetDeck(context.Background(), player2DeckID)
+		if err != nil {
+			s.logger.Error("プレイヤー2のデッキ取得に失敗: %v (fixtureを使用)", err)
+			player2Deck = fixturedeck.GenerateSampleDeck(player2ID)
+		} else {
+			player2Deck = s.convertDeckToCards(deck, player2ID)
+			s.logger.Info("プレイヤー2のデッキID: %s をDBから取得", player2DeckID)
+		}
+	} else {
+		player2Deck = fixturedeck.GenerateSampleDeck(player2ID)
+	}
 
 	// デッキをシャッフル
 	player1Deck = game.ShuffleDeck(player1Deck)
@@ -90,13 +178,16 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player2I
 	// 先攻のみIsFirstTurn=true、後攻はfalse
 	player1.IsFirstTurn = true
 	player2.IsFirstTurn = false
+	// 初期状態では両プレイヤーを接続状態に設定（マッチング後なので接続中とみなす）
+	player1.IsConnected = true
+	player2.IsConnected = true
 
 	// 初期手札をドロー
 	if _, err := player1.DrawCards(entity.InitialHandSize); err != nil {
-		return fmt.Errorf("failed to draw initial hand for player1: %w", err)
+		return fmt.Errorf("プレイヤー1の初期手札のドローに失敗しました: %w", err)
 	}
 	if _, err := player2.DrawCards(entity.InitialHandSize); err != nil {
-		return fmt.Errorf("failed to draw initial hand for player2: %w", err)
+		return fmt.Errorf("プレイヤー2の初期手札のドローに失敗しました: %w", err)
 	}
 
 	// ゲーム状態を作成
@@ -150,6 +241,9 @@ func (s *GameService) PerformMulligan(ctx context.Context, gameID string, player
 	if player == nil {
 		return entity.NewErrNotFound("player", playerID)
 	}
+
+	// プレイヤーのアクティビティを更新
+	player.LastActivityAt = time.Now()
 
 	// すでにマリガン済みかチェック
 	if state.IsMulliganDone(playerID) {
@@ -245,6 +339,9 @@ func (s *GameService) PlayCard(ctx context.Context, gameID string, playerID stri
 		return entity.NewErrNotFound("player", playerID)
 	}
 
+	// プレイヤーのアクティビティを更新
+	player.LastActivityAt = time.Now()
+
 	// アクションの妥当性を検証
 	if err := state.ValidateAction(playerID); err != nil {
 		return err
@@ -270,6 +367,13 @@ func (s *GameService) PlayCard(ctx context.Context, gameID string, playerID stri
 		s.logger.Info("Spell Debug - CardEffect: %v, targetID: %v", targetCard.CardEffect != nil, targetID)
 		if targetCard.CardEffect != nil && len(targetCard.CardEffect.Definitions) > 0 {
 			s.logger.Info("Spell Debug - RequireTarget: %v", targetCard.CardEffect.Definitions[0].RequireTarget)
+		}
+	}
+
+	// 対象指定が必要な場合、対象の妥当性を検証
+	if targetID != nil && *targetID != "" {
+		if err := validateTargetSelection(state, *targetID); err != nil {
+			return err
 		}
 	}
 
@@ -330,10 +434,16 @@ func (s *GameService) ExecuteAttack(ctx context.Context, gameID string, attacker
 
 	session, exists := s.games[gameID]
 	if !exists {
-		return nil, fmt.Errorf("game %s not found", gameID)
+		return nil, fmt.Errorf("ゲーム %s が見つかりません", gameID)
 	}
 
 	state := session.State
+
+	// プレイヤーのアクティビティを更新
+	player := state.GetPlayerByID(attackerPlayerID)
+	if player != nil {
+		player.LastActivityAt = time.Now()
+	}
 
 	// アクションの妥当性を検証
 	if err := state.ValidateAction(attackerPlayerID); err != nil {
@@ -380,6 +490,10 @@ func (s *GameService) StartTurn(ctx context.Context, gameID string) error {
 	if currentPlayer == nil {
 		return entity.NewErrNotFound("player", "current_player")
 	}
+
+	// プレイヤーのアクティビティを更新
+	currentPlayer.LastActivityAt = time.Now()
+
 	if err := session.UsecaseEngine.StartTurn(currentPlayer.ID); err != nil {
 		return err
 	}
@@ -412,6 +526,9 @@ func (s *GameService) EndTurn(ctx context.Context, gameID string) error {
 	if currentPlayer == nil {
 		return entity.NewErrNotFound("player", "current_player")
 	}
+
+	// プレイヤーのアクティビティを更新
+	currentPlayer.LastActivityAt = time.Now()
 
 	if err := session.UsecaseEngine.EndTurn(currentPlayer.ID); err != nil {
 		return err
@@ -469,7 +586,7 @@ func (s *GameService) SubscribeToEvents(gameID string) (chan *event.GameEvent, e
 	defer s.mu.RUnlock()
 
 	if _, exists := s.games[gameID]; !exists {
-		return nil, fmt.Errorf("game %s not found", gameID)
+		return nil, fmt.Errorf("ゲーム %s が見つかりません", gameID)
 	}
 
 	return s.eventBroadcaster.Subscribe(gameID), nil
@@ -486,7 +603,7 @@ func (s *GameService) DeleteGame(gameID string) error {
 	defer s.mu.Unlock()
 
 	if _, exists := s.games[gameID]; !exists {
-		return fmt.Errorf("game %s not found", gameID)
+		return fmt.Errorf("ゲーム %s が見つかりません", gameID)
 	}
 
 	// イベントブロードキャスターのクリーンアップ
@@ -507,7 +624,7 @@ func (s *GameService) broadcastEvent(gameID string, evt *event.GameEvent) {
 // ========================================
 
 // JoinQueue プレイヤーをマッチングキューに追加
-func (s *GameService) JoinQueue(playerID, playerName string) chan *MatchResult {
+func (s *GameService) JoinQueue(playerID, playerName, deckID string) chan *MatchResult {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -517,6 +634,7 @@ func (s *GameService) JoinQueue(playerID, playerName string) chan *MatchResult {
 	player := &MatchmakingPlayer{
 		PlayerID:   playerID,
 		PlayerName: playerName,
+		DeckID:     deckID,
 		JoinedAt:   time.Now(),
 		NotifyChan: notifyChan,
 	}
@@ -551,8 +669,10 @@ func (s *GameService) createMatchedGame(player1, player2 *MatchmakingPlayer) {
 		gameID,
 		player1.PlayerID,
 		player1.PlayerName,
+		player1.DeckID,
 		player2.PlayerID,
 		player2.PlayerName,
+		player2.DeckID,
 	)
 
 	if err != nil {
@@ -590,6 +710,29 @@ func (s *GameService) createMatchedGame(player1, player2 *MatchmakingPlayer) {
 	s.logger.Info("🎉 ゲーム作成完了: %s", gameID)
 }
 
+// convertDeckToCards デッキエンティティをカードスライスに変換
+func (s *GameService) convertDeckToCards(deck *entity.Deck, ownerID string) []entity.Card {
+	cards := make([]entity.Card, 0, len(deck.CardIDs))
+
+	for _, cardID := range deck.CardIDs {
+		card, err := s.deckService.cardRepo.FindByID(cardID)
+		if err != nil {
+			s.logger.Error("カードの取得に失敗: cardID=%s, error=%v", cardID, err)
+			continue
+		}
+		// カードをコピー (ゲーム内での独立したインスタンスとして扱う)
+		cardCopy := *card
+		cards = append(cards, cardCopy)
+	}
+
+	if len(cards) == 0 {
+		s.logger.Error("有効なカードが1枚もありません。fixtureデッキを使用します")
+		return fixturedeck.GenerateSampleDeck(ownerID)
+	}
+
+	return cards
+}
+
 // LeaveQueue プレイヤーをマッチングキューから削除
 func (s *GameService) LeaveQueue(playerID string) {
 	s.mu.Lock()
@@ -604,6 +747,45 @@ func (s *GameService) LeaveQueue(playerID string) {
 			return
 		}
 	}
+}
+
+// validateTargetSelection 対象指定の妥当性を検証
+func validateTargetSelection(state *game.State, targetID string) error {
+	player1 := state.Player1
+	player2 := state.Player2
+
+	// プレイヤーを対象にする場合は常にOK
+	if targetID == player1.GetID() || targetID == player2.GetID() {
+		return nil
+	}
+
+	// ユニットを対象にする場合、そのユニットの特性を確認
+	var targetUnit *entity.Unit
+	for _, unit := range player1.Field {
+		if unit.InstanceID == targetID {
+			targetUnit = &unit
+			break
+		}
+	}
+	if targetUnit == nil {
+		for _, unit := range player2.Field {
+			if unit.InstanceID == targetID {
+				targetUnit = &unit
+				break
+			}
+		}
+	}
+
+	if targetUnit == nil {
+		return entity.NewErrNotFound("target", targetID)
+	}
+
+	// 対象不可の特性を持つユニットは対象にできない
+	if targetUnit.HasTrait(entity.TraitUntargetable) {
+		return entity.NewErrInvalidState("target", "このユニットは対象不可の特性を持っています")
+	}
+
+	return nil
 }
 
 // GetWaitingCount 待機中のプレイヤー数を取得

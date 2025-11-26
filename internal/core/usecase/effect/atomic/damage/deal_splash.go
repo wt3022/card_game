@@ -51,6 +51,12 @@ func ExecuteDealSplash(effect *entity.AtomicEffect, sourcePlayer, opponent *enti
 			continue
 		}
 
+		// 効果盾チェック：効果によるダメージを無効化
+		if u.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "ダメージ無効", fmt.Sprintf("%s は効果盾によりダメージを無効化", u.Name))
+			continue
+		}
+
 		// 詳細ログ: 適用前の耐久
 		game.AddLog(sourcePlayer.ID, "範囲ダメージ(前)", fmt.Sprintf("%s の現在守備 %d に %d ダメージを適用", u.Name, u.CurrentDefense, effect.Value))
 

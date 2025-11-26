@@ -78,12 +78,37 @@
   background: #f9f9f9;
 }
 
+.deck-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .deck-current-cards h3,
 .deck-available-cards h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
+  margin: 0;
   color: #333;
   font-size: 1rem;
+}
+
+.deck-remaining-count {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.deck-remaining-count.warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+.deck-remaining-count.complete {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
 }
 
 .empty-message,
@@ -107,16 +132,52 @@
 .available-card-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0.75rem;
   background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
+  gap: 0.75rem;
 }
 
 .deck-card-item:hover,
 .available-card-item:hover {
   background: #f0f0f0;
+  border-color: #667eea;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.1);
+}
+
+.available-card-item.disabled {
+  opacity: 0.5;
+  background: #fafafa;
+}
+
+.available-card-item.disabled:hover {
+  background: #fafafa;
+  border-color: #ddd;
+  box-shadow: none;
+}
+
+.deck-card-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.deck-card-details {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.deck-card-effect,
+.available-card-effect {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+  font-style: italic;
 }
 
 .deck-card-name,
@@ -157,10 +218,12 @@
   font-weight: bold;
   width: 28px;
   height: 28px;
+  min-width: 28px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: flex-start;
 }
 
 .deck-card-remove:hover {
@@ -170,17 +233,36 @@
 .available-card-add {
   background: #10b981;
   color: white;
+  align-self: flex-start;
+  min-width: 60px;
 }
 
-.available-card-add:hover {
+.available-card-add:hover:not(:disabled) {
   background: #059669;
+}
+
+.available-card-add:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
 .available-card-info {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.375rem;
   flex: 1;
+}
+
+.available-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.available-card-meta {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .available-card-count {
@@ -190,6 +272,11 @@
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 600;
+  transition: background 0.2s;
+}
+
+.available-card-count.max {
+  background: #ef4444;
 }
 
 .deck-editor-actions {

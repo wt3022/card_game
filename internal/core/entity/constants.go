@@ -16,6 +16,7 @@ const (
 	// プレイヤー関連
 	InitialHP       = 20 // 初期HP
 	InitialHandSize = 4  // 初期手札枚数
+	MaxFieldSize    = 7  // フィールドの最大ユニット数
 
 	// ターン関連
 	DefaultTurnTime = 300 * time.Second // 初期持ち時間

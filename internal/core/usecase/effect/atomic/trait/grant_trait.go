@@ -51,6 +51,12 @@ func ExecuteGrantTrait(effect *entity.AtomicEffect, sourcePlayer *entity.Player,
 			continue
 		}
 
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "特性付与無効", fmt.Sprintf("%s は効果盾により特性付与を受けない", unit.Name))
+			continue
+		}
+
 		// 既に持っている場合はスキップ
 		if !unit.HasTrait(trait) {
 			unit.AddTrait(trait)

@@ -54,10 +54,15 @@ func (s *DeckService) CreateDeck(ctx context.Context, name, description, userID 
 
 // GetDeck はIDでデッキを取得
 func (s *DeckService) GetDeck(ctx context.Context, id string) (*entity.Deck, error) {
+	// 入力バリデーション
+	if id == "" {
+		return nil, entity.NewErrInvalidInput("deck.id", "デッキIDは必須です")
+	}
+
 	deck, err := s.deckRepo.FindByID(ctx, id)
 	if err != nil {
 		s.logger.Error("Failed to get deck", "error", err, "deck_id", id)
-		return nil, err
+		return nil, entity.NewErrNotFound("deck", id)
 	}
 	return deck, nil
 }
@@ -117,6 +122,11 @@ func (s *DeckService) UpdateDeck(ctx context.Context, id, name, description stri
 
 // DeleteDeck はデッキを削除
 func (s *DeckService) DeleteDeck(ctx context.Context, id string) error {
+	// 入力バリデーション
+	if id == "" {
+		return entity.NewErrInvalidInput("deck.id", "デッキIDは必須です")
+	}
+
 	if err := s.deckRepo.Delete(ctx, id); err != nil {
 		s.logger.Error("Failed to delete deck", "error", err, "deck_id", id)
 		return err
@@ -128,9 +138,18 @@ func (s *DeckService) DeleteDeck(ctx context.Context, id string) error {
 
 // validateCardIDs はカードIDの存在を確認
 func (s *DeckService) validateCardIDs(ctx context.Context, cardIDs []string) error {
+	// 空のカードリストをチェック
+	if len(cardIDs) == 0 {
+		return entity.NewErrInvalidDeck("cards", "カードリストは空にできません")
+	}
+
 	// 重複を除いてユニークなカードIDを取得
 	uniqueCardIDs := make(map[string]bool)
 	for _, cardID := range cardIDs {
+		// 空のカードIDをチェック
+		if cardID == "" {
+			return entity.NewErrInvalidDeck("cards", "無効なカードIDが含まれています")
+		}
 		uniqueCardIDs[cardID] = true
 	}
 

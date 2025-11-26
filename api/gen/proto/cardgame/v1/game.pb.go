@@ -1074,6 +1074,7 @@ type JoinMatchmakingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlayerId      string                 `protobuf:"bytes,1,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
 	PlayerName    string                 `protobuf:"bytes,2,opt,name=player_name,json=playerName,proto3" json:"player_name,omitempty"`
+	DeckId        *string                `protobuf:"bytes,3,opt,name=deck_id,json=deckId,proto3,oneof" json:"deck_id,omitempty"` // 使用するデッキID（指定しない場合はfixtureデッキを使用）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1118,6 +1119,13 @@ func (x *JoinMatchmakingRequest) GetPlayerId() string {
 func (x *JoinMatchmakingRequest) GetPlayerName() string {
 	if x != nil {
 		return x.PlayerName
+	}
+	return ""
+}
+
+func (x *JoinMatchmakingRequest) GetDeckId() string {
+	if x != nil && x.DeckId != nil {
+		return *x.DeckId
 	}
 	return ""
 }
@@ -1275,11 +1283,14 @@ const file_game_proto_rawDesc = "" +
 	"\x11GameEventResponse\x12,\n" +
 	"\x05event\x18\x01 \x01(\v2\x16.cardgame.v1.GameEventR\x05event\x125\n" +
 	"\n" +
-	"game_state\x18\x02 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"V\n" +
+	"game_state\x18\x02 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"\x80\x01\n" +
 	"\x16JoinMatchmakingRequest\x12\x1b\n" +
 	"\tplayer_id\x18\x01 \x01(\tR\bplayerId\x12\x1f\n" +
 	"\vplayer_name\x18\x02 \x01(\tR\n" +
-	"playerName\"\xb7\x01\n" +
+	"playerName\x12\x1c\n" +
+	"\adeck_id\x18\x03 \x01(\tH\x00R\x06deckId\x88\x01\x01B\n" +
+	"\n" +
+	"\b_deck_id\"\xb7\x01\n" +
 	"\x13MatchmakingResponse\x126\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x1e.cardgame.v1.MatchmakingStatusR\x06status\x12\x17\n" +
 	"\agame_id\x18\x02 \x01(\tR\x06gameId\x125\n" +
@@ -1387,6 +1398,7 @@ func file_game_proto_init() {
 	file_common_proto_init()
 	file_game_proto_msgTypes[6].OneofWrappers = []any{}
 	file_game_proto_msgTypes[8].OneofWrappers = []any{}
+	file_game_proto_msgTypes[17].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

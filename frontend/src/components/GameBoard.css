@@ -15,27 +15,174 @@
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.9);
   color: white;
-  padding: 15px 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  padding: 16px 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   z-index: 1000;
-  animation: slideDown 0.3s ease;
+  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 80%;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.05rem;
+  backdrop-filter: blur(10px);
+}
+
+.message-banner.success {
+  background: linear-gradient(
+    135deg,
+    rgba(72, 187, 120, 0.95) 0%,
+    rgba(56, 178, 172, 0.95) 100%
+  );
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.message-banner.error {
+  background: linear-gradient(
+    135deg,
+    rgba(229, 62, 62, 0.95) 0%,
+    rgba(220, 38, 38, 0.95) 100%
+  );
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 @keyframes slideDown {
   from {
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, -120%);
     opacity: 0;
+    scale: 0.9;
   }
   to {
     transform: translate(-50%, 0);
     opacity: 1;
+    scale: 1;
+  }
+}
+
+.action-guide {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.95) 0%,
+    rgba(118, 75, 162, 0.95) 100%
+  );
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+  z-index: 999;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: guideFadeIn 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.action-guide.attack {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 152, 0, 0.95) 0%,
+    rgba(255, 111, 0, 0.95) 100%
+  );
+  box-shadow: 0 4px 20px rgba(255, 152, 0, 0.4);
+}
+
+@keyframes guideFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .hand-card-detailed {
+    width: 100px;
+    min-width: 100px;
+    height: 160px;
+    padding: 6px;
+  }
+
+  .hand-card-detailed .card-name {
+    font-size: 0.75rem;
+    min-height: 32px;
+  }
+
+  .hand-card-detailed .card-cost {
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
+
+  .hand-card-detailed .card-effect {
+    font-size: 0.58rem;
+  }
+
+  .unit-card {
+    width: 100px;
+    min-width: 100px;
+    height: 150px;
+  }
+
+  .opponent-area,
+  .player-area,
+  .hand-area {
+    border-radius: 10px;
+    padding: 8px;
+  }
+
+  .message-banner,
+  .action-guide {
+    max-width: 90%;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+
+  .end-turn-button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+  }
+
+  .game-info {
+    padding: 6px 15px;
+  }
+}
+
+/* 小さい画面用 */
+@media (max-width: 480px) {
+  .hand-card-detailed {
+    width: 90px;
+    min-width: 90px;
+    height: 145px;
+  }
+
+  .unit-card {
+    width: 90px;
+    min-width: 90px;
+    height: 140px;
+  }
+
+  .field,
+  .hand-cards {
+    gap: 6px;
   }
 }
 
 .opponent-area {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(12px);
   border-radius: 15px;
   padding: 10px;
   display: flex;
@@ -43,11 +190,17 @@
   overflow: hidden;
   flex: 0 0 auto;
   height: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .player-area {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(12px);
   border-radius: 15px;
   padding: 10px;
   display: flex;
@@ -55,6 +208,8 @@
   overflow: hidden;
   flex: 0 0 auto;
   height: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .field {
@@ -68,6 +223,27 @@
   overflow-x: auto;
   overflow-y: hidden;
   flex: 1;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.field::-webkit-scrollbar {
+  height: 6px;
+}
+
+.field::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.field::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.field::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .opponent-area .field,
@@ -99,13 +275,61 @@
 .end-turn-button {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
-  padding: 8px 24px;
+  padding: 10px 28px;
   font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.end-turn-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.end-turn-button:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+}
+
+.end-turn-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.end-turn-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.end-turn-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #9ca3af;
+  box-shadow: none;
 }
 
 .hand-area {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.08) 100%
+  );
+  backdrop-filter: blur(12px);
   border-radius: 12px;
   padding: 8px;
   flex-shrink: 0;
@@ -113,6 +337,8 @@
   flex-direction: column;
   height: 260px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .hand-title {
@@ -132,6 +358,28 @@
   padding: 8px 4px;
   flex: 1;
   align-items: center;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+}
+
+.hand-cards::-webkit-scrollbar {
+  height: 8px;
+}
+
+.hand-cards::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.hand-cards::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.hand-cards::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .hand-card-detailed {
@@ -143,7 +391,7 @@
   min-width: 110px;
   height: 170px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -153,15 +401,34 @@
 }
 
 .hand-card-detailed:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
   border-color: #667eea;
+  z-index: 10;
 }
 
 .hand-card-detailed.selected {
   border-color: #4caf50;
-  transform: translateY(-10px);
-  box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+  transform: translateY(-12px) scale(1.05);
+  box-shadow:
+    0 0 25px rgba(76, 175, 80, 0.6),
+    0 12px 30px rgba(76, 175, 80, 0.3);
+  z-index: 20;
+  animation: selectedPulse 2s ease-in-out infinite;
+}
+
+@keyframes selectedPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 25px rgba(76, 175, 80, 0.6),
+      0 12px 30px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 35px rgba(76, 175, 80, 0.8),
+      0 12px 35px rgba(76, 175, 80, 0.4);
+  }
 }
 
 .hand-card-detailed .card-cost {
@@ -248,10 +515,40 @@
   font-weight: 700;
   margin-top: auto;
   cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.hand-card-detailed .card-play-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.3s,
+    height 0.3s;
 }
 
 .hand-card-detailed .card-play-button:hover {
   background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+.hand-card-detailed .card-play-button:hover::before {
+  width: 100px;
+  height: 100px;
+}
+
+.hand-card-detailed .card-play-button:active {
+  transform: scale(0.98);
 }
 
 .no-cards {

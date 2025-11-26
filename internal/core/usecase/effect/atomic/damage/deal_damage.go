@@ -15,6 +15,12 @@ func ExecuteDealDamage(effect *entity.AtomicEffect, sourcePlayer, opponent *enti
 			t.TakeDamage(effect.Value)
 			game.AddLog(sourcePlayer.ID, "ダメージ", fmt.Sprintf("%s に %d ダメージ", t.Name, effect.Value))
 		case *entity.Unit:
+			// 効果盾チェック：効果によるダメージを無効化
+			if t.HasTrait(entity.TraitEffectShield) {
+				game.AddLog(sourcePlayer.ID, "ダメージ無効", fmt.Sprintf("%s は効果盾によりダメージを無効化", t.Name))
+				continue
+			}
+
 			// ユニットへの効果ダメージ
 			destroyed := t.TakeDamage(effect.Value, true)
 			game.AddLog(sourcePlayer.ID, "ダメージ", fmt.Sprintf("%s に %d ダメージ", t.Name, effect.Value))

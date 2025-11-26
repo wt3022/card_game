@@ -28,6 +28,11 @@ func executeSummonUnit(state port.GameState, playerID string, cardID string) (*e
 		return nil, entity.NewErrNotFound("player", playerID)
 	}
 
+	// フィールドが満杯でないか事前チェック（マナ消費前に検証）
+	if len(player.Field) >= entity.MaxFieldSize {
+		return nil, entity.NewErrInvalidState("field", "フィールドがいっぱいです")
+	}
+
 	// 手札からカードをプレイ
 	card, err := player.PlayCardFromHand(cardID)
 	if err != nil {
@@ -83,7 +88,7 @@ func executeUseSpell(state port.GameState, playerID string, cardID string, targe
 	}
 
 	// 対象が必要な効果かチェック
-	if err := validateSpellTarget(card, targetID); err != nil {
+	if err := validateSpellTarget(card, targetID, state, playerID); err != nil {
 		return nil, err
 	}
 
@@ -109,7 +114,7 @@ func findCardInHand(player *entity.Player, cardID string) *entity.Card {
 }
 
 // スペルの対象指定を検証
-func validateSpellTarget(card *entity.Card, targetID *string) error {
+func validateSpellTarget(card *entity.Card, targetID *string, state port.GameState, playerID string) error {
 	requiresTarget := false
 
 	// CardEffectから対象指定が必要か判定
@@ -127,10 +132,38 @@ func validateSpellTarget(card *entity.Card, targetID *string) error {
 
 	// 対象が必要なのに指定されていない
 	if requiresTarget && targetID == nil {
+		// 有効な対象が存在するか確認
+		if !hasValidTargets(card, state, playerID) {
+			return entity.NewErrInvalidAction("use_spell", fmt.Sprintf("spell '%s' has no valid targets", card.Name))
+		}
 		return entity.NewErrInvalidAction("use_spell", fmt.Sprintf("spell '%s' requires a target", card.Name))
 	}
 
 	return nil
+}
+
+// 有効な対象が存在するか確認
+func hasValidTargets(card *entity.Card, state port.GameState, playerID string) bool {
+	player := state.GetPlayerByID(playerID)
+	opponent := state.GetOpponent(playerID)
+
+	if player == nil || opponent == nil {
+		return false
+	}
+
+	// 簡易的なチェック：敵ユニットが1体以上いるか
+	// 将来的には、CardEffectのTargetタイプを見てより詳細にチェックすべき
+	if len(opponent.Field) > 0 {
+		return true
+	}
+
+	// 味方ユニットがいるか
+	if len(player.Field) > 0 {
+		return true
+	}
+
+	// プレイイー対象の場合は常に有効
+	return true
 }
 
 // 効果テキストに対象指定キーワードが含まれるか確認

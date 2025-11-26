@@ -35,7 +35,7 @@ import (
 func main() {
 	// .envファイルを読み込む（存在しない場合はスキップ）
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env file not found, using environment variables or defaults")
+		log.Println("⚠️  .envファイルが見つかりません。環境変数またはデフォルト値を使用します")
 	}
 
 	// ロガーを初期化
@@ -47,28 +47,28 @@ func main() {
 	// SQL接続（マイグレーション用）
 	sqlDB, err := persistence.OpenDB(dbConfig)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		log.Fatalf("データベース接続に失敗しました: %v", err)
 	}
 	defer sqlDB.Close()
-	log.Println("✅ Database connected")
+	log.Println("✅ データベース接続成功")
 
 	// GORM接続（アプリケーション用）
 	gormDB, err := persistence.OpenGormDB(dbConfig)
 	if err != nil {
-		log.Fatalf("Failed to connect to database with GORM: %v", err)
+		log.Fatalf("GORM データベース接続に失敗しました: %v", err)
 	}
-	log.Println("✅ GORM Database connected")
+	log.Println("✅ GORM データベース接続成功")
 
 	// GORMマイグレーションを実行
 	if err := persistence.RunGormMigrations(gormDB, logger); err != nil {
-		log.Fatalf("Failed to run GORM migrations: %v", err)
+		log.Fatalf("GORM マイグレーション実行に失敗しました: %v", err)
 	}
-	log.Println("✅ GORM Migrations completed")
+	log.Println("✅ GORM マイグレーション完了")
 
 	// JWTプロバイダーを初期化
 	tokenProvider, err := auth.NewJWTProvider()
 	if err != nil {
-		log.Fatalf("Failed to initialize JWT provider: %v", err)
+		log.Fatalf("JWTプロバイダーの初期化に失敗しました: %v", err)
 	}
 
 	// パスワードハッシャーを初期化
@@ -81,15 +81,14 @@ func main() {
 
 	// 初期管理者ユーザーを作成(存在しない場合)
 	if err := service.InitializeDefaultAdmin(userRepo, passwordHasher, logger); err != nil {
-		log.Printf("⚠️  Failed to initialize default admin user: %v", err)
-		// エラーでも続行(既に存在する場合など)
+		log.Printf("⚠️  デフォルト管理者ユーザーの初期化に失敗しました: %v", err)
 	}
 
 	// サービスを初期化
-	gameService := service.NewGameService(logger)
 	authService := service.NewAuthService(userRepo, tokenProvider, passwordHasher, logger)
 	cardService := service.NewCardService(cardRepo, logger)
 	deckService := service.NewDeckService(deckRepo, cardRepo, logger)
+	gameService := service.NewGameService(deckService, logger)
 
 	// 認証インターセプターを作成
 	authInterceptor := interceptor.NewAuthInterceptorFunc(tokenProvider)
@@ -97,7 +96,7 @@ func main() {
 	// Connect-Goハンドラーを初期化
 	gameHandler := handler.NewGameConnectHandler(gameService)
 	authHandler := handler.NewAuthConnectHandler(authService)
-	cardManagementHandler := handler.NewCardManagementConnectHandler(cardService, deckService, cardRepo)
+	cardManagementHandler := handler.NewCardManagementConnectHandler(cardService, deckService)
 
 	// マルチプレクサを作成
 	mux := http.NewServeMux()
@@ -138,11 +137,11 @@ func main() {
 	port := getEnv("GAME_SERVER_PORT", "8080")
 	addr := fmt.Sprintf(":%s", port)
 
-	log.Printf("🎮 Connect-Go Server starting on http://localhost%s", addr)
-	log.Printf("📡 gRPC-Web & HTTP/JSON endpoints:")
-	log.Printf("   %s (Auth - No auth required)", authPath)
-	log.Printf("   %s (Game - No auth required)", gamePath)
-	log.Printf("   %s (Card Management - Auth required)", cardMgmtPath)
+	log.Printf("🎮 Connect-Go サーバー起動: http://localhost%s", addr)
+	log.Printf("📡 gRPC-Web & HTTP/JSON エンドポイント:")
+	log.Printf("   %s (認証 - 認証不要)", authPath)
+	log.Printf("   %s (ゲーム - 認証不要)", gamePath)
+	log.Printf("   %s (カード管理 - 認証必須)", cardMgmtPath)
 	log.Printf("💡 特徴:")
 	log.Printf("   - プロキシ不要（直接ブラウザと通信）")
 	log.Printf("   - HTTP/1.1 + HTTP/2対応")
@@ -151,7 +150,7 @@ func main() {
 	log.Printf("   - JWT認証対応")
 
 	if err := http.ListenAndServe(addr, h2cHandler); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Fatalf("サーバー起動に失敗しました: %v", err)
 	}
 }
 

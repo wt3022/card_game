@@ -31,19 +31,21 @@ func NewCardService(
 // CreateCard カードを作成
 func (s *CardService) CreateCard(card *entity.Card) error {
 	// バリデーション
-	if err := s.validateCard(card); err != nil {
+	if err := card.Validate(); err != nil {
+		s.logger.Error("Card validation failed: %v", err)
 		return err
 	}
 
 	// 既存のカードをチェック
 	_, err := s.cardRepo.FindByID(card.ID)
 	if err == nil {
-		return fmt.Errorf("card with id %s already exists", card.ID)
+		return entity.NewErrAlreadyExists("card", card.ID)
 	}
 
 	// カードを作成
 	if err := s.cardRepo.Create(card); err != nil {
-		return fmt.Errorf("failed to create card: %w", err)
+		s.logger.Error("Failed to create card: %v", err)
+		return fmt.Errorf("カードの作成に失敗しました: %w", err)
 	}
 
 	s.logger.Info("Card created: %s (%s)", card.ID, card.Name)
@@ -54,7 +56,7 @@ func (s *CardService) CreateCard(card *entity.Card) error {
 func (s *CardService) GetCard(id string) (*entity.Card, error) {
 	card, err := s.cardRepo.FindByID(id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get card: %w", err)
+		return nil, fmt.Errorf("カードの取得に失敗しました: %w", err)
 	}
 	return card, nil
 }
@@ -63,7 +65,7 @@ func (s *CardService) GetCard(id string) (*entity.Card, error) {
 func (s *CardService) ListCards() ([]*entity.Card, error) {
 	cards, err := s.cardRepo.FindAll()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list cards: %w", err)
+		return nil, fmt.Errorf("カード一覧の取得に失敗しました: %w", err)
 	}
 	return cards, nil
 }
@@ -72,7 +74,7 @@ func (s *CardService) ListCards() ([]*entity.Card, error) {
 func (s *CardService) ListCardsByType(cardType entity.CardType) ([]*entity.Card, error) {
 	cards, err := s.cardRepo.FindByType(cardType)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list cards by type: %w", err)
+		return nil, fmt.Errorf("タイプ別カード一覧の取得に失敗しました: %w", err)
 	}
 	return cards, nil
 }
@@ -80,19 +82,21 @@ func (s *CardService) ListCardsByType(cardType entity.CardType) ([]*entity.Card,
 // UpdateCard カードを更新
 func (s *CardService) UpdateCard(card *entity.Card) error {
 	// バリデーション
-	if err := s.validateCard(card); err != nil {
+	if err := card.Validate(); err != nil {
+		s.logger.Error("Card validation failed: %v", err)
 		return err
 	}
 
 	// 既存のカードをチェック
 	_, err := s.cardRepo.FindByID(card.ID)
 	if err != nil {
-		return fmt.Errorf("card with id %s not found", card.ID)
+		return entity.NewErrNotFound("card", card.ID)
 	}
 
 	// カードを更新
 	if err := s.cardRepo.Update(card); err != nil {
-		return fmt.Errorf("failed to update card: %w", err)
+		s.logger.Error("Failed to update card: %v", err)
+		return fmt.Errorf("カードの更新に失敗しました: %w", err)
 	}
 
 	s.logger.Info("Card updated: %s (%s)", card.ID, card.Name)
@@ -101,68 +105,50 @@ func (s *CardService) UpdateCard(card *entity.Card) error {
 
 // DeleteCard カードを削除
 func (s *CardService) DeleteCard(id string) error {
+	// 入力バリデーション
+	if id == "" {
+		return entity.NewErrInvalidInput("card.id", "カードIDは必須です")
+	}
+
 	// 既存のカードをチェック
 	card, err := s.cardRepo.FindByID(id)
 	if err != nil {
-		return fmt.Errorf("card with id %s not found", id)
+		return entity.NewErrNotFound("card", id)
 	}
 
 	// カードを削除
 	if err := s.cardRepo.Delete(id); err != nil {
-		return fmt.Errorf("failed to delete card: %w", err)
+		s.logger.Error("Failed to delete card: %v", err)
+		return fmt.Errorf("カードの削除に失敗しました: %w", err)
 	}
 
 	s.logger.Info("Card deleted: %s (%s)", card.ID, card.Name)
 	return nil
 }
 
-// SaveCardEffect カード効果を保存（抽象化されたインターフェースを使用）
-func (s *CardService) SaveCardEffect(cardID string, cardEffectModel interface{}) error {
-	if err := s.cardRepo.SaveCardEffect(cardID, cardEffectModel); err != nil {
-		return fmt.Errorf("failed to save card effect: %w", err)
+// SaveCardEffect カード効果を保存
+func (s *CardService) SaveCardEffect(cardID string, cardEffect *entity.CardEffect) error {
+	if err := s.cardRepo.SaveCardEffect(cardID, cardEffect); err != nil {
+		return fmt.Errorf("カード効果の保存に失敗しました: %w", err)
 	}
 	s.logger.Info("Card effect saved for card: %s", cardID)
 	return nil
 }
 
-// validateCard カードのバリデーション
-func (s *CardService) validateCard(card *entity.Card) error {
-	if card.ID == "" {
-		return fmt.Errorf("card id is required")
+// GetCardEffect カード効果を取得
+func (s *CardService) GetCardEffect(cardID string) (*entity.CardEffect, error) {
+	cardEffect, err := s.cardRepo.GetCardEffect(cardID)
+	if err != nil {
+		return nil, fmt.Errorf("カード効果の取得に失敗しました: %w", err)
 	}
-	if card.Name == "" {
-		return fmt.Errorf("card name is required")
-	}
-	if card.Type == "" {
-		return fmt.Errorf("card type is required")
-	}
-	if card.Cost < 0 {
-		return fmt.Errorf("card cost must be non-negative")
-	}
+	return cardEffect, nil
+}
 
-	// ユニットカードの場合、攻撃力と防御力が必要
-	if card.Type == entity.CardTypeUnit {
-		if card.Attack == nil || card.Defense == nil {
-			return fmt.Errorf("unit card must have attack and defense")
-		}
-		if *card.Attack < 0 || *card.Defense < 0 {
-			return fmt.Errorf("attack and defense must be non-negative")
-		}
+// GenerateEffectDescription カード効果から効果テキストを生成
+func (s *CardService) GenerateEffectDescription(cardID string) (string, error) {
+	description, err := s.cardRepo.GenerateEffectDescription(cardID)
+	if err != nil {
+		return "", fmt.Errorf("効果テキストの生成に失敗しました: %w", err)
 	}
-
-	// スペルまたはリーダーカードの場合、特性は設定できない
-	if card.Type == entity.CardTypeSpell || card.Type == entity.CardTypeLeader {
-		if len(card.Traits) > 0 {
-			return fmt.Errorf("spell and leader cards cannot have traits")
-		}
-	}
-
-	// スペルまたはリーダーカードの場合、攻撃力と防御力は設定できない
-	if card.Type == entity.CardTypeSpell || card.Type == entity.CardTypeLeader {
-		if card.Attack != nil || card.Defense != nil {
-			return fmt.Errorf("spell and leader cards cannot have attack or defense")
-		}
-	}
-
-	return nil
+	return description, nil
 }

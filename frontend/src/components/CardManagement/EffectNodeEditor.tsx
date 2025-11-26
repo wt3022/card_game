@@ -303,7 +303,7 @@ export default function EffectNodeEditor({
                 <option value="UNIT_ATTACK">ユニット攻撃力</option>
                 <option value="UNIT_DEFENSE">ユニット防御力</option>
                 <option value="HAS_KEYWORD">特性を持っている</option>
-                <option value="CARD_PLAYED">カードをプレイした</option>
+                <option value="CARD_PLAYED">カードを使用した</option>
                 <option value="DAMAGE_TAKEN">ダメージを受けた</option>
               </select>
               <select

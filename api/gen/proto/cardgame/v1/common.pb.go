@@ -199,6 +199,71 @@ func (GamePhase) EnumDescriptor() ([]byte, []int) {
 	return file_common_proto_rawDescGZIP(), []int{2}
 }
 
+// 効果発動タイミング
+type EffectTiming int32
+
+const (
+	EffectTiming_EFFECT_TIMING_UNSPECIFIED EffectTiming = 0
+	EffectTiming_EFFECT_TIMING_IMMEDIATE   EffectTiming = 1 // 即座に発動
+	EffectTiming_EFFECT_TIMING_ON_SUMMON   EffectTiming = 2 // 召喚時
+	EffectTiming_EFFECT_TIMING_ON_DESTROY  EffectTiming = 3 // 破壊時
+	EffectTiming_EFFECT_TIMING_ON_ATTACK   EffectTiming = 4 // 攻撃時
+	EffectTiming_EFFECT_TIMING_ON_DAMAGED  EffectTiming = 5 // ダメージを受けた時
+	EffectTiming_EFFECT_TIMING_TURN_START  EffectTiming = 6 // ターン開始時
+	EffectTiming_EFFECT_TIMING_TURN_END    EffectTiming = 7 // ターン終了時
+)
+
+// Enum value maps for EffectTiming.
+var (
+	EffectTiming_name = map[int32]string{
+		0: "EFFECT_TIMING_UNSPECIFIED",
+		1: "EFFECT_TIMING_IMMEDIATE",
+		2: "EFFECT_TIMING_ON_SUMMON",
+		3: "EFFECT_TIMING_ON_DESTROY",
+		4: "EFFECT_TIMING_ON_ATTACK",
+		5: "EFFECT_TIMING_ON_DAMAGED",
+		6: "EFFECT_TIMING_TURN_START",
+		7: "EFFECT_TIMING_TURN_END",
+	}
+	EffectTiming_value = map[string]int32{
+		"EFFECT_TIMING_UNSPECIFIED": 0,
+		"EFFECT_TIMING_IMMEDIATE":   1,
+		"EFFECT_TIMING_ON_SUMMON":   2,
+		"EFFECT_TIMING_ON_DESTROY":  3,
+		"EFFECT_TIMING_ON_ATTACK":   4,
+		"EFFECT_TIMING_ON_DAMAGED":  5,
+		"EFFECT_TIMING_TURN_START":  6,
+		"EFFECT_TIMING_TURN_END":    7,
+	}
+)
+
+func (x EffectTiming) Enum() *EffectTiming {
+	p := new(EffectTiming)
+	*p = x
+	return p
+}
+
+func (x EffectTiming) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EffectTiming) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_proto_enumTypes[3].Descriptor()
+}
+
+func (EffectTiming) Type() protoreflect.EnumType {
+	return &file_common_proto_enumTypes[3]
+}
+
+func (x EffectTiming) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EffectTiming.Descriptor instead.
+func (EffectTiming) EnumDescriptor() ([]byte, []int) {
+	return file_common_proto_rawDescGZIP(), []int{3}
+}
+
 // カード効果タイプ
 type AtomicEffectType int32
 
@@ -293,11 +358,11 @@ func (x AtomicEffectType) String() string {
 }
 
 func (AtomicEffectType) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[3].Descriptor()
+	return file_common_proto_enumTypes[4].Descriptor()
 }
 
 func (AtomicEffectType) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[3]
+	return &file_common_proto_enumTypes[4]
 }
 
 func (x AtomicEffectType) Number() protoreflect.EnumNumber {
@@ -306,7 +371,7 @@ func (x AtomicEffectType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AtomicEffectType.Descriptor instead.
 func (AtomicEffectType) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{3}
+	return file_common_proto_rawDescGZIP(), []int{4}
 }
 
 // ターゲット対象タイプ
@@ -367,11 +432,11 @@ func (x TargetType) String() string {
 }
 
 func (TargetType) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[4].Descriptor()
+	return file_common_proto_enumTypes[5].Descriptor()
 }
 
 func (TargetType) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[4]
+	return &file_common_proto_enumTypes[5]
 }
 
 func (x TargetType) Number() protoreflect.EnumNumber {
@@ -380,7 +445,7 @@ func (x TargetType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TargetType.Descriptor instead.
 func (TargetType) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{4}
+	return file_common_proto_rawDescGZIP(), []int{5}
 }
 
 // 効果チェーンノードタイプ
@@ -426,11 +491,11 @@ func (x EffectChainNodeType) String() string {
 }
 
 func (EffectChainNodeType) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_proto_enumTypes[5].Descriptor()
+	return file_common_proto_enumTypes[6].Descriptor()
 }
 
 func (EffectChainNodeType) Type() protoreflect.EnumType {
-	return &file_common_proto_enumTypes[5]
+	return &file_common_proto_enumTypes[6]
 }
 
 func (x EffectChainNodeType) Number() protoreflect.EnumNumber {
@@ -439,7 +504,7 @@ func (x EffectChainNodeType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EffectChainNodeType.Descriptor instead.
 func (EffectChainNodeType) EnumDescriptor() ([]byte, []int) {
-	return file_common_proto_rawDescGZIP(), []int{5}
+	return file_common_proto_rawDescGZIP(), []int{6}
 }
 
 // 原子効果
@@ -451,6 +516,7 @@ type AtomicEffect struct {
 	Value         *int32                 `protobuf:"varint,4,opt,name=value,proto3,oneof" json:"value,omitempty"`
 	CardId        *string                `protobuf:"bytes,5,opt,name=card_id,json=cardId,proto3,oneof" json:"card_id,omitempty"`
 	Trait         *Trait                 `protobuf:"varint,6,opt,name=trait,proto3,enum=cardgame.v1.Trait,oneof" json:"trait,omitempty"`
+	Timing        EffectTiming           `protobuf:"varint,7,opt,name=timing,proto3,enum=cardgame.v1.EffectTiming" json:"timing,omitempty"` // 発動タイミング
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -525,6 +591,13 @@ func (x *AtomicEffect) GetTrait() Trait {
 		return *x.Trait
 	}
 	return Trait_TRAIT_UNSPECIFIED
+}
+
+func (x *AtomicEffect) GetTiming() EffectTiming {
+	if x != nil {
+		return x.Timing
+	}
+	return EffectTiming_EFFECT_TIMING_UNSPECIFIED
 }
 
 // ターゲットセレクター
@@ -1160,7 +1233,9 @@ type Player struct {
 	GraveyardCount       int32                  `protobuf:"varint,9,opt,name=graveyard_count,json=graveyardCount,proto3" json:"graveyard_count,omitempty"`
 	Field                []*Unit                `protobuf:"bytes,10,rep,name=field,proto3" json:"field,omitempty"`
 	TimeRemainingSeconds int32                  `protobuf:"varint,11,opt,name=time_remaining_seconds,json=timeRemainingSeconds,proto3" json:"time_remaining_seconds,omitempty"`
-	Hand                 []*Card                `protobuf:"bytes,12,rep,name=hand,proto3" json:"hand,omitempty"` // 自分のプレイヤーの場合のみ含まれる
+	Hand                 []*Card                `protobuf:"bytes,12,rep,name=hand,proto3" json:"hand,omitempty"`                                             // 自分のプレイヤーの場合のみ含まれる
+	IsConnected          bool                   `protobuf:"varint,13,opt,name=is_connected,json=isConnected,proto3" json:"is_connected,omitempty"`           // 接続状態
+	LastActivityAt       *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=last_activity_at,json=lastActivityAt,proto3" json:"last_activity_at,omitempty"` // 最後のアクティビティ時刻
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1275,6 +1350,20 @@ func (x *Player) GetTimeRemainingSeconds() int32 {
 func (x *Player) GetHand() []*Card {
 	if x != nil {
 		return x.Hand
+	}
+	return nil
+}
+
+func (x *Player) GetIsConnected() bool {
+	if x != nil {
+		return x.IsConnected
+	}
+	return false
+}
+
+func (x *Player) GetLastActivityAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LastActivityAt
 	}
 	return nil
 }
@@ -1594,14 +1683,15 @@ var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9e\x02\n" +
+	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd1\x02\n" +
 	"\fAtomicEffect\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x121\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x1d.cardgame.v1.AtomicEffectTypeR\x04type\x128\n" +
 	"\x06target\x18\x03 \x01(\v2\x1b.cardgame.v1.TargetSelectorH\x00R\x06target\x88\x01\x01\x12\x19\n" +
 	"\x05value\x18\x04 \x01(\x05H\x01R\x05value\x88\x01\x01\x12\x1c\n" +
 	"\acard_id\x18\x05 \x01(\tH\x02R\x06cardId\x88\x01\x01\x12-\n" +
-	"\x05trait\x18\x06 \x01(\x0e2\x12.cardgame.v1.TraitH\x03R\x05trait\x88\x01\x01B\t\n" +
+	"\x05trait\x18\x06 \x01(\x0e2\x12.cardgame.v1.TraitH\x03R\x05trait\x88\x01\x01\x121\n" +
+	"\x06timing\x18\a \x01(\x0e2\x19.cardgame.v1.EffectTimingR\x06timingB\t\n" +
 	"\a_targetB\b\n" +
 	"\x06_valueB\n" +
 	"\n" +
@@ -1683,7 +1773,7 @@ const file_common_proto_rawDesc = "" +
 	"\x11attacks_remaining\x18\n" +
 	" \x01(\x05R\x10attacksRemaining\x12,\n" +
 	"\x12summoned_this_turn\x18\v \x01(\bR\x10summonedThisTurn\x12\x19\n" +
-	"\bowner_id\x18\f \x01(\tR\aownerId\"\xa0\x03\n" +
+	"\bowner_id\x18\f \x01(\tR\aownerId\"\x89\x04\n" +
 	"\x06Player\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x0e\n" +
@@ -1699,7 +1789,9 @@ const file_common_proto_rawDesc = "" +
 	"\x05field\x18\n" +
 	" \x03(\v2\x11.cardgame.v1.UnitR\x05field\x124\n" +
 	"\x16time_remaining_seconds\x18\v \x01(\x05R\x14timeRemainingSeconds\x12%\n" +
-	"\x04hand\x18\f \x03(\v2\x11.cardgame.v1.CardR\x04hand\"\xe1\x03\n" +
+	"\x04hand\x18\f \x03(\v2\x11.cardgame.v1.CardR\x04hand\x12!\n" +
+	"\fis_connected\x18\r \x01(\bR\visConnected\x12D\n" +
+	"\x10last_activity_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\x0elastActivityAt\"\xe1\x03\n" +
 	"\tGameState\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12-\n" +
 	"\aplayer1\x18\x02 \x01(\v2\x13.cardgame.v1.PlayerR\aplayer1\x12-\n" +
@@ -1756,7 +1848,16 @@ const file_common_proto_rawDesc = "" +
 	"\x0fGAME_PHASE_DRAW\x10\x02\x12\x1c\n" +
 	"\x18GAME_PHASE_RESOURCE_GAIN\x10\x03\x12\x13\n" +
 	"\x0fGAME_PHASE_MAIN\x10\x04\x12\x17\n" +
-	"\x13GAME_PHASE_TURN_END\x10\x05*\xdd\x06\n" +
+	"\x13GAME_PHASE_TURN_END\x10\x05*\xfa\x01\n" +
+	"\fEffectTiming\x12\x1d\n" +
+	"\x19EFFECT_TIMING_UNSPECIFIED\x10\x00\x12\x1b\n" +
+	"\x17EFFECT_TIMING_IMMEDIATE\x10\x01\x12\x1b\n" +
+	"\x17EFFECT_TIMING_ON_SUMMON\x10\x02\x12\x1c\n" +
+	"\x18EFFECT_TIMING_ON_DESTROY\x10\x03\x12\x1b\n" +
+	"\x17EFFECT_TIMING_ON_ATTACK\x10\x04\x12\x1c\n" +
+	"\x18EFFECT_TIMING_ON_DAMAGED\x10\x05\x12\x1c\n" +
+	"\x18EFFECT_TIMING_TURN_START\x10\x06\x12\x1a\n" +
+	"\x16EFFECT_TIMING_TURN_END\x10\a*\xdd\x06\n" +
 	"\x10AtomicEffectType\x12\"\n" +
 	"\x1eATOMIC_EFFECT_TYPE_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eATOMIC_EFFECT_TYPE_DEAL_DAMAGE\x10\x01\x12\"\n" +
@@ -1816,64 +1917,67 @@ func file_common_proto_rawDescGZIP() []byte {
 	return file_common_proto_rawDescData
 }
 
-var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_common_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_common_proto_goTypes = []any{
 	(CardType)(0),                 // 0: cardgame.v1.CardType
 	(Trait)(0),                    // 1: cardgame.v1.Trait
 	(GamePhase)(0),                // 2: cardgame.v1.GamePhase
-	(AtomicEffectType)(0),         // 3: cardgame.v1.AtomicEffectType
-	(TargetType)(0),               // 4: cardgame.v1.TargetType
-	(EffectChainNodeType)(0),      // 5: cardgame.v1.EffectChainNodeType
-	(*AtomicEffect)(nil),          // 6: cardgame.v1.AtomicEffect
-	(*TargetSelector)(nil),        // 7: cardgame.v1.TargetSelector
-	(*ConditionFilter)(nil),       // 8: cardgame.v1.ConditionFilter
-	(*EffectChainNode)(nil),       // 9: cardgame.v1.EffectChainNode
-	(*EffectDefinition)(nil),      // 10: cardgame.v1.EffectDefinition
-	(*CardEffect)(nil),            // 11: cardgame.v1.CardEffect
-	(*Card)(nil),                  // 12: cardgame.v1.Card
-	(*Unit)(nil),                  // 13: cardgame.v1.Unit
-	(*Player)(nil),                // 14: cardgame.v1.Player
-	(*GameState)(nil),             // 15: cardgame.v1.GameState
-	(*GameEvent)(nil),             // 16: cardgame.v1.GameEvent
-	(*Deck)(nil),                  // 17: cardgame.v1.Deck
-	(*timestamppb.Timestamp)(nil), // 18: google.protobuf.Timestamp
+	(EffectTiming)(0),             // 3: cardgame.v1.EffectTiming
+	(AtomicEffectType)(0),         // 4: cardgame.v1.AtomicEffectType
+	(TargetType)(0),               // 5: cardgame.v1.TargetType
+	(EffectChainNodeType)(0),      // 6: cardgame.v1.EffectChainNodeType
+	(*AtomicEffect)(nil),          // 7: cardgame.v1.AtomicEffect
+	(*TargetSelector)(nil),        // 8: cardgame.v1.TargetSelector
+	(*ConditionFilter)(nil),       // 9: cardgame.v1.ConditionFilter
+	(*EffectChainNode)(nil),       // 10: cardgame.v1.EffectChainNode
+	(*EffectDefinition)(nil),      // 11: cardgame.v1.EffectDefinition
+	(*CardEffect)(nil),            // 12: cardgame.v1.CardEffect
+	(*Card)(nil),                  // 13: cardgame.v1.Card
+	(*Unit)(nil),                  // 14: cardgame.v1.Unit
+	(*Player)(nil),                // 15: cardgame.v1.Player
+	(*GameState)(nil),             // 16: cardgame.v1.GameState
+	(*GameEvent)(nil),             // 17: cardgame.v1.GameEvent
+	(*Deck)(nil),                  // 18: cardgame.v1.Deck
+	(*timestamppb.Timestamp)(nil), // 19: google.protobuf.Timestamp
 }
 var file_common_proto_depIdxs = []int32{
-	3,  // 0: cardgame.v1.AtomicEffect.type:type_name -> cardgame.v1.AtomicEffectType
-	7,  // 1: cardgame.v1.AtomicEffect.target:type_name -> cardgame.v1.TargetSelector
+	4,  // 0: cardgame.v1.AtomicEffect.type:type_name -> cardgame.v1.AtomicEffectType
+	8,  // 1: cardgame.v1.AtomicEffect.target:type_name -> cardgame.v1.TargetSelector
 	1,  // 2: cardgame.v1.AtomicEffect.trait:type_name -> cardgame.v1.Trait
-	4,  // 3: cardgame.v1.TargetSelector.type:type_name -> cardgame.v1.TargetType
-	8,  // 4: cardgame.v1.TargetSelector.filter:type_name -> cardgame.v1.ConditionFilter
-	5,  // 5: cardgame.v1.EffectChainNode.type:type_name -> cardgame.v1.EffectChainNodeType
-	6,  // 6: cardgame.v1.EffectChainNode.atomic_effect:type_name -> cardgame.v1.AtomicEffect
-	9,  // 7: cardgame.v1.EffectChainNode.next:type_name -> cardgame.v1.EffectChainNode
-	9,  // 8: cardgame.v1.EffectChainNode.children:type_name -> cardgame.v1.EffectChainNode
-	9,  // 9: cardgame.v1.EffectChainNode.then_node:type_name -> cardgame.v1.EffectChainNode
-	9,  // 10: cardgame.v1.EffectChainNode.else_node:type_name -> cardgame.v1.EffectChainNode
-	8,  // 11: cardgame.v1.EffectChainNode.condition:type_name -> cardgame.v1.ConditionFilter
-	9,  // 12: cardgame.v1.EffectChainNode.repeat_effect:type_name -> cardgame.v1.EffectChainNode
-	9,  // 13: cardgame.v1.EffectChainNode.foreach_effect:type_name -> cardgame.v1.EffectChainNode
-	7,  // 14: cardgame.v1.EffectChainNode.foreach_target:type_name -> cardgame.v1.TargetSelector
-	9,  // 15: cardgame.v1.EffectDefinition.root:type_name -> cardgame.v1.EffectChainNode
-	10, // 16: cardgame.v1.CardEffect.definitions:type_name -> cardgame.v1.EffectDefinition
-	0,  // 17: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
-	1,  // 18: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
-	11, // 19: cardgame.v1.Card.card_effect:type_name -> cardgame.v1.CardEffect
-	1,  // 20: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
-	13, // 21: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
-	12, // 22: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
-	14, // 23: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
-	14, // 24: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
-	2,  // 25: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
-	18, // 26: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
-	18, // 27: cardgame.v1.Deck.created_at:type_name -> google.protobuf.Timestamp
-	18, // 28: cardgame.v1.Deck.updated_at:type_name -> google.protobuf.Timestamp
-	29, // [29:29] is the sub-list for method output_type
-	29, // [29:29] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	3,  // 3: cardgame.v1.AtomicEffect.timing:type_name -> cardgame.v1.EffectTiming
+	5,  // 4: cardgame.v1.TargetSelector.type:type_name -> cardgame.v1.TargetType
+	9,  // 5: cardgame.v1.TargetSelector.filter:type_name -> cardgame.v1.ConditionFilter
+	6,  // 6: cardgame.v1.EffectChainNode.type:type_name -> cardgame.v1.EffectChainNodeType
+	7,  // 7: cardgame.v1.EffectChainNode.atomic_effect:type_name -> cardgame.v1.AtomicEffect
+	10, // 8: cardgame.v1.EffectChainNode.next:type_name -> cardgame.v1.EffectChainNode
+	10, // 9: cardgame.v1.EffectChainNode.children:type_name -> cardgame.v1.EffectChainNode
+	10, // 10: cardgame.v1.EffectChainNode.then_node:type_name -> cardgame.v1.EffectChainNode
+	10, // 11: cardgame.v1.EffectChainNode.else_node:type_name -> cardgame.v1.EffectChainNode
+	9,  // 12: cardgame.v1.EffectChainNode.condition:type_name -> cardgame.v1.ConditionFilter
+	10, // 13: cardgame.v1.EffectChainNode.repeat_effect:type_name -> cardgame.v1.EffectChainNode
+	10, // 14: cardgame.v1.EffectChainNode.foreach_effect:type_name -> cardgame.v1.EffectChainNode
+	8,  // 15: cardgame.v1.EffectChainNode.foreach_target:type_name -> cardgame.v1.TargetSelector
+	10, // 16: cardgame.v1.EffectDefinition.root:type_name -> cardgame.v1.EffectChainNode
+	11, // 17: cardgame.v1.CardEffect.definitions:type_name -> cardgame.v1.EffectDefinition
+	0,  // 18: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
+	1,  // 19: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
+	12, // 20: cardgame.v1.Card.card_effect:type_name -> cardgame.v1.CardEffect
+	1,  // 21: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
+	14, // 22: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
+	13, // 23: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
+	19, // 24: cardgame.v1.Player.last_activity_at:type_name -> google.protobuf.Timestamp
+	15, // 25: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
+	15, // 26: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
+	2,  // 27: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
+	19, // 28: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
+	19, // 29: cardgame.v1.Deck.created_at:type_name -> google.protobuf.Timestamp
+	19, // 30: cardgame.v1.Deck.updated_at:type_name -> google.protobuf.Timestamp
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }
@@ -1892,7 +1996,7 @@ func file_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_proto_rawDesc), len(file_common_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,

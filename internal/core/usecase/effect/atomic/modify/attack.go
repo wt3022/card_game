@@ -20,6 +20,12 @@ func ExecuteModifyAttack(effect *entity.AtomicEffect, sourcePlayer *entity.Playe
 			continue
 		}
 
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "攻撃力変更無効", fmt.Sprintf("%s は効果盾により攻撃力変更を受けない", unit.Name))
+			continue
+		}
+
 		// 攻撃力を変更
 		unit.ModifyAttack(effect.Value)
 

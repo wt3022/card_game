@@ -25,6 +25,8 @@ type Player struct {
 	TimeRemaining       time.Duration `json:"time_remaining"`        // ターン残り時間
 	HasDrawnThisTurn    bool          `json:"has_drawn_this_turn"`   // このターンにドローしたか
 	IsFirstTurn         bool          `json:"is_first_turn"`         // 初ターンかどうか
+	IsConnected         bool          `json:"is_connected"`          // 接続状態
+	LastActivityAt      time.Time     `json:"last_activity_at"`      // 最後のアクティビティ時刻
 }
 
 // ========================================
@@ -48,6 +50,8 @@ func NewPlayer(id, name string, deck []Card) *Player {
 		TimeRemaining:       DefaultTurnTime,
 		HasDrawnThisTurn:    false,
 		IsFirstTurn:         true,
+		IsConnected:         false,
+		LastActivityAt:      time.Now(),
 	}
 }
 
@@ -231,6 +235,11 @@ func (p *Player) PlayCardFromHand(cardID string) (*Card, error) {
 
 // SummonUnit ユニットを盤面に配置
 func (p *Player) SummonUnit(card Card, instanceID string) error {
+	// フィールド上限チェック
+	if len(p.Field) >= MaxFieldSize {
+		return NewErrInvalidState("field", "フィールドがいっぱいです")
+	}
+
 	if card.Attack == nil || card.Defense == nil {
 		return NewErrInvalidCardType("unit", "spell")
 	}

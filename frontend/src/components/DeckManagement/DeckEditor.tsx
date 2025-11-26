@@ -3,6 +3,9 @@ import type { Card, Deck } from '../../gen/common_pb'
 import { cardManagementClient } from '../../lib/api-client'
 import './DeckEditor.css'
 
+const DECK_SIZE = 40
+const MAX_COPIES_PER_CARD = 3
+
 interface DeckEditorProps {
   deck: Deck | null
   isNewDeckMode: boolean
@@ -36,10 +39,10 @@ export default function DeckEditor({
         setLoading(true)
         const response = await cardManagementClient.listCards({})
         const cards = response.cards || []
-        console.log('Loaded cards:', cards)
+        console.log('カードを読み込みました:', cards)
         // カードデータの詳細をログ出力
         if (cards.length > 0) {
-          console.log('Sample card data:', {
+          console.log('サンプルカードデータ:', {
             id: cards[0].id,
             name: cards[0].name,
             cost: cards[0].cost,
@@ -53,7 +56,7 @@ export default function DeckEditor({
         }
         setAvailableCards(cards)
       } catch (err: unknown) {
-        console.error('Failed to load cards:', err)
+        console.error('カードの読み込みに失敗:', err)
       } finally {
         setLoading(false)
       }
@@ -86,8 +89,10 @@ export default function DeckEditor({
       return
     }
 
-    if (deckCards.length === 0) {
-      setError('少なくとも1枚のカードを追加してください')
+    if (deckCards.length !== DECK_SIZE) {
+      setError(
+        `デッキは${DECK_SIZE}枚である必要があります（現在${deckCards.length}枚）`,
+      )
       return
     }
 
@@ -127,15 +132,30 @@ export default function DeckEditor({
   }
 
   const handleAddCard = (cardId: string) => {
+    // 40枚制限チェック
+    if (deckCards.length >= DECK_SIZE) {
+      setError(`デッキは${DECK_SIZE}枚までです`)
+      return
+    }
+
+    // 同じカード3枚制限チェック
+    const currentCount = getCardCount(cardId)
+    if (currentCount >= MAX_COPIES_PER_CARD) {
+      setError(`同じカードは${MAX_COPIES_PER_CARD}枚までです`)
+      return
+    }
+
     const newEntry: DeckCardEntry = {
       id: `${cardId}-${Date.now()}-${Math.random()}`,
       cardId,
     }
     setDeckCards((prev) => [...prev, newEntry])
+    setError(null)
   }
 
   const handleRemoveCard = (entryId: string) => {
     setDeckCards((prev) => prev.filter((entry) => entry.id !== entryId))
+    setError(null)
   }
 
   const getCardById = (cardId: string): Card | undefined => {
@@ -189,7 +209,19 @@ export default function DeckEditor({
 
         <div className="deck-cards-section">
           <div className="deck-current-cards">
-            <h3>デッキ内のカード ({deckCards.length}枚)</h3>
+            <div className="deck-header">
+              <h3>
+                デッキ内のカード ({deckCards.length}/{DECK_SIZE}枚)
+              </h3>
+              {deckCards.length < DECK_SIZE && (
+                <span className="deck-remaining-count warning">
+                  あと{DECK_SIZE - deckCards.length}枚必要
+                </span>
+              )}
+              {deckCards.length === DECK_SIZE && (
+                <span className="deck-remaining-count complete">✓ 完成</span>
+              )}
+            </div>
             {deckCards.length === 0 ? (
               <div className="empty-message">カードが追加されていません</div>
             ) : (
@@ -197,17 +229,32 @@ export default function DeckEditor({
                 {deckCards.map((entry) => {
                   const card = getCardById(entry.cardId)
                   if (!card) return null
+                  const effectText = card.effect || ''
+                  const traitsText = card.traits?.join(', ') || ''
+
                   return (
-                    <div key={entry.id} className="deck-card-item">
-                      <span className="deck-card-name">{card.name}</span>
-                      <span className="deck-card-cost">
-                        コスト: {card.cost}
-                      </span>
-                      {card.attack !== undefined && card.defense !== undefined && (
-                        <span className="deck-card-stats">
-                          {card.attack}/{card.defense}
-                        </span>
-                      )}
+                    <div
+                      key={entry.id}
+                      className="deck-card-item"
+                      title={`${card.name}${effectText ? `\n効果: ${effectText}` : ''}${traitsText ? `\n特性: ${traitsText}` : ''}`}
+                    >
+                      <div className="deck-card-main">
+                        <span className="deck-card-name">{card.name}</span>
+                        <div className="deck-card-details">
+                          <span className="deck-card-cost">
+                            コスト: {card.cost}
+                          </span>
+                          {card.attack !== undefined &&
+                            card.defense !== undefined && (
+                              <span className="deck-card-stats">
+                                {card.attack}/{card.defense}
+                              </span>
+                            )}
+                        </div>
+                        {effectText && (
+                          <div className="deck-card-effect">{effectText}</div>
+                        )}
+                      </div>
                       <button
                         type="button"
                         className="deck-card-remove"
@@ -232,28 +279,62 @@ export default function DeckEditor({
               <div className="available-card-list">
                 {availableCards.map((card) => {
                   const count = getCardCount(card.id)
+                  const isMaxCopies = count >= MAX_COPIES_PER_CARD
+                  const isDeckFull = deckCards.length >= DECK_SIZE
+                  const canAdd = !isMaxCopies && !isDeckFull
+                  const effectText = card.effect || ''
+                  const traitsText = card.traits?.join(', ') || ''
+
                   return (
-                    <div key={card.id} className="available-card-item">
+                    <div
+                      key={card.id}
+                      className={`available-card-item ${!canAdd ? 'disabled' : ''}`}
+                      title={`${card.name}${effectText ? `\n効果: ${effectText}` : ''}${traitsText ? `\n特性: ${traitsText}` : ''}`}
+                    >
                       <div className="available-card-info">
-                        <span className="available-card-name">{card.name}</span>
-                        <span className="available-card-cost">
-                          コスト: {card.cost}
-                        </span>
-                        {card.attack !== undefined && card.defense !== undefined && (
-                          <span className="available-card-stats">
-                            {card.attack}/{card.defense}
+                        <div className="available-card-header">
+                          <span className="available-card-name">
+                            {card.name}
                           </span>
-                        )}
-                        {count > 0 && (
-                          <span className="available-card-count">×{count}</span>
+                          <div className="available-card-meta">
+                            <span className="available-card-cost">
+                              コスト: {card.cost}
+                            </span>
+                            {card.attack !== undefined &&
+                              card.defense !== undefined && (
+                                <span className="available-card-stats">
+                                  {card.attack}/{card.defense}
+                                </span>
+                              )}
+                            {count > 0 && (
+                              <span
+                                className={`available-card-count ${isMaxCopies ? 'max' : ''}`}
+                              >
+                                ×{count}/{MAX_COPIES_PER_CARD}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {effectText && (
+                          <div className="available-card-effect">
+                            {effectText}
+                          </div>
                         )}
                       </div>
                       <button
                         type="button"
                         className="available-card-add"
                         onClick={() => handleAddCard(card.id)}
+                        disabled={!canAdd}
+                        title={
+                          isDeckFull
+                            ? `デッキは${DECK_SIZE}枚までです`
+                            : isMaxCopies
+                              ? `同じカードは${MAX_COPIES_PER_CARD}枚までです`
+                              : '追加'
+                        }
                       >
-                        追加
+                        {canAdd ? '追加' : '上限'}
                       </button>
                     </div>
                   )

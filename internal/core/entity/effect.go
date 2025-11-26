@@ -145,7 +145,7 @@ const (
 	ConditionUnitAttack  ConditionType = "UNIT_ATTACK"  // ユニット攻撃力
 	ConditionUnitDefense ConditionType = "UNIT_DEFENSE" // ユニット防御力
 	ConditionHasTrait    ConditionType = "HAS_KEYWORD"  // 特性所持
-	ConditionCardPlayed  ConditionType = "CARD_PLAYED"  // このターンプレイしたカード数
+	ConditionCardPlayed  ConditionType = "CARD_PLAYED"  // このターン使用したカード数
 	ConditionDamageTaken ConditionType = "DAMAGE_TAKEN" // 受けたダメージ量
 )
 
@@ -537,57 +537,195 @@ func generateAtomicEffectDescription(effect *AtomicEffect) string {
 
 	switch effect.Type {
 	case AtomicEffectDealDamage:
+		if effect.Value == 0 {
+			return fmt.Sprintf("%sにダメージ", targetDesc)
+		}
 		return fmt.Sprintf("%sに%sダメージ", targetDesc, valueStr)
 	case AtomicEffectDealSplash:
-		return fmt.Sprintf("%sに%sダメージ", targetDesc, valueStr)
+		if effect.Value == 0 {
+			return fmt.Sprintf("%sに範囲ダメージ", targetDesc)
+		}
+		return fmt.Sprintf("%sに%sの範囲ダメージ", targetDesc, valueStr)
 	case AtomicEffectRestoreHP:
+		if effect.Value == 0 {
+			return fmt.Sprintf("%sのHPを回復", targetDesc)
+		}
 		return fmt.Sprintf("%sのHPを%s回復", targetDesc, valueStr)
 	case AtomicEffectRestoreMana:
+		if effect.Value == 0 {
+			return "マナを回復"
+		}
+		if effect.Value == 1 {
+			return "マナを1回復"
+		}
 		return fmt.Sprintf("マナを%s回復", valueStr)
 	case AtomicEffectFullRestore:
-		return fmt.Sprintf("%sを完全回復", targetDesc)
+		if targetDesc == "自分" || targetDesc == "相手" {
+			return fmt.Sprintf("%sのHPを最大まで回復", targetDesc)
+		}
+		return fmt.Sprintf("%sのHPを全回復", targetDesc)
 	case AtomicEffectDrawCard:
+		if effect.Value == 1 {
+			return "カードを1枚引く"
+		}
 		return fmt.Sprintf("カードを%s枚引く", valueStr)
 	case AtomicEffectDiscardCard:
+		if effect.Value == 1 {
+			return "カードを1枚捨てる"
+		}
 		return fmt.Sprintf("カードを%s枚捨てる", valueStr)
 	case AtomicEffectSearchCard:
+		// サーチする条件を詳細に表示
+		if effect.Parameters != nil {
+			// カードタイプでフィルタリング
+			if cardType, ok := effect.Parameters["card_type"].(CardType); ok {
+				switch cardType {
+				case CardTypeUnit:
+					return "デッキからユニットカードをサーチ"
+				case CardTypeSpell:
+					return "デッキから呪文カードをサーチ"
+				}
+			}
+			// コストでフィルタリング
+			if maxCost, ok := effect.Parameters["max_cost"].(int); ok {
+				return fmt.Sprintf("デッキからコスト%d以下のカードをサーチ", maxCost)
+			}
+			// 特性でフィルタリング
+			if trait, ok := effect.Parameters["trait"].(Trait); ok {
+				traitDesc := generateTraitDescription(trait)
+				return fmt.Sprintf("デッキから%sを持つカードをサーチ", traitDesc)
+			}
+		}
 		return "デッキからカードをサーチ"
 	case AtomicEffectShuffleDeck:
-		return "デッキをシャッフル"
+		if effect.Parameters != nil {
+			if owner, ok := effect.Parameters["owner"].(string); ok {
+				if owner == "opponent" {
+					return "相手のデッキをシャッフル"
+				}
+			}
+		}
+		return "自分のデッキをシャッフル"
 	case AtomicEffectModifyAttack:
 		sign := "+"
 		if effect.Value < 0 {
 			sign = ""
 		}
-		return fmt.Sprintf("%sの攻撃力%s%d", targetDesc, sign, effect.Value)
+		duration := ""
+		if effect.Duration != nil {
+			if *effect.Duration == 1 {
+				duration = "(このターン)"
+			} else {
+				duration = fmt.Sprintf("(%dターン)", *effect.Duration)
+			}
+		}
+		return fmt.Sprintf("%sの攻撃力%s%d%s", targetDesc, sign, effect.Value, duration)
 	case AtomicEffectModifyDefense:
 		sign := "+"
 		if effect.Value < 0 {
 			sign = ""
 		}
-		return fmt.Sprintf("%sの防御力%s%d", targetDesc, sign, effect.Value)
+		duration := ""
+		if effect.Duration != nil {
+			if *effect.Duration == 1 {
+				duration = "(このターン)"
+			} else {
+				duration = fmt.Sprintf("(%dターン)", *effect.Duration)
+			}
+		}
+		return fmt.Sprintf("%sの防御力%s%d%s", targetDesc, sign, effect.Value, duration)
 	case AtomicEffectModifyCost:
 		sign := "+"
 		if effect.Value < 0 {
 			sign = ""
 		}
-		return fmt.Sprintf("%sのコスト%s%d", targetDesc, sign, effect.Value)
+		scope := ""
+		if effect.Parameters != nil {
+			if permanent, ok := effect.Parameters["permanent"].(bool); ok && permanent {
+				scope = "(永続)"
+			} else {
+				scope = "(このターン)"
+			}
+		}
+		return fmt.Sprintf("%sのコスト%s%d%s", targetDesc, sign, effect.Value, scope)
 	case AtomicEffectModifyMaxHP:
 		sign := "+"
 		if effect.Value < 0 {
 			sign = ""
 		}
-		return fmt.Sprintf("%sの最大HP%s%d", targetDesc, sign, effect.Value)
+		if effect.Value == 0 {
+			return fmt.Sprintf("%sの最大HPを変更", targetDesc)
+		}
+		return fmt.Sprintf("%sの最大HP%s%d(現在HPも同量変化)", targetDesc, sign, effect.Value)
 	case AtomicEffectSummonUnit:
-		return "ユニットを召喚"
+		// card_idパラメータからカード情報を取得して詳細を表示
+		if effect.Parameters != nil {
+			// 召喚数を取得
+			count := 1
+			if c, ok := effect.Parameters["count"].(int); ok && c > 0 {
+				count = c
+			}
+			countStr := ""
+			if count > 1 {
+				countStr = fmt.Sprintf("%d体の", count)
+			}
+
+			if cardID, ok := effect.Parameters["card_id"].(string); ok && cardID != "" {
+				// カードIDが指定されている場合はそれを表示
+				if count > 1 {
+					return fmt.Sprintf("「%s」を%d体召喚", cardID, count)
+				}
+				return fmt.Sprintf("「%s」を召喚", cardID)
+			}
+			// 攻撃力/防御力が指定されている場合
+			if attack, hasAttack := effect.Parameters["attack"].(int); hasAttack {
+				if defense, hasDefense := effect.Parameters["defense"].(int); hasDefense {
+					return fmt.Sprintf("%s%d/%dのトークンを召喚", countStr, attack, defense)
+				}
+				return fmt.Sprintf("%s攻撃力%dのトークンを召喚", countStr, attack)
+			}
+		}
+		return "トークンを召喚"
 	case AtomicEffectDestroyUnit:
+		if effect.Condition != nil {
+			condDesc := generateConditionDescription(effect.Condition)
+			if condDesc != "" {
+				return fmt.Sprintf("%s(%s)を破壊", targetDesc, condDesc)
+			}
+		}
 		return fmt.Sprintf("%sを破壊", targetDesc)
 	case AtomicEffectReturnToHand:
-		return fmt.Sprintf("%sを手札に戻す", targetDesc)
+		if effect.Parameters != nil {
+			if owner, ok := effect.Parameters["owner"].(string); ok {
+				if owner == "opponent" {
+					return fmt.Sprintf("%sを相手の手札に戻す", targetDesc)
+				}
+			}
+		}
+		return fmt.Sprintf("%sを持ち主の手札に戻す", targetDesc)
 	case AtomicEffectReturnToDeck:
-		return fmt.Sprintf("%sをデッキに戻す", targetDesc)
+		position := "デッキ"
+		if effect.Parameters != nil {
+			if pos, ok := effect.Parameters["position"].(string); ok {
+				switch pos {
+				case "top":
+					position = "デッキの一番上"
+				case "bottom":
+					position = "デッキの一番下"
+				case "random":
+					position = "デッキのランダムな位置"
+				}
+			}
+		}
+		return fmt.Sprintf("%sを%sに戻す", targetDesc, position)
 	case AtomicEffectSilenceUnit:
-		return fmt.Sprintf("%sの効果を無効化", targetDesc)
+		if effect.Duration != nil {
+			if *effect.Duration == 1 {
+				return fmt.Sprintf("%sの効果を無効化(このターン)", targetDesc)
+			}
+			return fmt.Sprintf("%sの効果を無効化(%dターン)", targetDesc, *effect.Duration)
+		}
+		return fmt.Sprintf("%sの効果を永続的に無効化", targetDesc)
 	case AtomicEffectGrantTrait:
 		if effect.Parameters != nil {
 			if trait, ok := effect.Parameters["trait"].(Trait); ok {
@@ -605,9 +743,37 @@ func generateAtomicEffectDescription(effect *AtomicEffect) string {
 		}
 		return fmt.Sprintf("%sから特性を除去", targetDesc)
 	case AtomicEffectGainMana:
-		return fmt.Sprintf("マナ+%d", effect.Value)
+		if effect.Value == 0 {
+			return "マナを獲得"
+		}
+		if effect.Value == 1 {
+			return "マナを1獲得"
+		}
+		if effect.Parameters != nil {
+			if permanent, ok := effect.Parameters["permanent"].(bool); ok && permanent {
+				return fmt.Sprintf("最大マナ+%d(このターンも回復)", effect.Value)
+			}
+		}
+		return fmt.Sprintf("このターンのマナ+%d", effect.Value)
 	case AtomicEffectReduceCost:
-		return fmt.Sprintf("コスト-%d", effect.Value)
+		if effect.Value == 0 {
+			return "コストを軽減"
+		}
+		if effect.Value == 1 {
+			return "コストを1軽減"
+		}
+		scope := "手札の"
+		if effect.Parameters != nil {
+			if cardType, ok := effect.Parameters["card_type"].(CardType); ok {
+				switch cardType {
+				case CardTypeUnit:
+					scope = "手札のユニットカードの"
+				case CardTypeSpell:
+					scope = "手札の呪文カードの"
+				}
+			}
+		}
+		return fmt.Sprintf("%sコストを%d軽減(このターン)", scope, effect.Value)
 	default:
 		return "未定義の効果"
 	}
@@ -664,7 +830,7 @@ func generateConditionDescription(cond *Condition) string {
 	case ConditionHasTrait:
 		targetStr = "特性を持つ"
 	case ConditionCardPlayed:
-		targetStr = "プレイしたカード数"
+		targetStr = "使用したカード数"
 	case ConditionDamageTaken:
 		targetStr = "受けたダメージ"
 	default:

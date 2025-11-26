@@ -140,11 +140,11 @@ func RunGormMigrations(db *gorm.DB, logger port.Logger) error {
 	// 未実行のマイグレーションを実行
 	for _, migration := range models {
 		if executedMap[migration.version] {
-			logger.Info("Migration %s (%s) already executed, skipping", migration.version, migration.description)
+			logger.Info("マイグレーション %s (%s) は実行済みです。スキップします", migration.version, migration.description)
 			continue
 		}
 
-		logger.Info("Running migration %s: %s...", migration.version, migration.description)
+		logger.Info("マイグレーション %s を実行中: %s...", migration.version, migration.description)
 
 		// トランザクション内でマイグレーションを実行
 		err := db.Transaction(func(tx *gorm.DB) error {
@@ -169,7 +169,7 @@ func RunGormMigrations(db *gorm.DB, logger port.Logger) error {
 			return fmt.Errorf("failed to run migration %s: %w", migration.version, err)
 		}
 
-		logger.Info("✅ Migration %s completed", migration.version)
+		logger.Info("✅ マイグレーション %s 完了", migration.version)
 	}
 
 	return nil

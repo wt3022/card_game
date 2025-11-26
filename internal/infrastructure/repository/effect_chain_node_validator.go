@@ -49,7 +49,7 @@ func ValidateEffectChainNode(db *gorm.DB, logger port.Logger, nodeID uint, nodeT
 		}
 		// 読み込み時はwarningをログに出力
 		if logger != nil {
-			logger.Info("Effect chain node (id=%d, type=%s) does not have corresponding concrete table record, ignoring", nodeID, nodeType)
+			logger.Info("効果チェーンノード (id=%d, type=%s) に対応する具体テーブルレコードがありません。無視します", nodeID, nodeType)
 		}
 	}
 

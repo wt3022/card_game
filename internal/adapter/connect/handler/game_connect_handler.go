@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand/v2"
+	"time"
 
 	"connectrpc.com/connect"
 
@@ -12,6 +13,8 @@ import (
 	"card_game/internal/adapter/converter"
 	"card_game/internal/application/service"
 	"card_game/internal/core/entity"
+	"card_game/internal/infrastructure/middleware"
+	"card_game/internal/infrastructure/security"
 )
 
 // ========================================
@@ -25,13 +28,24 @@ import (
 
 // GameConnectHandler Connect-Go用のゲームサービスハンドラー
 type GameConnectHandler struct {
-	gameService *service.GameService
+	gameService    *service.GameService
+	rateLimiter    *middleware.RateLimiter
+	stateValidator *security.StateValidator
+	cheatDetector  *security.CheatDetector
+	lastActionTime map[string]time.Time
 }
 
 // NewGameConnectHandler 新しいGameConnectHandlerを作成
 func NewGameConnectHandler(gameService *service.GameService) *GameConnectHandler {
+	rateLimiter := middleware.NewRateLimiter()
+	rateLimiter.StartCleanupRoutine()
+
 	return &GameConnectHandler{
-		gameService: gameService,
+		gameService:    gameService,
+		rateLimiter:    rateLimiter,
+		stateValidator: security.NewStateValidator(),
+		cheatDetector:  security.NewCheatDetector(),
+		lastActionTime: make(map[string]time.Time),
 	}
 }
 
@@ -53,7 +67,7 @@ func (h *GameConnectHandler) CreateGame(
 	gameID := fmt.Sprintf("game-%s-%s", player1ID, player2ID)
 
 	// ゲームを作成
-	err := h.gameService.CreateGame(gameID, player1ID, player1Name, player2ID, player2Name)
+	err := h.gameService.CreateGame(gameID, player1ID, player1Name, "", player2ID, player2Name, "")
 	if err != nil {
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
@@ -105,6 +119,11 @@ func (h *GameConnectHandler) PerformMulligan(
 	playerID := req.Msg.GetPlayerId()
 	cardIDs := req.Msg.GetCardIds()
 
+	// レート制限チェック（マリガンは厳しめ）
+	if err := h.rateLimiter.CheckLimit(playerID, "PerformMulligan"); err != nil {
+		return nil, connect.NewError(connect.CodeResourceExhausted, err)
+	}
+
 	// マリガンを実行
 	err := h.gameService.PerformMulligan(ctx, gameID, playerID, cardIDs)
 	if err != nil {
@@ -135,6 +154,17 @@ func (h *GameConnectHandler) PlayCard(
 	gameID := req.Msg.GetGameId()
 	playerID := req.Msg.GetPlayerId()
 	cardID := req.Msg.GetCardId()
+
+	// レート制限チェック
+	if err := h.rateLimiter.CheckLimit(playerID, "PlayCard"); err != nil {
+		return nil, connect.NewError(connect.CodeResourceExhausted, err)
+	}
+
+	// 高速操作の検出
+	if lastTime, ok := h.lastActionTime[playerID]; ok {
+		h.cheatDetector.DetectImpossibleTiming(playerID, "PlayCard", lastTime)
+	}
+	h.lastActionTime[playerID] = time.Now()
 
 	var targetID *string
 	if req.Msg.TargetId != nil {
@@ -172,6 +202,17 @@ func (h *GameConnectHandler) ExecuteAttack(
 	gameID := req.Msg.GetGameId()
 	playerID := req.Msg.GetPlayerId()
 	attackerID := req.Msg.GetAttackerId()
+
+	// レート制限チェック
+	if err := h.rateLimiter.CheckLimit(playerID, "ExecuteAttack"); err != nil {
+		return nil, connect.NewError(connect.CodeResourceExhausted, err)
+	}
+
+	// 高速操作の検出
+	if lastTime, ok := h.lastActionTime[playerID]; ok {
+		h.cheatDetector.DetectImpossibleTiming(playerID, "ExecuteAttack", lastTime)
+	}
+	h.lastActionTime[playerID] = time.Now()
 
 	var targetID *string
 	if req.Msg.TargetId != nil {
@@ -239,6 +280,11 @@ func (h *GameConnectHandler) EndTurn(
 	gameID := req.Msg.GetGameId()
 	playerID := req.Msg.GetPlayerId()
 
+	// レート制限チェック
+	if err := h.rateLimiter.CheckLimit(playerID, "EndTurn"); err != nil {
+		return nil, connect.NewError(connect.CodeResourceExhausted, err)
+	}
+
 	// ターンを終了
 	err := h.gameService.EndTurn(ctx, gameID)
 	if err != nil {
@@ -270,6 +316,8 @@ func (h *GameConnectHandler) StreamGameEvents(
 	gameID := req.Msg.GetGameId()
 	playerID := req.Msg.GetPlayerId()
 
+	fmt.Printf("🔌 ゲーム %s のプレイヤー %s がイベントストリームに接続しました\n", gameID, playerID)
+
 	// イベントをSubscribe
 	eventChan, err := h.gameService.SubscribeToEvents(gameID)
 	if err != nil {
@@ -282,13 +330,29 @@ func (h *GameConnectHandler) StreamGameEvents(
 		return connect.NewError(connect.CodeInternal, err)
 	}
 
+	// 接続後の最新ゲーム状態を取得して送信（接続状態の更新を反映）
+	state, err := h.gameService.GetGameState(gameID)
+	if err == nil {
+		initialResp := &pbv1.GameEventResponse{
+			Event:     nil, // 初期状態送信なのでイベントはnil
+			GameState: converter.GameStateToProto(state, playerID),
+		}
+		if err := stream.Send(initialResp); err != nil {
+			return err
+		}
+	}
+
 	// 切断時に切断状態をマーク
-	defer h.gameService.MarkPlayerDisconnected(gameID, playerID)
+	defer func() {
+		fmt.Printf("🔌 プレイヤー %s (ゲーム %s) のイベントストリームを終了します\n", playerID, gameID)
+		h.gameService.MarkPlayerDisconnected(gameID, playerID)
+	}()
 
 	for {
 		select {
 		case <-ctx.Done():
 			// 接続が切れた場合（defer で MarkPlayerDisconnected が呼ばれる）
+			fmt.Printf("⚠️ プレイヤー %s (ゲーム %s) のコンテキストが終了しました: %v\n", playerID, gameID, ctx.Err())
 			return ctx.Err()
 		case event := <-eventChan:
 			// イベントをprotoに変換して送信
@@ -339,9 +403,13 @@ func (h *GameConnectHandler) JoinMatchmaking(
 ) error {
 	playerID := req.Msg.GetPlayerId()
 	playerName := req.Msg.GetPlayerName()
+	deckID := ""
+	if req.Msg.DeckId != nil {
+		deckID = *req.Msg.DeckId
+	}
 
 	// マッチングキューに参加
-	notifyChan := h.gameService.JoinQueue(playerID, playerName)
+	notifyChan := h.gameService.JoinQueue(playerID, playerName, deckID)
 
 	// 接続が切れた時にキューから退出させる
 	defer h.gameService.LeaveQueue(playerID)

@@ -66,7 +66,9 @@ func PlayerToProto(player *entity.Player, viewerPlayerID string) *cardgamev1.Pla
 		GraveyardCount:       int32(len(player.Graveyard)),
 		Field:                UnitsToProto(player.Field),
 		Hand:                 hand,
-		TimeRemainingSeconds: 0, // TODO: 将来実装
+		TimeRemainingSeconds: 0, // ターン時間制限機能は将来実装予定
+		IsConnected:          player.IsConnected,
+		LastActivityAt:       timestamppb.New(player.LastActivityAt),
 	}
 }
 
@@ -115,12 +117,12 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 	}
 
 	// CardEffectの変換
-	// TODO: entity.CardEffectとproto CardEffectの構造が異なるため、段階的に実装
-	// entity側はゲームエンジン用の複雑な構造、proto側は管理UI用の別設計として実装予定
+	// Note: entity.CardEffectとproto CardEffectは設計が異なる
+	// entity側: ゲームエンジン用の実行可能な構造体
+	// proto側: 管理UI用のJSON化可能な構造
+	// CardEffectはhandler層で直接repository経由で取得して設定される
 	var cardEffect *cardgamev1.CardEffect
-	// if card.CardEffect != nil {
-	//     cardEffect = CardEffectToProto(card.CardEffect)
-	// }
+	// ここではnilのまま。handler層でGetCardEffectAsProtoを使って設定される
 
 	return &cardgamev1.Card{
 		Id:         card.ID,
@@ -131,7 +133,7 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 		Defense:    intPtrToOptionalInt32(card.Defense),
 		Effect:     effectText,
 		Traits:     TraitsToProto(card.Traits),
-		CardEffect: cardEffect, // TODO: 実装予定
+		CardEffect: cardEffect, // handler層で設定される
 	}
 }
 
@@ -278,5 +280,263 @@ func DeckToProto(deck *entity.Deck) *cardgamev1.Deck {
 		UserId:      deck.UserID,
 		CreatedAt:   timestamppb.New(deck.CreatedAt),
 		UpdatedAt:   timestamppb.New(deck.UpdatedAt),
+	}
+}
+
+// ========================================
+// CardEffect変換
+// ========================================
+
+// CardEffectToProto CardEffectをProtoに変換
+func CardEffectToProto(cardEffect *entity.CardEffect) *cardgamev1.CardEffect {
+	if cardEffect == nil {
+		return nil
+	}
+
+	definitions := make([]*cardgamev1.EffectDefinition, len(cardEffect.Definitions))
+	for i, def := range cardEffect.Definitions {
+		definitions[i] = effectDefinitionToProto(def)
+	}
+
+	return &cardgamev1.CardEffect{
+		CardId:      "", // CardIDはhandlerで設定
+		Definitions: definitions,
+	}
+}
+
+func effectDefinitionToProto(def *entity.EffectDefinition) *cardgamev1.EffectDefinition {
+	if def == nil {
+		return nil
+	}
+
+	return &cardgamev1.EffectDefinition{
+		Id:            uint32(0), // IDはDBで管理
+		RequireTarget: def.RequireTarget,
+		Root:          effectChainNodeToProto(def.Root),
+	}
+}
+
+func effectChainNodeToProto(node *entity.EffectChainNode) *cardgamev1.EffectChainNode {
+	if node == nil {
+		return nil
+	}
+
+	pbNode := &cardgamev1.EffectChainNode{
+		Id:   uint32(0), // IDはDBで管理
+		Type: effectChainNodeTypeToProto(node.Type),
+	}
+
+	switch node.Type {
+	case entity.OperatorSequential:
+		if node.Sequential != nil {
+			pbNode.AtomicEffect = atomicEffectToProto(node.Sequential.Effect)
+			pbNode.Next = effectChainNodeToProto(node.Sequential.Next)
+		}
+	case entity.OperatorParallel:
+		if node.Parallel != nil {
+			children := make([]*cardgamev1.EffectChainNode, len(node.Parallel.Children))
+			for i, child := range node.Parallel.Children {
+				children[i] = effectChainNodeToProto(child)
+			}
+			pbNode.Children = children
+		}
+	case entity.OperatorIfElse:
+		if node.IfElse != nil {
+			pbNode.Condition = conditionToProto(node.IfElse.Condition)
+			pbNode.ThenNode = effectChainNodeToProto(node.IfElse.Then)
+			pbNode.ElseNode = effectChainNodeToProto(node.IfElse.Else)
+		}
+	case entity.OperatorRepeat:
+		if node.Repeat != nil {
+			count := int32(node.Repeat.Count)
+			pbNode.RepeatCount = &count
+			pbNode.RepeatEffect = effectChainNodeToProto(node.Repeat.Effect)
+		}
+	case entity.OperatorForEach:
+		if node.ForEach != nil {
+			pbNode.ForeachTarget = targetSelectorToProto(&node.ForEach.Target)
+			pbNode.ForeachEffect = effectChainNodeToProto(node.ForEach.Effect)
+		}
+	}
+
+	return pbNode
+}
+
+func effectChainNodeTypeToProto(t entity.EffectOperator) cardgamev1.EffectChainNodeType {
+	switch t {
+	case entity.OperatorSequential:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_THEN
+	case entity.OperatorParallel:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_AND
+	case entity.OperatorIfElse:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_IF_ELSE
+	case entity.OperatorRepeat:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_REPEAT
+	case entity.OperatorForEach:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_FOREACH
+	default:
+		return cardgamev1.EffectChainNodeType_EFFECT_CHAIN_NODE_TYPE_UNSPECIFIED
+	}
+}
+
+func atomicEffectToProto(effect *entity.AtomicEffect) *cardgamev1.AtomicEffect {
+	if effect == nil {
+		return nil
+	}
+
+	pbEffect := &cardgamev1.AtomicEffect{
+		Id:     uint32(0), // IDはDBで管理
+		Type:   atomicEffectTypeToProto(effect.Type),
+		Target: targetSelectorToProto(&effect.Target),
+		Timing: effectTimingToProto(effect.Timing),
+	}
+
+	if effect.Value != 0 {
+		value := int32(effect.Value)
+		pbEffect.Value = &value
+	}
+
+	if cardID, ok := effect.Parameters["card_id"].(string); ok {
+		pbEffect.CardId = &cardID
+	}
+
+	if trait, ok := effect.Parameters["trait"].(entity.Trait); ok {
+		pbTrait := TraitToProto(trait)
+		pbEffect.Trait = &pbTrait
+	}
+
+	return pbEffect
+}
+
+func atomicEffectTypeToProto(t entity.AtomicEffectType) cardgamev1.AtomicEffectType {
+	switch t {
+	case entity.AtomicEffectDealDamage:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DEAL_DAMAGE
+	case entity.AtomicEffectDealSplash:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DEAL_SPLASH
+	case entity.AtomicEffectRestoreHP:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_RESTORE_HP
+	case entity.AtomicEffectRestoreMana:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_RESTORE_MANA
+	case entity.AtomicEffectFullRestore:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_FULL_RESTORE
+	case entity.AtomicEffectDrawCard:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DRAW_CARD
+	case entity.AtomicEffectDiscardCard:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DISCARD_CARD
+	case entity.AtomicEffectSearchCard:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_SEARCH_CARD
+	case entity.AtomicEffectShuffleDeck:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_SHUFFLE_DECK
+	case entity.AtomicEffectModifyAttack:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_ATTACK
+	case entity.AtomicEffectModifyDefense:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_DEFENSE
+	case entity.AtomicEffectModifyCost:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_COST
+	case entity.AtomicEffectModifyMaxHP:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_MODIFY_MAX_HP
+	case entity.AtomicEffectSummonUnit:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_SUMMON_UNIT
+	case entity.AtomicEffectDestroyUnit:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DESTROY_UNIT
+	case entity.AtomicEffectReturnToHand:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_RETURN_TO_HAND
+	case entity.AtomicEffectReturnToDeck:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_RETURN_TO_DECK
+	case entity.AtomicEffectSilenceUnit:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_DISABLE_UNIT
+	case entity.AtomicEffectGrantTrait:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_GRANT_TRAIT
+	case entity.AtomicEffectRemoveTrait:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_REMOVE_TRAIT
+	case entity.AtomicEffectGainMana:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_GAIN_MANA
+	case entity.AtomicEffectReduceCost:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_REDUCE_COST
+	default:
+		return cardgamev1.AtomicEffectType_ATOMIC_EFFECT_TYPE_UNSPECIFIED
+	}
+}
+
+func effectTimingToProto(timing entity.EffectTiming) cardgamev1.EffectTiming {
+	switch timing {
+	case entity.EffectTimingImmediate:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_IMMEDIATE
+	case entity.EffectTimingOnSummon:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_ON_SUMMON
+	case entity.EffectTimingOnDestroy:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_ON_DESTROY
+	case entity.EffectTimingOnAttack:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_ON_ATTACK
+	case entity.EffectTimingOnDamaged:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_ON_DAMAGED
+	case entity.EffectTimingTurnStart:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_TURN_START
+	case entity.EffectTimingTurnEnd:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_TURN_END
+	default:
+		return cardgamev1.EffectTiming_EFFECT_TIMING_UNSPECIFIED
+	}
+}
+
+func targetSelectorToProto(selector *entity.TargetSelector) *cardgamev1.TargetSelector {
+	if selector == nil {
+		return nil
+	}
+
+	return &cardgamev1.TargetSelector{
+		Id:     uint32(0), // IDはDBで管理
+		Type:   targetTypeToProto(selector.Type),
+		Filter: targetFilterToProto(selector.Filter),
+	}
+}
+
+func targetTypeToProto(t entity.EffectTarget) cardgamev1.TargetType {
+	switch t {
+	case entity.EffectTargetSelf:
+		return cardgamev1.TargetType_TARGET_TYPE_SELF
+	case entity.EffectTargetOpponent:
+		return cardgamev1.TargetType_TARGET_TYPE_ENEMY_LEADER
+	case entity.EffectTargetAllies:
+		return cardgamev1.TargetType_TARGET_TYPE_ALL_ALLY_UNITS
+	case entity.EffectTargetEnemies:
+		return cardgamev1.TargetType_TARGET_TYPE_ALL_ENEMY_UNITS
+	case entity.EffectTargetAllUnits:
+		return cardgamev1.TargetType_TARGET_TYPE_ALL_UNITS
+	case entity.EffectTargetRandomAlly:
+		return cardgamev1.TargetType_TARGET_TYPE_RANDOM_ALLY_UNIT
+	case entity.EffectTargetRandomEnemy:
+		return cardgamev1.TargetType_TARGET_TYPE_RANDOM_ENEMY_UNIT
+	case entity.EffectTargetSpecific:
+		return cardgamev1.TargetType_TARGET_TYPE_UNSPECIFIED
+	default:
+		return cardgamev1.TargetType_TARGET_TYPE_UNSPECIFIED
+	}
+}
+
+func conditionToProto(cond *entity.Condition) *cardgamev1.ConditionFilter {
+	if cond == nil {
+		return nil
+	}
+
+	// TODO: Conditionの適切な変換ロジックを実装
+	return &cardgamev1.ConditionFilter{
+		Id:            uint32(0),
+		ConditionType: string(cond.Type),
+		Parameters:    []string{},
+	}
+}
+
+func targetFilterToProto(filter *entity.TargetFilter) *cardgamev1.ConditionFilter {
+	if filter == nil {
+		return nil
+	}
+
+	// TODO: TargetFilterの適切な変換ロジックを実装
+	return &cardgamev1.ConditionFilter{
+		Id:            uint32(0),
+		ConditionType: "",
+		Parameters:    []string{},
 	}
 }

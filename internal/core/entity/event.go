@@ -37,6 +37,10 @@ const (
 	EventTypeTurnEnd     EventType = "TURN_END"     // ターン終了
 	EventTypePhaseChange EventType = "PHASE_CHANGE" // フェーズ変更
 	EventTypeGameOver    EventType = "GAME_OVER"    // ゲーム終了
+
+	// プレイヤー接続状態イベント
+	EventTypePlayerConnected    EventType = "PLAYER_CONNECTED"    // プレイヤー接続
+	EventTypePlayerDisconnected EventType = "PLAYER_DISCONNECTED" // プレイヤー切断
 )
 
 // イベントカテゴリ
@@ -139,7 +143,8 @@ func (e *baseEvent) Category() EventCategory {
 	case EventTypeDamage, EventTypeHeal, EventTypeBuffDebuff, EventTypeDraw,
 		EventTypeUnitSummoned, EventTypeDestroy, EventTypeDiscard, EventTypeEnchantment:
 		return EventCategoryStateChange
-	case EventTypeTurnStart, EventTypeTurnEnd, EventTypePhaseChange, EventTypeGameOver:
+	case EventTypeTurnStart, EventTypeTurnEnd, EventTypePhaseChange, EventTypeGameOver,
+		EventTypePlayerConnected, EventTypePlayerDisconnected:
 		return EventCategoryGameFlow
 	default:
 		return EventCategoryStateChange

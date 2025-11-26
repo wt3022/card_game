@@ -12,6 +12,13 @@ func ExecuteReturnToDeck(effect *entity.AtomicEffect, sourcePlayer *entity.Playe
 		if !ok {
 			continue
 		}
+
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "デッキに戻す無効", unit.Name+" は効果盾によりデッキに戻らない")
+			continue
+		}
+
 		owner := game.GetPlayerByID(unit.OwnerID)
 		if owner == nil {
 			continue

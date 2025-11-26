@@ -1,12 +1,23 @@
 package entity
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 const (
-	// DeckSize デッキの固定枚数
+	// DeckSize デッキの推奨枚数
 	DeckSize = 40
+	// MinDeckSize デッキの最小枚数
+	MinDeckSize = 30
+	// MaxDeckSize デッキの最大枚数
+	MaxDeckSize = 60
 	// MaxCardCopies 同じカードの最大枚数
 	MaxCardCopies = 3
+	// MaxDeckNameLength デッキ名の最大長
+	MaxDeckNameLength = 100
+	// MaxDeckDescriptionLength デッキ説明の最大長
+	MaxDeckDescriptionLength = 500
 )
 
 // Deck はデッキを表すドメインエンティティ
@@ -42,25 +53,48 @@ func NewDeck(id, name, description, userID string, cardIDs []string) (*Deck, err
 
 // Validate はデッキの妥当性を検証
 func (d *Deck) Validate() error {
+	// 名前検証
 	if d.Name == "" {
 		return NewErrInvalidDeck("name", "デッキ名は必須です")
 	}
+	if len(d.Name) > MaxDeckNameLength {
+		return NewErrInvalidDeck("name", fmt.Sprintf("デッキ名は%d文字以内である必要があります", MaxDeckNameLength))
+	}
 
+	// 説明検証
+	if len(d.Description) > MaxDeckDescriptionLength {
+		return NewErrInvalidDeck("description", fmt.Sprintf("デッキ説明は%d文字以内である必要があります", MaxDeckDescriptionLength))
+	}
+
+	// ユーザーID検証
+	if d.UserID == "" {
+		return NewErrInvalidDeck("user_id", "ユーザーIDは必須です")
+	}
+
+	// カード数検証
 	if len(d.CardIDs) == 0 {
 		return NewErrInvalidDeck("cards", "デッキにカードが含まれていません")
 	}
 
-	// デッキの枚数は厳密に40枚
-	if len(d.CardIDs) != DeckSize {
-		return NewErrInvalidDeck("cards", "デッキは正確に40枚である必要があります")
+	// デッキの枚数は30〜60枚（推奨は40枚）
+	if len(d.CardIDs) < MinDeckSize {
+		return NewErrInvalidDeck("cards", fmt.Sprintf("デッキは最低%d枚必要です", MinDeckSize))
+	}
+	if len(d.CardIDs) > MaxDeckSize {
+		return NewErrInvalidDeck("cards", fmt.Sprintf("デッキは最大%d枚までです", MaxDeckSize))
 	}
 
 	// 同じカードの枚数チェック
 	cardCount := make(map[string]int)
 	for _, cardID := range d.CardIDs {
+		// 空のカードIDをチェック
+		if cardID == "" {
+			return NewErrInvalidDeck("cards", "無効なカードIDが含まれています")
+		}
+
 		cardCount[cardID]++
 		if cardCount[cardID] > MaxCardCopies {
-			return NewErrInvalidDeck("cards", "同じカードは3枚までしか入れられません")
+			return NewErrInvalidDeck("cards", fmt.Sprintf("同じカードは%d枚までしか入れられません", MaxCardCopies))
 		}
 	}
 
@@ -85,6 +119,12 @@ func (d *Deck) UpdateCards(cardIDs []string) error {
 func (d *Deck) UpdateInfo(name, description string) error {
 	if name == "" {
 		return NewErrInvalidDeck("name", "デッキ名は必須です")
+	}
+	if len(name) > MaxDeckNameLength {
+		return NewErrInvalidDeck("name", fmt.Sprintf("デッキ名は%d文字以内である必要があります", MaxDeckNameLength))
+	}
+	if len(description) > MaxDeckDescriptionLength {
+		return NewErrInvalidDeck("description", fmt.Sprintf("デッキ説明は%d文字以内である必要があります", MaxDeckDescriptionLength))
 	}
 
 	d.Name = name

@@ -41,7 +41,7 @@ func NewBus() port.EventBus {
 // イベントを非同期で発行
 func (b *Bus) Publish(event entity.Event) error {
 	if event == nil {
-		return fmt.Errorf("event cannot be nil")
+		return fmt.Errorf("イベントがnilです")
 	}
 
 	b.mu.RLock()
@@ -66,7 +66,7 @@ func (b *Bus) Publish(event entity.Event) error {
 // イベントを同期的に発行（すべてのハンドラーが処理完了するまで待つ）
 func (b *Bus) PublishSync(event entity.Event) error {
 	if event == nil {
-		return fmt.Errorf("event cannot be nil")
+		return fmt.Errorf("イベントがnilです")
 	}
 
 	b.mu.RLock()
@@ -77,7 +77,7 @@ func (b *Bus) PublishSync(event entity.Event) error {
 	for _, handler := range handlers {
 		if handler.CanHandle(event.Type()) {
 			if err := handler.Handle(event); err != nil {
-				return fmt.Errorf("handler error for event %s: %w", event.Type(), err)
+				return fmt.Errorf("イベント %s のハンドラーエラー: %w", event.Type(), err)
 			}
 		}
 	}

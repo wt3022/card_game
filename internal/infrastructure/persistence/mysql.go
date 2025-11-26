@@ -44,11 +44,11 @@ func (c *DBConfig) DSN() string {
 func OpenDB(config *DBConfig) (*sql.DB, error) {
 	db, err := sql.Open("mysql", config.DSN())
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("データベースのオープンに失敗しました: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to ping database: %w", err)
+		return nil, fmt.Errorf("データベースへの接続確認に失敗しました: %w", err)
 	}
 
 	return db, nil
@@ -59,7 +59,7 @@ func OpenGormDB(config *DBConfig) (*gorm.DB, error) {
 	dsn := config.DSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("データベースのオープンに失敗しました: %w", err)
 	}
 	return db, nil
 }

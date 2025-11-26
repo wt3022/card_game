@@ -13,6 +13,13 @@ func ExecuteModifyDefense(effect *entity.AtomicEffect, sourcePlayer *entity.Play
 		if !ok {
 			continue
 		}
+
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "守備力変更無効", fmt.Sprintf("%s は効果盾により守備力変更を受けない", unit.Name))
+			continue
+		}
+
 		unit.ModifyDefense(effect.Value)
 		action := "増加"
 		if effect.Value < 0 {

@@ -80,31 +80,44 @@ func (r *cardRepository) attachCardEffect(card *entity.Card) error {
 		return nil
 	}
 
-	effect, err := r.loadCardEffect(card.ID)
+	// CardEffectModelから説明を直接生成（常に最新の説明を取得）
+	cardEffectModel, err := r.LoadCardEffectModel(card.ID)
 	if err != nil {
 		return err
 	}
 
-	card.CardEffect = effect
-	if effect != nil && card.Effect == "" {
-		card.Effect = effect.GenerateDescription()
+	if cardEffectModel != nil {
+		// CardEffectModelから説明を生成してcard.Effectを上書き
+		effectDescription := GenerateEffectDescription(cardEffectModel)
+		if effectDescription != "" {
+			card.Effect = effectDescription
+		}
 	}
+
+	// entity.CardEffectも必要な場合はロード
+	effect, err := r.loadCardEffect(card.ID)
+	if err != nil {
+		return err
+	}
+	card.CardEffect = effect
+
 	return nil
 }
 
-// SaveCardEffect CardEffectを保存（model構造を直接受け取る）
-func (r *cardRepository) SaveCardEffect(cardID string, cardEffectModelInterface interface{}) error {
-	cardEffectModel, ok := cardEffectModelInterface.(*model.CardEffectModel)
-	if !ok {
-		return fmt.Errorf("invalid card effect model type")
-	}
-
-	if cardEffectModel == nil || len(cardEffectModel.Definitions) == 0 {
+// SaveCardEffect CardEffectを保存（model構造またはproto構造を受け取る）
+func (r *cardRepository) SaveCardEffect(cardID string, cardEffect *entity.CardEffect) error {
+	if cardEffect == nil || len(cardEffect.Definitions) == 0 {
 		// CardEffectが存在しない場合は既存のものを削除
 		if err := r.db.Where("card_id = ?", cardID).Delete(&model.CardEffectModel{}).Error; err != nil {
 			return fmt.Errorf("failed to delete existing card effect: %w", err)
 		}
 		return nil
+	}
+
+	// entity.CardEffectをmodel.CardEffectModelに変換
+	cardEffectModel, err := CardEffectFromEntityToModel(cardEffect)
+	if err != nil {
+		return fmt.Errorf("failed to convert card effect to model: %w", err)
 	}
 
 	// 既存のCardEffectを削除
@@ -1237,7 +1250,7 @@ func (r *cardRepository) loadConditionModel(id uint) (*model.ConditionModel, err
 }
 
 // GetCardEffectAsProto CardEffectをProto形式で取得
-func (r *cardRepository) GetCardEffectAsProto(cardID string) (interface{}, error) {
+func (r *cardRepository) GetCardEffect(cardID string) (*entity.CardEffect, error) {
 	cardEffectModel, err := r.LoadCardEffectModel(cardID)
 	if err != nil {
 		return nil, err
@@ -1246,11 +1259,25 @@ func (r *cardRepository) GetCardEffectAsProto(cardID string) (interface{}, error
 		return nil, nil
 	}
 
-	// Model→Proto変換
-	cardEffectProto, err := CardEffectModelToProto(cardEffectModel)
+	// Model→Entity変換
+	cardEffect, err := CardEffectFromModelToEntity(cardEffectModel)
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert card effect to proto: %w", err)
+		return nil, fmt.Errorf("failed to convert card effect to entity: %w", err)
 	}
 
-	return cardEffectProto, nil
+	return cardEffect, nil
+}
+
+// GenerateEffectDescription CardEffectから効果テキストを生成
+func (r *cardRepository) GenerateEffectDescription(cardID string) (string, error) {
+	cardEffectModel, err := r.LoadCardEffectModel(cardID)
+	if err != nil {
+		return "", err
+	}
+	if cardEffectModel == nil {
+		return "", nil
+	}
+
+	description := GenerateEffectDescription(cardEffectModel)
+	return description, nil
 }

@@ -12,6 +12,13 @@ func ExecuteModifyMaxHP(effect *entity.AtomicEffect, sourcePlayer *entity.Player
 		if !ok {
 			continue
 		}
+
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "最大HP変更無効", unit.Name+" は効果盾により最大HP変更を受けない")
+			continue
+		}
+
 		unit.Defense += effect.Value
 		if unit.Defense < 0 {
 			unit.Defense = 0

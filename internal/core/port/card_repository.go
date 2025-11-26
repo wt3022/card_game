@@ -12,7 +12,7 @@ type CardRepository interface {
 	FindByType(cardType entity.CardType) ([]*entity.Card, error)
 	Update(card *entity.Card) error
 	Delete(id string) error
-	SaveCardEffect(cardID string, cardEffectModel interface{}) error
-	// GetCardEffectAsProto CardEffectをProto形式で取得（adapterレイヤー用）
-	GetCardEffectAsProto(cardID string) (interface{}, error)
+	SaveCardEffect(cardID string, cardEffect *entity.CardEffect) error
+	GetCardEffect(cardID string) (*entity.CardEffect, error)
+	GenerateEffectDescription(cardID string) (string, error)
 }

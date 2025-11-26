@@ -18,6 +18,12 @@ func ExecuteSilenceUnit(effect *entity.AtomicEffect, sourcePlayer *entity.Player
 			continue
 		}
 
+		// 効果盾チェック：効果を受けない
+		if unit.HasTrait(entity.TraitEffectShield) {
+			game.AddLog(sourcePlayer.ID, "サイレンス無効", fmt.Sprintf("%s は効果盾によりサイレンスを受けない", unit.Name))
+			continue
+		}
+
 		// 効果無効化: ユニットの効果テキストをクリアし、特性を全て除去する
 		unit.Effect = ""
 		unit.Traits = []entity.Trait{}

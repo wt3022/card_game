@@ -49,17 +49,17 @@ func (h *LoggingHandler) Handle(event entity.Event) error {
 	// イベントタイプに応じてログを出力
 	switch e := event.(type) {
 	case *entity.DamageEvent:
-		h.logger.Info("Damage: %s -> %s (%d)", e.SourceID, e.TargetID, e.Amount)
+		h.logger.Info("ダメージ: %s -> %s (%d)", e.SourceID, e.TargetID, e.Amount)
 	case *entity.HealEvent:
-		h.logger.Info("Heal: %s -> %s (%d)", e.SourceID, e.TargetID, e.Amount)
+		h.logger.Info("回復: %s -> %s (%d)", e.SourceID, e.TargetID, e.Amount)
 	case *entity.DrawEvent:
-		h.logger.Info("Draw: %s drew %d cards", e.PlayerID, e.CardCount)
+		h.logger.Info("ドロー: %s が %d 枚ドロー", e.PlayerID, e.CardCount)
 	case *entity.UnitSummonedEvent:
-		h.logger.Info("Summon: %s summoned %s", e.PlayerID, e.InstanceID)
+		h.logger.Info("召喚: %s が %s を召喚", e.PlayerID, e.InstanceID)
 	case *entity.DestroyEvent:
-		h.logger.Info("Destroy: %s destroyed (reason: %s)", e.UnitID, e.Reason)
+		h.logger.Info("破壊: %s が破壊された (理由: %s)", e.UnitID, e.Reason)
 	default:
-		h.logger.Info("Event: %s", event.Type())
+		h.logger.Info("イベント: %s", event.Type())
 	}
 
 	return nil

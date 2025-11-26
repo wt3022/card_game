@@ -71,7 +71,7 @@ func (p *Processor) getConditionValue(condType entity.ConditionType, sourcePlaye
 		return 0
 
 	case entity.ConditionCardPlayed:
-		// このターンプレイしたカード数（変数から取得）
+		// このターン使用したカード数（変数から取得）
 		if count, ok := ctx.Variables["cards_played_this_turn"]; ok {
 			return count
 		}

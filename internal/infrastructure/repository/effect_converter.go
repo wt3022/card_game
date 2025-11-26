@@ -14,8 +14,19 @@ import (
 // クリーンアーキテクチャの依存関係を守るため、infrastructureレイヤーに配置
 // ========================================
 
-// CardEffectFromProtoToModel ProtoのCardEffectをModelに変換
-func CardEffectFromProtoToModel(pb *cardgamev1.CardEffect) (*model.CardEffectModel, error) {
+// CardEffectFromProtoToModel ProtoのCardEffectをModelに変換（interface{}版）
+func CardEffectFromProtoToModel(pbInterface interface{}) (*model.CardEffectModel, error) {
+	// 型アサーション
+	pb, ok := pbInterface.(*cardgamev1.CardEffect)
+	if !ok {
+		return nil, fmt.Errorf("invalid type: expected *cardgamev1.CardEffect")
+	}
+
+	return cardEffectFromProtoToModelInternal(pb)
+}
+
+// cardEffectFromProtoToModelInternal 内部実装
+func cardEffectFromProtoToModelInternal(pb *cardgamev1.CardEffect) (*model.CardEffectModel, error) {
 	if pb == nil {
 		return nil, nil
 	}
@@ -424,7 +435,8 @@ func TargetTypeFromProtoToString(pbType cardgamev1.TargetType) string {
 	}
 }
 
-// TraitFromProto Trait変換
+// TraitFromProto Trait変換（repository層専用、string形式に変換）
+// Note: adapter/converter層にも同名の関数があるが、こちらはstring形式に変換する点が異なる
 func TraitFromProto(pbTrait cardgamev1.Trait) string {
 	switch pbTrait {
 	case cardgamev1.Trait_TRAIT_RUSH:

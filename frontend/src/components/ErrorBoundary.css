@@ -1,0 +1,69 @@
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.error-content {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.error-content h2 {
+  color: #e53e3e;
+  margin: 0 0 20px;
+  font-size: 28px;
+}
+
+.error-message {
+  color: #4a5568;
+  margin: 0 0 30px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primary-button,
+.secondary-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primary-button {
+  background: #4a90e2;
+  color: white;
+}
+
+.primary-button:hover {
+  background: #357abd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+}
+
+.secondary-button {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.secondary-button:hover {
+  background: #cbd5e0;
+  transform: translateY(-2px);
+}

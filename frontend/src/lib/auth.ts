@@ -5,6 +5,11 @@ import { authClient } from './api-client'
 const TOKEN_KEY = 'auth_token'
 const USER_KEY = 'user_info'
 
+// セキュリティ定数
+const MAX_USERNAME_LENGTH = 50
+const MIN_PASSWORD_LENGTH = 8
+const MAX_PASSWORD_LENGTH = 128
+
 /**
  * ユーザー情報の型定義
  */
@@ -12,6 +17,16 @@ export interface UserInfo {
   userId: string
   username: string
   role: string
+}
+
+/**
+ * 認証エラーの型定義
+ */
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'AuthError'
+  }
 }
 
 /**
@@ -57,27 +72,91 @@ export const setUserInfo = (userInfo: UserInfo): void => {
 }
 
 /**
+ * 入力バリデーション
+ */
+const validateLoginInput = (username: string, password: string): void => {
+  if (!username || username.trim().length === 0) {
+    throw new AuthError('ユーザー名を入力してください')
+  }
+  if (username.length > MAX_USERNAME_LENGTH) {
+    throw new AuthError(
+      `ユーザー名は${MAX_USERNAME_LENGTH}文字以内で入力してください`,
+    )
+  }
+  if (!password || password.length === 0) {
+    throw new AuthError('パスワードを入力してください')
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw new AuthError(
+      `パスワードは${MIN_PASSWORD_LENGTH}文字以上である必要があります`,
+    )
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    throw new AuthError(
+      `パスワードは${MAX_PASSWORD_LENGTH}文字以内で入力してください`,
+    )
+  }
+}
+
+/**
+ * レスポンスのバリデーション
+ */
+const validateLoginResponse = (response: {
+  accessToken: string
+  userId: string
+  username: string
+  role: string
+}): void => {
+  if (!response.accessToken || response.accessToken.trim().length === 0) {
+    throw new AuthError('無効な認証トークンを受信しました')
+  }
+  if (!response.userId || response.userId.trim().length === 0) {
+    throw new AuthError('無効なユーザーIDを受信しました')
+  }
+  if (!response.username || response.username.trim().length === 0) {
+    throw new AuthError('無効なユーザー名を受信しました')
+  }
+}
+
+/**
  * ログイン処理
  */
 export const login = async (
   username: string,
   password: string,
 ): Promise<UserInfo> => {
-  const response = await authClient.login({
-    username,
-    password,
-  })
+  try {
+    // 入力バリデーション
+    validateLoginInput(username, password)
 
-  // トークンとユーザー情報を保存
-  setToken(response.accessToken)
-  const userInfo: UserInfo = {
-    userId: response.userId,
-    username: response.username,
-    role: response.role,
+    const response = await authClient.login({
+      username: username.trim(),
+      password,
+    })
+
+    // レスポンスのバリデーション
+    validateLoginResponse(response)
+
+    // トークンとユーザー情報を保存
+    setToken(response.accessToken)
+    const userInfo: UserInfo = {
+      userId: response.userId,
+      username: response.username,
+      role: response.role,
+    }
+    setUserInfo(userInfo)
+
+    return userInfo
+  } catch (error) {
+    // エラーハンドリング
+    if (error instanceof AuthError) {
+      throw error
+    }
+    if (error instanceof Error) {
+      throw new AuthError(`ログインに失敗しました: ${error.message}`)
+    }
+    throw new AuthError('予期しないエラーが発生しました')
   }
-  setUserInfo(userInfo)
-
-  return userInfo
 }
 
 /**

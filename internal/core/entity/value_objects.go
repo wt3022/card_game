@@ -12,7 +12,7 @@ type GameID string
 func NewGameID(id string) (GameID, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {
-		return "", fmt.Errorf("game ID cannot be empty")
+		return "", fmt.Errorf("ゲームIDは空にできません")
 	}
 	return GameID(id), nil
 }
@@ -34,7 +34,7 @@ type PlayerID string
 func NewPlayerID(id string) (PlayerID, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {
-		return "", fmt.Errorf("player ID cannot be empty")
+		return "", fmt.Errorf("プレイヤーIDは空にできません")
 	}
 	return PlayerID(id), nil
 }
@@ -56,7 +56,7 @@ type CardID string
 func NewCardID(id string) (CardID, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {
-		return "", fmt.Errorf("card ID cannot be empty")
+		return "", fmt.Errorf("カードIDは空にできません")
 	}
 	return CardID(id), nil
 }
@@ -78,7 +78,7 @@ type UnitInstanceID string
 func NewUnitInstanceID(id string) (UnitInstanceID, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {
-		return "", fmt.Errorf("unit instance ID cannot be empty")
+		return "", fmt.Errorf("ユニットインスタンスIDは空にできません")
 	}
 	return UnitInstanceID(id), nil
 }

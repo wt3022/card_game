@@ -9,6 +9,7 @@ import {
   getOpponent,
   isMyUnit,
 } from '../utils/gameHelpers'
+import ConnectionStatus from './ConnectionStatus'
 import PlayerInfo from './PlayerInfo'
 import UnitCard from './UnitCard'
 import './GameBoard.css'
@@ -21,6 +22,13 @@ export default function GameBoard({
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null)
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null)
 
+  console.log(
+    'GameBoardがレンダリングされました - gameId:',
+    initialGameState.gameId,
+    'currentPlayerId:',
+    currentPlayerId,
+  )
+
   // ゲーム状態の購読と管理
   const { gameState: liveGameState } = useGameState(
     initialGameState.gameId,
@@ -31,8 +39,15 @@ export default function GameBoard({
   const gameState = liveGameState || initialGameState
 
   // ゲームアクション
-  const { playCard, executeAttack, endTurn, message, clearMessage } =
-    useGameActions(gameState.gameId, currentPlayerId, onGameStateUpdate)
+  const {
+    playCard,
+    executeAttack,
+    endTurn,
+    message,
+    error,
+    isLoading,
+    clearMessage,
+  } = useGameActions(gameState.gameId, currentPlayerId, onGameStateUpdate)
 
   // 状態の取得
   const isCurrentPlayerTurn = checkIsCurrentPlayerTurn(
@@ -56,6 +71,19 @@ export default function GameBoard({
       onGameStateUpdate(liveGameState)
     }
   }, [liveGameState, onGameStateUpdate])
+
+  // キーボードショートカット（Escapeで選択解除）
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedCardId(null)
+        setSelectedUnitId(null)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   /**
    * カードプレイのハンドラー
@@ -129,7 +157,20 @@ export default function GameBoard({
 
   return (
     <div className="game-board">
-      {message && <div className="message-banner">{message}</div>}
+      {message && (
+        <div className={`message-banner ${error ? 'error' : 'success'}`}>
+          {message}
+        </div>
+      )}
+      {selectedCardId && isCurrentPlayerTurn && (
+        <div className="action-guide">
+          💡 対象を選択するか、「使用」ボタンをクリックしてください
+        </div>
+      )}
+      {selectedUnitId && isCurrentPlayerTurn && (
+        <div className="action-guide attack">⚔️ 攻撃対象を選択してください</div>
+      )}
+      <ConnectionStatus opponent={opponent} />
 
       {/* 相手の情報 */}
       <div className="opponent-area">
@@ -171,8 +212,9 @@ export default function GameBoard({
             type="button"
             className="end-turn-button"
             onClick={handleEndTurn}
+            disabled={isLoading}
           >
-            ターン終了
+            {isLoading ? '処理中...' : 'ターン終了'}
           </button>
         )}
       </div>

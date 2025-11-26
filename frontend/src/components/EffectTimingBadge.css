@@ -1,0 +1,123 @@
+.effect-timing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
+.effect-timing-badge.immediate {
+  background: rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.6);
+  color: #ffd700;
+}
+
+.effect-timing-badge.on-summon {
+  background: rgba(135, 206, 250, 0.2);
+  border-color: rgba(135, 206, 250, 0.6);
+  color: #87cefa;
+}
+
+.effect-timing-badge.on-destroy {
+  background: rgba(255, 69, 0, 0.2);
+  border-color: rgba(255, 69, 0, 0.6);
+  color: #ff4500;
+}
+
+.effect-timing-badge.on-attack {
+  background: rgba(220, 20, 60, 0.2);
+  border-color: rgba(220, 20, 60, 0.6);
+  color: #dc143c;
+}
+
+.effect-timing-badge.on-damaged {
+  background: rgba(255, 140, 0, 0.2);
+  border-color: rgba(255, 140, 0, 0.6);
+  color: #ff8c00;
+}
+
+.effect-timing-badge.turn-start {
+  background: rgba(100, 149, 237, 0.2);
+  border-color: rgba(100, 149, 237, 0.6);
+  color: #6495ed;
+}
+
+.effect-timing-badge.turn-end {
+  background: rgba(75, 0, 130, 0.2);
+  border-color: rgba(75, 0, 130, 0.6);
+  color: #9370db;
+}
+
+.effect-timing-badge .icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.effect-timing-badge .label {
+  line-height: 1;
+}
+
+.effect-timing-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.effect-timing-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.effect-timing-tooltip:hover .tooltip-content {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tooltip-content {
+  position: fixed;
+  bottom: auto;
+  left: auto;
+  transform: translate(-50%, calc(-100% - 4px));
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  color: white;
+  display: none;
+  max-width: 250px;
+  text-align: center;
+}
+
+.effect-timing-tooltip:hover .tooltip-content {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block;
+}
+
+/* ツールチップの三角形（オプション） */
+.tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}

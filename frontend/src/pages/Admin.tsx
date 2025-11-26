@@ -72,7 +72,7 @@ export default function Admin() {
   }
 
   const getSortedAndFilteredCards = () => {
-    let filtered = cards.filter(card => {
+    const filtered = cards.filter((card) => {
       if (!filterText) return true
       const searchText = filterText.toLowerCase()
       return (
@@ -83,12 +83,16 @@ export default function Admin() {
     })
 
     return filtered.sort((a, b) => {
-      let aValue: any = a[sortColumn as keyof Card]
-      let bValue: any = b[sortColumn as keyof Card]
+      let aValue: unknown = a[sortColumn as keyof Card]
+      let bValue: unknown = b[sortColumn as keyof Card]
 
-      if (sortColumn === 'cost' || sortColumn === 'attack' || sortColumn === 'defense') {
-        aValue = aValue ?? -1
-        bValue = bValue ?? -1
+      if (
+        sortColumn === 'cost' ||
+        sortColumn === 'attack' ||
+        sortColumn === 'defense'
+      ) {
+        aValue = (aValue as number | undefined) ?? -1
+        bValue = (bValue as number | undefined) ?? -1
       }
 
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
@@ -98,7 +102,7 @@ export default function Admin() {
   }
 
   const getSortedAndFilteredDecks = () => {
-    let filtered = decks.filter(deck => {
+    const filtered = decks.filter((deck) => {
       if (!filterText) return true
       const searchText = filterText.toLowerCase()
       return (
@@ -108,8 +112,8 @@ export default function Admin() {
     })
 
     return filtered.sort((a, b) => {
-      let aValue: any = a[sortColumn as keyof Deck]
-      let bValue: any = b[sortColumn as keyof Deck]
+      const aValue: unknown = a[sortColumn as keyof Deck]
+      const bValue: unknown = b[sortColumn as keyof Deck]
 
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
@@ -129,7 +133,7 @@ export default function Admin() {
     setCurrentView('card-edit')
   }
 
-  const handleCardSave = async (savedCardId: string) => {
+  const handleCardSave = async (_savedCardId: string) => {
     await loadCards()
     setIsNewCardMode(false)
     setCurrentView('card-list')
@@ -163,7 +167,7 @@ export default function Admin() {
     setCurrentView('deck-edit')
   }
 
-  const handleDeckSave = async (savedDeckId?: string) => {
+  const handleDeckSave = async (_savedDeckId?: string) => {
     await loadDecks()
     setIsNewDeckMode(false)
     setCurrentView('deck-list')
@@ -261,23 +265,53 @@ export default function Admin() {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th onClick={() => handleSort('id')} className="sortable">
-                          ID {sortColumn === 'id' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('id')}
+                          className="sortable"
+                        >
+                          ID{' '}
+                          {sortColumn === 'id' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('name')} className="sortable">
-                          名前 {sortColumn === 'name' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('name')}
+                          className="sortable"
+                        >
+                          名前{' '}
+                          {sortColumn === 'name' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('type')} className="sortable">
-                          タイプ {sortColumn === 'type' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('type')}
+                          className="sortable"
+                        >
+                          タイプ{' '}
+                          {sortColumn === 'type' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('cost')} className="sortable">
-                          コスト {sortColumn === 'cost' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('cost')}
+                          className="sortable"
+                        >
+                          コスト{' '}
+                          {sortColumn === 'cost' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('attack')} className="sortable">
-                          攻撃力 {sortColumn === 'attack' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('attack')}
+                          className="sortable"
+                        >
+                          攻撃力{' '}
+                          {sortColumn === 'attack' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('defense')} className="sortable">
-                          体力 {sortColumn === 'defense' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('defense')}
+                          className="sortable"
+                        >
+                          体力{' '}
+                          {sortColumn === 'defense' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
                         <th>効果</th>
                         <th>操作</th>
@@ -285,7 +319,11 @@ export default function Admin() {
                     </thead>
                     <tbody>
                       {getSortedAndFilteredCards().map((card) => (
-                        <tr key={card.id} onClick={() => handleCardSelect(card)} className="clickable">
+                        <tr
+                          key={card.id}
+                          onClick={() => handleCardSelect(card)}
+                          className="clickable"
+                        >
                           <td>{card.id}</td>
                           <td>{card.name}</td>
                           <td>{card.type}</td>
@@ -364,11 +402,21 @@ export default function Admin() {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th onClick={() => handleSort('id')} className="sortable">
-                          ID {sortColumn === 'id' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('id')}
+                          className="sortable"
+                        >
+                          ID{' '}
+                          {sortColumn === 'id' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
-                        <th onClick={() => handleSort('name')} className="sortable">
-                          名前 {sortColumn === 'name' && (sortDirection === 'asc' ? '▲' : '▼')}
+                        <th
+                          onClick={() => handleSort('name')}
+                          className="sortable"
+                        >
+                          名前{' '}
+                          {sortColumn === 'name' &&
+                            (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
                         <th>カード枚数</th>
                         <th>操作</th>
@@ -376,7 +424,11 @@ export default function Admin() {
                     </thead>
                     <tbody>
                       {getSortedAndFilteredDecks().map((deck) => (
-                        <tr key={deck.id} onClick={() => handleDeckSelect(deck)} className="clickable">
+                        <tr
+                          key={deck.id}
+                          onClick={() => handleDeckSelect(deck)}
+                          className="clickable"
+                        >
                           <td>{deck.id}</td>
                           <td>{deck.name}</td>
                           <td>{deck.cardIds?.length ?? 0}枚</td>

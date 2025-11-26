@@ -11,6 +11,7 @@ export const useGameActions = (
   onGameStateUpdate: (state: GameState) => void,
 ) => {
   const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   /**
@@ -107,10 +108,11 @@ export const useGameActions = (
   }, [gameId, currentPlayerId, onGameStateUpdate])
 
   /**
-   * メッセージを自動で消す
+   * メッセージとエラーをクリアする
    */
   const clearMessage = useCallback(() => {
     setMessage(null)
+    setError(null)
   }, [])
 
   return {
@@ -118,6 +120,7 @@ export const useGameActions = (
     executeAttack,
     endTurn,
     message,
+    error,
     isLoading,
     clearMessage,
   }
