@@ -3,16 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import type {
-  BinaryReadOptions,
-  FieldList,
-  JsonReadOptions,
-  JsonValue,
-  PartialMessage,
-  PlainMessage,
-} from '@bufbuild/protobuf'
-import { Message, proto3 } from '@bufbuild/protobuf'
-import { GameEvent, GameState } from './common_pb.js'
+import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
+import { Message, proto3 } from "@bufbuild/protobuf";
+import { GameEvent, GameState } from "./common_pb.js";
 
 /**
  * @generated from enum cardgame.v1.MatchmakingStatus
@@ -45,12 +38,12 @@ export enum MatchmakingStatus {
   GAME_STARTED = 3,
 }
 // Retrieve enum metadata with: proto3.getEnumType(MatchmakingStatus)
-proto3.util.setEnumType(MatchmakingStatus, 'cardgame.v1.MatchmakingStatus', [
-  { no: 0, name: 'MATCHMAKING_STATUS_UNSPECIFIED' },
-  { no: 1, name: 'MATCHMAKING_STATUS_WAITING' },
-  { no: 2, name: 'MATCHMAKING_STATUS_MATCHED' },
-  { no: 3, name: 'MATCHMAKING_STATUS_GAME_STARTED' },
-])
+proto3.util.setEnumType(MatchmakingStatus, "cardgame.v1.MatchmakingStatus", [
+  { no: 0, name: "MATCHMAKING_STATUS_UNSPECIFIED" },
+  { no: 1, name: "MATCHMAKING_STATUS_WAITING" },
+  { no: 2, name: "MATCHMAKING_STATUS_MATCHED" },
+  { no: 3, name: "MATCHMAKING_STATUS_GAME_STARTED" },
+]);
 
 /**
  * @generated from message cardgame.v1.CreateGameRequest
@@ -59,73 +52,51 @@ export class CreateGameRequest extends Message<CreateGameRequest> {
   /**
    * @generated from field: string player1_id = 1;
    */
-  player1Id = ''
+  player1Id = "";
 
   /**
    * @generated from field: string player1_name = 2;
    */
-  player1Name = ''
+  player1Name = "";
 
   /**
    * @generated from field: string player2_id = 3;
    */
-  player2Id = ''
+  player2Id = "";
 
   /**
    * @generated from field: string player2_name = 4;
    */
-  player2Name = ''
+  player2Name = "";
 
   constructor(data?: PartialMessage<CreateGameRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.CreateGameRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.CreateGameRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'player1_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 2,
-      name: 'player1_name',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-    { no: 3, name: 'player2_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 4,
-      name: 'player2_name',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-  ])
+    { no: 1, name: "player1_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player1_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "player2_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "player2_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): CreateGameRequest {
-    return new CreateGameRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateGameRequest {
+    return new CreateGameRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): CreateGameRequest {
-    return new CreateGameRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateGameRequest {
+    return new CreateGameRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): CreateGameRequest {
-    return new CreateGameRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateGameRequest {
+    return new CreateGameRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: CreateGameRequest | PlainMessage<CreateGameRequest> | undefined,
-    b: CreateGameRequest | PlainMessage<CreateGameRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(CreateGameRequest, a, b)
+  static equals(a: CreateGameRequest | PlainMessage<CreateGameRequest> | undefined, b: CreateGameRequest | PlainMessage<CreateGameRequest> | undefined): boolean {
+    return proto3.util.equals(CreateGameRequest, a, b);
   }
 }
 
@@ -136,51 +107,39 @@ export class CreateGameResponse extends Message<CreateGameResponse> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 2;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<CreateGameResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.CreateGameResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.CreateGameResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): CreateGameResponse {
-    return new CreateGameResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateGameResponse {
+    return new CreateGameResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): CreateGameResponse {
-    return new CreateGameResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateGameResponse {
+    return new CreateGameResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): CreateGameResponse {
-    return new CreateGameResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateGameResponse {
+    return new CreateGameResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: CreateGameResponse | PlainMessage<CreateGameResponse> | undefined,
-    b: CreateGameResponse | PlainMessage<CreateGameResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(CreateGameResponse, a, b)
+  static equals(a: CreateGameResponse | PlainMessage<CreateGameResponse> | undefined, b: CreateGameResponse | PlainMessage<CreateGameResponse> | undefined): boolean {
+    return proto3.util.equals(CreateGameResponse, a, b);
   }
 }
 
@@ -191,51 +150,39 @@ export class GetGameStateRequest extends Message<GetGameStateRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   constructor(data?: PartialMessage<GetGameStateRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GetGameStateRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GetGameStateRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GetGameStateRequest {
-    return new GetGameStateRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetGameStateRequest {
+    return new GetGameStateRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GetGameStateRequest {
-    return new GetGameStateRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetGameStateRequest {
+    return new GetGameStateRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GetGameStateRequest {
-    return new GetGameStateRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetGameStateRequest {
+    return new GetGameStateRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GetGameStateRequest | PlainMessage<GetGameStateRequest> | undefined,
-    b: GetGameStateRequest | PlainMessage<GetGameStateRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(GetGameStateRequest, a, b)
+  static equals(a: GetGameStateRequest | PlainMessage<GetGameStateRequest> | undefined, b: GetGameStateRequest | PlainMessage<GetGameStateRequest> | undefined): boolean {
+    return proto3.util.equals(GetGameStateRequest, a, b);
   }
 }
 
@@ -246,45 +193,33 @@ export class GetGameStateResponse extends Message<GetGameStateResponse> {
   /**
    * @generated from field: cardgame.v1.GameState game_state = 1;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<GetGameStateResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GetGameStateResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GetGameStateResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GetGameStateResponse {
-    return new GetGameStateResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetGameStateResponse {
+    return new GetGameStateResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GetGameStateResponse {
-    return new GetGameStateResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetGameStateResponse {
+    return new GetGameStateResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GetGameStateResponse {
-    return new GetGameStateResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetGameStateResponse {
+    return new GetGameStateResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GetGameStateResponse | PlainMessage<GetGameStateResponse> | undefined,
-    b: GetGameStateResponse | PlainMessage<GetGameStateResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(GetGameStateResponse, a, b)
+  static equals(a: GetGameStateResponse | PlainMessage<GetGameStateResponse> | undefined, b: GetGameStateResponse | PlainMessage<GetGameStateResponse> | undefined): boolean {
+    return proto3.util.equals(GetGameStateResponse, a, b);
   }
 }
 
@@ -295,71 +230,47 @@ export class PerformMulliganRequest extends Message<PerformMulliganRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   /**
    * 戻すカードのIDリスト
    *
    * @generated from field: repeated string card_ids = 3;
    */
-  cardIds: string[] = []
+  cardIds: string[] = [];
 
   constructor(data?: PartialMessage<PerformMulliganRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.PerformMulliganRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PerformMulliganRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 3,
-      name: 'card_ids',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-      repeated: true,
-    },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "card_ids", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): PerformMulliganRequest {
-    return new PerformMulliganRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): PerformMulliganRequest {
-    return new PerformMulliganRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): PerformMulliganRequest {
-    return new PerformMulliganRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PerformMulliganRequest {
+    return new PerformMulliganRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a:
-      | PerformMulliganRequest
-      | PlainMessage<PerformMulliganRequest>
-      | undefined,
-    b:
-      | PerformMulliganRequest
-      | PlainMessage<PerformMulliganRequest>
-      | undefined,
-  ): boolean {
-    return proto3.util.equals(PerformMulliganRequest, a, b)
+  static equals(a: PerformMulliganRequest | PlainMessage<PerformMulliganRequest> | undefined, b: PerformMulliganRequest | PlainMessage<PerformMulliganRequest> | undefined): boolean {
+    return proto3.util.equals(PerformMulliganRequest, a, b);
   }
 }
 
@@ -370,63 +281,45 @@ export class PerformMulliganResponse extends Message<PerformMulliganResponse> {
   /**
    * @generated from field: bool success = 1;
    */
-  success = false
+  success = false;
 
   /**
    * @generated from field: string message = 2;
    */
-  message = ''
+  message = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 3;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<PerformMulliganResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.PerformMulliganResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PerformMulliganResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): PerformMulliganResponse {
-    return new PerformMulliganResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): PerformMulliganResponse {
-    return new PerformMulliganResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): PerformMulliganResponse {
-    return new PerformMulliganResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PerformMulliganResponse {
+    return new PerformMulliganResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a:
-      | PerformMulliganResponse
-      | PlainMessage<PerformMulliganResponse>
-      | undefined,
-    b:
-      | PerformMulliganResponse
-      | PlainMessage<PerformMulliganResponse>
-      | undefined,
-  ): boolean {
-    return proto3.util.equals(PerformMulliganResponse, a, b)
+  static equals(a: PerformMulliganResponse | PlainMessage<PerformMulliganResponse> | undefined, b: PerformMulliganResponse | PlainMessage<PerformMulliganResponse> | undefined): boolean {
+    return proto3.util.equals(PerformMulliganResponse, a, b);
   }
 }
 
@@ -437,69 +330,51 @@ export class PlayCardRequest extends Message<PlayCardRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   /**
    * @generated from field: string card_id = 3;
    */
-  cardId = ''
+  cardId = "";
 
   /**
    * @generated from field: optional string target_id = 4;
    */
-  targetId?: string
+  targetId?: string;
 
   constructor(data?: PartialMessage<PlayCardRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.PlayCardRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PlayCardRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'card_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 4,
-      name: 'target_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-      opt: true,
-    },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "card_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "target_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): PlayCardRequest {
-    return new PlayCardRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PlayCardRequest {
+    return new PlayCardRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): PlayCardRequest {
-    return new PlayCardRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PlayCardRequest {
+    return new PlayCardRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): PlayCardRequest {
-    return new PlayCardRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PlayCardRequest {
+    return new PlayCardRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: PlayCardRequest | PlainMessage<PlayCardRequest> | undefined,
-    b: PlayCardRequest | PlainMessage<PlayCardRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(PlayCardRequest, a, b)
+  static equals(a: PlayCardRequest | PlainMessage<PlayCardRequest> | undefined, b: PlayCardRequest | PlainMessage<PlayCardRequest> | undefined): boolean {
+    return proto3.util.equals(PlayCardRequest, a, b);
   }
 }
 
@@ -510,57 +385,45 @@ export class PlayCardResponse extends Message<PlayCardResponse> {
   /**
    * @generated from field: bool success = 1;
    */
-  success = false
+  success = false;
 
   /**
    * @generated from field: string message = 2;
    */
-  message = ''
+  message = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 3;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<PlayCardResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.PlayCardResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.PlayCardResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): PlayCardResponse {
-    return new PlayCardResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PlayCardResponse {
+    return new PlayCardResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): PlayCardResponse {
-    return new PlayCardResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PlayCardResponse {
+    return new PlayCardResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): PlayCardResponse {
-    return new PlayCardResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PlayCardResponse {
+    return new PlayCardResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: PlayCardResponse | PlainMessage<PlayCardResponse> | undefined,
-    b: PlayCardResponse | PlainMessage<PlayCardResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(PlayCardResponse, a, b)
+  static equals(a: PlayCardResponse | PlainMessage<PlayCardResponse> | undefined, b: PlayCardResponse | PlainMessage<PlayCardResponse> | undefined): boolean {
+    return proto3.util.equals(PlayCardResponse, a, b);
   }
 }
 
@@ -571,74 +434,51 @@ export class ExecuteAttackRequest extends Message<ExecuteAttackRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   /**
    * @generated from field: string attacker_id = 3;
    */
-  attackerId = ''
+  attackerId = "";
 
   /**
    * @generated from field: optional string target_id = 4;
    */
-  targetId?: string
+  targetId?: string;
 
   constructor(data?: PartialMessage<ExecuteAttackRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.ExecuteAttackRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.ExecuteAttackRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 3,
-      name: 'attacker_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-    {
-      no: 4,
-      name: 'target_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-      opt: true,
-    },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "attacker_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "target_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): ExecuteAttackRequest {
-    return new ExecuteAttackRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecuteAttackRequest {
+    return new ExecuteAttackRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): ExecuteAttackRequest {
-    return new ExecuteAttackRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecuteAttackRequest {
+    return new ExecuteAttackRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): ExecuteAttackRequest {
-    return new ExecuteAttackRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecuteAttackRequest {
+    return new ExecuteAttackRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: ExecuteAttackRequest | PlainMessage<ExecuteAttackRequest> | undefined,
-    b: ExecuteAttackRequest | PlainMessage<ExecuteAttackRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(ExecuteAttackRequest, a, b)
+  static equals(a: ExecuteAttackRequest | PlainMessage<ExecuteAttackRequest> | undefined, b: ExecuteAttackRequest | PlainMessage<ExecuteAttackRequest> | undefined): boolean {
+    return proto3.util.equals(ExecuteAttackRequest, a, b);
   }
 }
 
@@ -649,63 +489,51 @@ export class ExecuteAttackResponse extends Message<ExecuteAttackResponse> {
   /**
    * @generated from field: bool success = 1;
    */
-  success = false
+  success = false;
 
   /**
    * @generated from field: string message = 2;
    */
-  message = ''
+  message = "";
 
   /**
    * @generated from field: cardgame.v1.AttackResult result = 3;
    */
-  result?: AttackResult
+  result?: AttackResult;
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 4;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<ExecuteAttackResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.ExecuteAttackResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.ExecuteAttackResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'result', kind: 'message', T: AttackResult },
-    { no: 4, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "result", kind: "message", T: AttackResult },
+    { no: 4, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): ExecuteAttackResponse {
-    return new ExecuteAttackResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecuteAttackResponse {
+    return new ExecuteAttackResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): ExecuteAttackResponse {
-    return new ExecuteAttackResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecuteAttackResponse {
+    return new ExecuteAttackResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): ExecuteAttackResponse {
-    return new ExecuteAttackResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecuteAttackResponse {
+    return new ExecuteAttackResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: ExecuteAttackResponse | PlainMessage<ExecuteAttackResponse> | undefined,
-    b: ExecuteAttackResponse | PlainMessage<ExecuteAttackResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(ExecuteAttackResponse, a, b)
+  static equals(a: ExecuteAttackResponse | PlainMessage<ExecuteAttackResponse> | undefined, b: ExecuteAttackResponse | PlainMessage<ExecuteAttackResponse> | undefined): boolean {
+    return proto3.util.equals(ExecuteAttackResponse, a, b);
   }
 }
 
@@ -716,78 +544,51 @@ export class AttackResult extends Message<AttackResult> {
   /**
    * @generated from field: bool attacker_destroyed = 1;
    */
-  attackerDestroyed = false
+  attackerDestroyed = false;
 
   /**
    * @generated from field: bool defender_destroyed = 2;
    */
-  defenderDestroyed = false
+  defenderDestroyed = false;
 
   /**
    * @generated from field: int32 damage = 3;
    */
-  damage = 0
+  damage = 0;
 
   /**
    * @generated from field: int32 direct_damage = 4;
    */
-  directDamage = 0
+  directDamage = 0;
 
   constructor(data?: PartialMessage<AttackResult>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.AttackResult'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.AttackResult";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    {
-      no: 1,
-      name: 'attacker_destroyed',
-      kind: 'scalar',
-      T: 8 /* ScalarType.BOOL */,
-    },
-    {
-      no: 2,
-      name: 'defender_destroyed',
-      kind: 'scalar',
-      T: 8 /* ScalarType.BOOL */,
-    },
-    { no: 3, name: 'damage', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
-    {
-      no: 4,
-      name: 'direct_damage',
-      kind: 'scalar',
-      T: 5 /* ScalarType.INT32 */,
-    },
-  ])
+    { no: 1, name: "attacker_destroyed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "defender_destroyed", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "damage", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: "direct_damage", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): AttackResult {
-    return new AttackResult().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AttackResult {
+    return new AttackResult().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): AttackResult {
-    return new AttackResult().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): AttackResult {
+    return new AttackResult().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): AttackResult {
-    return new AttackResult().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): AttackResult {
+    return new AttackResult().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: AttackResult | PlainMessage<AttackResult> | undefined,
-    b: AttackResult | PlainMessage<AttackResult> | undefined,
-  ): boolean {
-    return proto3.util.equals(AttackResult, a, b)
+  static equals(a: AttackResult | PlainMessage<AttackResult> | undefined, b: AttackResult | PlainMessage<AttackResult> | undefined): boolean {
+    return proto3.util.equals(AttackResult, a, b);
   }
 }
 
@@ -798,51 +599,39 @@ export class StartTurnRequest extends Message<StartTurnRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   constructor(data?: PartialMessage<StartTurnRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.StartTurnRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.StartTurnRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): StartTurnRequest {
-    return new StartTurnRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): StartTurnRequest {
-    return new StartTurnRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): StartTurnRequest {
-    return new StartTurnRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartTurnRequest {
+    return new StartTurnRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined,
-    b: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(StartTurnRequest, a, b)
+  static equals(a: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined, b: StartTurnRequest | PlainMessage<StartTurnRequest> | undefined): boolean {
+    return proto3.util.equals(StartTurnRequest, a, b);
   }
 }
 
@@ -853,57 +642,45 @@ export class StartTurnResponse extends Message<StartTurnResponse> {
   /**
    * @generated from field: bool success = 1;
    */
-  success = false
+  success = false;
 
   /**
    * @generated from field: string message = 2;
    */
-  message = ''
+  message = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 3;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<StartTurnResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.StartTurnResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.StartTurnResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): StartTurnResponse {
-    return new StartTurnResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): StartTurnResponse {
-    return new StartTurnResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): StartTurnResponse {
-    return new StartTurnResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): StartTurnResponse {
+    return new StartTurnResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined,
-    b: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(StartTurnResponse, a, b)
+  static equals(a: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined, b: StartTurnResponse | PlainMessage<StartTurnResponse> | undefined): boolean {
+    return proto3.util.equals(StartTurnResponse, a, b);
   }
 }
 
@@ -914,51 +691,39 @@ export class EndTurnRequest extends Message<EndTurnRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   constructor(data?: PartialMessage<EndTurnRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.EndTurnRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.EndTurnRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): EndTurnRequest {
-    return new EndTurnRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EndTurnRequest {
+    return new EndTurnRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): EndTurnRequest {
-    return new EndTurnRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EndTurnRequest {
+    return new EndTurnRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): EndTurnRequest {
-    return new EndTurnRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EndTurnRequest {
+    return new EndTurnRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: EndTurnRequest | PlainMessage<EndTurnRequest> | undefined,
-    b: EndTurnRequest | PlainMessage<EndTurnRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(EndTurnRequest, a, b)
+  static equals(a: EndTurnRequest | PlainMessage<EndTurnRequest> | undefined, b: EndTurnRequest | PlainMessage<EndTurnRequest> | undefined): boolean {
+    return proto3.util.equals(EndTurnRequest, a, b);
   }
 }
 
@@ -969,57 +734,45 @@ export class EndTurnResponse extends Message<EndTurnResponse> {
   /**
    * @generated from field: bool success = 1;
    */
-  success = false
+  success = false;
 
   /**
    * @generated from field: string message = 2;
    */
-  message = ''
+  message = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 3;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<EndTurnResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.EndTurnResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.EndTurnResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
-    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "success", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): EndTurnResponse {
-    return new EndTurnResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): EndTurnResponse {
+    return new EndTurnResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): EndTurnResponse {
-    return new EndTurnResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): EndTurnResponse {
+    return new EndTurnResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): EndTurnResponse {
-    return new EndTurnResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): EndTurnResponse {
+    return new EndTurnResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: EndTurnResponse | PlainMessage<EndTurnResponse> | undefined,
-    b: EndTurnResponse | PlainMessage<EndTurnResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(EndTurnResponse, a, b)
+  static equals(a: EndTurnResponse | PlainMessage<EndTurnResponse> | undefined, b: EndTurnResponse | PlainMessage<EndTurnResponse> | undefined): boolean {
+    return proto3.util.equals(EndTurnResponse, a, b);
   }
 }
 
@@ -1030,51 +783,39 @@ export class GameEventRequest extends Message<GameEventRequest> {
   /**
    * @generated from field: string game_id = 1;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: string player_id = 2;
    */
-  playerId = ''
+  playerId = "";
 
   constructor(data?: PartialMessage<GameEventRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GameEventRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GameEventRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GameEventRequest {
-    return new GameEventRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GameEventRequest {
+    return new GameEventRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GameEventRequest {
-    return new GameEventRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GameEventRequest {
+    return new GameEventRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GameEventRequest {
-    return new GameEventRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GameEventRequest {
+    return new GameEventRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GameEventRequest | PlainMessage<GameEventRequest> | undefined,
-    b: GameEventRequest | PlainMessage<GameEventRequest> | undefined,
-  ): boolean {
-    return proto3.util.equals(GameEventRequest, a, b)
+  static equals(a: GameEventRequest | PlainMessage<GameEventRequest> | undefined, b: GameEventRequest | PlainMessage<GameEventRequest> | undefined): boolean {
+    return proto3.util.equals(GameEventRequest, a, b);
   }
 }
 
@@ -1085,51 +826,39 @@ export class GameEventResponse extends Message<GameEventResponse> {
   /**
    * @generated from field: cardgame.v1.GameEvent event = 1;
    */
-  event?: GameEvent
+  event?: GameEvent;
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 2;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   constructor(data?: PartialMessage<GameEventResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.GameEventResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.GameEventResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'event', kind: 'message', T: GameEvent },
-    { no: 2, name: 'game_state', kind: 'message', T: GameState },
-  ])
+    { no: 1, name: "event", kind: "message", T: GameEvent },
+    { no: 2, name: "game_state", kind: "message", T: GameState },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): GameEventResponse {
-    return new GameEventResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GameEventResponse {
+    return new GameEventResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): GameEventResponse {
-    return new GameEventResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GameEventResponse {
+    return new GameEventResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): GameEventResponse {
-    return new GameEventResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GameEventResponse {
+    return new GameEventResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: GameEventResponse | PlainMessage<GameEventResponse> | undefined,
-    b: GameEventResponse | PlainMessage<GameEventResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(GameEventResponse, a, b)
+  static equals(a: GameEventResponse | PlainMessage<GameEventResponse> | undefined, b: GameEventResponse | PlainMessage<GameEventResponse> | undefined): boolean {
+    return proto3.util.equals(GameEventResponse, a, b);
   }
 }
 
@@ -1142,76 +871,47 @@ export class JoinMatchmakingRequest extends Message<JoinMatchmakingRequest> {
   /**
    * @generated from field: string player_id = 1;
    */
-  playerId = ''
+  playerId = "";
 
   /**
    * @generated from field: string player_name = 2;
    */
-  playerName = ''
+  playerName = "";
 
   /**
    * 使用するデッキID（指定しない場合はfixtureデッキを使用）
    *
    * @generated from field: optional string deck_id = 3;
    */
-  deckId?: string
+  deckId?: string;
 
   constructor(data?: PartialMessage<JoinMatchmakingRequest>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.JoinMatchmakingRequest'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.JoinMatchmakingRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    {
-      no: 2,
-      name: 'player_name',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-    },
-    {
-      no: 3,
-      name: 'deck_id',
-      kind: 'scalar',
-      T: 9 /* ScalarType.STRING */,
-      opt: true,
-    },
-  ])
+    { no: 1, name: "player_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "player_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "deck_id", kind: "scalar", T: 9 /* ScalarType.STRING */, opt: true },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): JoinMatchmakingRequest {
-    return new JoinMatchmakingRequest().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): JoinMatchmakingRequest {
+    return new JoinMatchmakingRequest().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): JoinMatchmakingRequest {
-    return new JoinMatchmakingRequest().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): JoinMatchmakingRequest {
+    return new JoinMatchmakingRequest().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): JoinMatchmakingRequest {
-    return new JoinMatchmakingRequest().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): JoinMatchmakingRequest {
+    return new JoinMatchmakingRequest().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a:
-      | JoinMatchmakingRequest
-      | PlainMessage<JoinMatchmakingRequest>
-      | undefined,
-    b:
-      | JoinMatchmakingRequest
-      | PlainMessage<JoinMatchmakingRequest>
-      | undefined,
-  ): boolean {
-    return proto3.util.equals(JoinMatchmakingRequest, a, b)
+  static equals(a: JoinMatchmakingRequest | PlainMessage<JoinMatchmakingRequest> | undefined, b: JoinMatchmakingRequest | PlainMessage<JoinMatchmakingRequest> | undefined): boolean {
+    return proto3.util.equals(JoinMatchmakingRequest, a, b);
   }
 }
 
@@ -1222,67 +922,51 @@ export class MatchmakingResponse extends Message<MatchmakingResponse> {
   /**
    * @generated from field: cardgame.v1.MatchmakingStatus status = 1;
    */
-  status = MatchmakingStatus.UNSPECIFIED
+  status = MatchmakingStatus.UNSPECIFIED;
 
   /**
    * @generated from field: string game_id = 2;
    */
-  gameId = ''
+  gameId = "";
 
   /**
    * @generated from field: cardgame.v1.GameState game_state = 3;
    */
-  gameState?: GameState
+  gameState?: GameState;
 
   /**
    * @generated from field: string message = 4;
    */
-  message = ''
+  message = "";
 
   constructor(data?: PartialMessage<MatchmakingResponse>) {
-    super()
-    proto3.util.initPartial(data, this)
+    super();
+    proto3.util.initPartial(data, this);
   }
 
-  static readonly runtime: typeof proto3 = proto3
-  static readonly typeName = 'cardgame.v1.MatchmakingResponse'
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "cardgame.v1.MatchmakingResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    {
-      no: 1,
-      name: 'status',
-      kind: 'enum',
-      T: proto3.getEnumType(MatchmakingStatus),
-    },
-    { no: 2, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-    { no: 3, name: 'game_state', kind: 'message', T: GameState },
-    { no: 4, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
-  ])
+    { no: 1, name: "status", kind: "enum", T: proto3.getEnumType(MatchmakingStatus) },
+    { no: 2, name: "game_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "game_state", kind: "message", T: GameState },
+    { no: 4, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
 
-  static fromBinary(
-    bytes: Uint8Array,
-    options?: Partial<BinaryReadOptions>,
-  ): MatchmakingResponse {
-    return new MatchmakingResponse().fromBinary(bytes, options)
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MatchmakingResponse {
+    return new MatchmakingResponse().fromBinary(bytes, options);
   }
 
-  static fromJson(
-    jsonValue: JsonValue,
-    options?: Partial<JsonReadOptions>,
-  ): MatchmakingResponse {
-    return new MatchmakingResponse().fromJson(jsonValue, options)
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MatchmakingResponse {
+    return new MatchmakingResponse().fromJson(jsonValue, options);
   }
 
-  static fromJsonString(
-    jsonString: string,
-    options?: Partial<JsonReadOptions>,
-  ): MatchmakingResponse {
-    return new MatchmakingResponse().fromJsonString(jsonString, options)
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MatchmakingResponse {
+    return new MatchmakingResponse().fromJsonString(jsonString, options);
   }
 
-  static equals(
-    a: MatchmakingResponse | PlainMessage<MatchmakingResponse> | undefined,
-    b: MatchmakingResponse | PlainMessage<MatchmakingResponse> | undefined,
-  ): boolean {
-    return proto3.util.equals(MatchmakingResponse, a, b)
+  static equals(a: MatchmakingResponse | PlainMessage<MatchmakingResponse> | undefined, b: MatchmakingResponse | PlainMessage<MatchmakingResponse> | undefined): boolean {
+    return proto3.util.equals(MatchmakingResponse, a, b);
   }
 }
+

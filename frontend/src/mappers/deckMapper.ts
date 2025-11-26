@@ -3,8 +3,9 @@
  * デッキモデルの変換ロジック
  */
 
-import type { Deck } from '../../domain/models/Deck'
-import type { Deck as ProtoDeck } from '../../gen/card_management_pb'
+import { Timestamp } from '@bufbuild/protobuf'
+import type { Deck } from '../domain/models/Deck'
+import type { Deck as ProtoDeck } from '../gen/common_pb'
 
 // Proto → Domain
 export function deckToDomain(proto: ProtoDeck): Deck {
@@ -14,12 +15,8 @@ export function deckToDomain(proto: ProtoDeck): Deck {
     description: proto.description,
     cardIds: [...proto.cardIds],
     userId: proto.userId,
-    createdAt: proto.createdAt
-      ? new Date(Number(proto.createdAt) * 1000)
-      : undefined,
-    updatedAt: proto.updatedAt
-      ? new Date(Number(proto.updatedAt) * 1000)
-      : undefined,
+    createdAt: proto.createdAt ? proto.createdAt.toDate() : new Date(),
+    updatedAt: proto.updatedAt ? proto.updatedAt.toDate() : new Date(),
   }
 }
 
@@ -31,12 +28,8 @@ export function deckToProto(domain: Deck): Partial<ProtoDeck> {
     description: domain.description,
     cardIds: [...domain.cardIds],
     userId: domain.userId,
-    createdAt: domain.createdAt
-      ? BigInt(Math.floor(domain.createdAt.getTime() / 1000))
-      : undefined,
-    updatedAt: domain.updatedAt
-      ? BigInt(Math.floor(domain.updatedAt.getTime() / 1000))
-      : undefined,
+    createdAt: Timestamp.fromDate(domain.createdAt),
+    updatedAt: Timestamp.fromDate(domain.updatedAt),
   }
 }
 

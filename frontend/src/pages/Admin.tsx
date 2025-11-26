@@ -95,8 +95,10 @@ export default function Admin() {
         bValue = (bValue as number | undefined) ?? -1
       }
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      const aComp = aValue as string | number
+      const bComp = bValue as string | number
+      if (aComp < bComp) return sortDirection === 'asc' ? -1 : 1
+      if (aComp > bComp) return sortDirection === 'asc' ? 1 : -1
       return 0
     })
   }
@@ -115,8 +117,10 @@ export default function Admin() {
       const aValue: unknown = a[sortColumn as keyof Deck]
       const bValue: unknown = b[sortColumn as keyof Deck]
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      const aComp = aValue as string | number
+      const bComp = bValue as string | number
+      if (aComp < bComp) return sortDirection === 'asc' ? -1 : 1
+      if (aComp > bComp) return sortDirection === 'asc' ? 1 : -1
       return 0
     })
   }

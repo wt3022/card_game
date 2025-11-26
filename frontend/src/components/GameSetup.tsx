@@ -160,7 +160,7 @@ export default function GameSetup({ onGameStart }: GameSetupProps) {
                 <option value="">デフォルトデッキ (Fixture)</option>
                 {decks.map((deck) => (
                   <option key={deck.id} value={deck.id}>
-                    {deck.name} ({deck.cards.length}枚)
+                    {deck.name} ({deck.cardIds.length}枚)
                   </option>
                 ))}
               </select>
