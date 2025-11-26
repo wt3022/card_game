@@ -366,6 +366,31 @@
   white-space: nowrap;
 }
 
+.data-table th:nth-child(1) {
+  width: 15%;
+} /* ID */
+.data-table th:nth-child(2) {
+  width: 12%;
+} /* 名前 */
+.data-table th:nth-child(3) {
+  width: 10%;
+} /* タイプ */
+.data-table th:nth-child(4) {
+  width: 8%;
+} /* コスト */
+.data-table th:nth-child(5) {
+  width: 8%;
+} /* 攻撃力 */
+.data-table th:nth-child(6) {
+  width: 8%;
+} /* 体力 */
+.data-table th:nth-child(7) {
+  width: 29%;
+} /* 効果 */
+.data-table th:nth-child(8) {
+  width: 10%;
+} /* 操作 */
+
 .data-table th.sortable {
   cursor: pointer;
   user-select: none;
@@ -398,34 +423,12 @@
 
 .data-table tbody tr.clickable {
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-
-.data-table tbody tr.clickable::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(102, 126, 234, 0.08) 0%,
-    transparent 100%
-  );
-  transition: width 0.3s ease;
-  pointer-events: none;
+  transition: all 0.2s ease;
 }
 
 .data-table tbody tr.clickable:hover {
-  background: linear-gradient(90deg, #f8f9fa 0%, #ffffff 100%);
-  transform: translateX(4px);
+  background: #f8f9fa;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.data-table tbody tr.clickable:hover::before {
-  width: 100%;
 }
 
 .data-table td {

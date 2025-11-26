@@ -13,9 +13,13 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
 /**
  * 認証トークンを取得する関数
+ * auth.tsと同じロジックでsessionStorage/localStorageから取得
  */
 const getAuthToken = (): string | null => {
-  return localStorage.getItem('auth_token')
+  // sessionStorageを優先（auth.tsと同じロジック）
+  const useSessionStorage = import.meta.env.VITE_USE_SESSION_STORAGE !== 'false'
+  const storage = useSessionStorage ? sessionStorage : localStorage
+  return storage.getItem('auth_token')
 }
 
 /**
@@ -46,11 +50,11 @@ const isValidToken = (token: string): boolean => {
  */
 const authInterceptor: Interceptor = (next) => async (req) => {
   const token = getAuthToken()
+
   if (token && isValidToken(token)) {
     req.header.set('Authorization', `Bearer ${token}`)
   } else if (token) {
     // 無効なトークンの場合はクリア
-    console.warn('無効な認証トークンを検出しました。クリアします。')
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_info')
     sessionStorage.removeItem('auth_token')
@@ -62,10 +66,10 @@ const authInterceptor: Interceptor = (next) => async (req) => {
     return response
   } catch (err) {
     const error = err as { code?: string; message?: string }
-    
+
     // ログインエンドポイント（/cardgame.v1.AuthService/Login）の場合は認証エラー処理をスキップ
     const isLoginRequest = req.url.includes('/cardgame.v1.AuthService/Login')
-    
+
     // 認証エラーの場合、トークンをクリアしてログインページにリダイレクト
     const isAuthError =
       (error.code &&
@@ -112,9 +116,13 @@ const createBaseTransport = (): Transport => {
  * 認証付きトランスポートを作成
  */
 const createAuthTransport = (): Transport => {
+  console.log('[createAuthTransport] Creating transport with baseUrl:', baseUrl)
   return createConnectTransport({
     baseUrl,
     interceptors: [authInterceptor],
+    useBinaryFormat: false, // JSON形式を明示的に指定
+    // デフォルトのタイムアウトは0（無制限）だが、念のため設定
+    defaultTimeoutMs: 30000, // 30秒
   })
 }
 

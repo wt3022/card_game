@@ -3,11 +3,25 @@ import { Link } from 'react-router-dom'
 import CardEditor from '../components/CardManagement/CardEditor'
 import DeckEditor from '../components/DeckManagement/DeckEditor'
 import type { Card, Deck } from '../gen/common_pb'
+import { CardType } from '../gen/common_pb'
 import { cardManagementClient } from '../lib/api-client'
 import { getUserInfo, logout } from '../lib/auth'
 import './Admin.css'
 
 type AdminView = 'card-list' | 'card-edit' | 'deck-list' | 'deck-edit'
+
+const getCardTypeLabel = (type: CardType): string => {
+  switch (type) {
+    case CardType.UNIT:
+      return 'ユニット'
+    case CardType.SPELL:
+      return 'スペル'
+    case CardType.LEADER:
+      return 'リーダー'
+    default:
+      return '不明'
+  }
+}
 
 export default function Admin() {
   const [currentView, setCurrentView] = useState<AdminView>('card-list')
@@ -28,9 +42,11 @@ export default function Admin() {
     try {
       setLoading(true)
       setError(null)
+
       const response = await cardManagementClient.listCards({})
       setCards(response.cards || [])
     } catch (err: unknown) {
+      console.error('Failed to load cards:', err)
       setError(
         err instanceof Error ? err.message : 'カードの読み込みに失敗しました',
       )
@@ -60,6 +76,7 @@ export default function Admin() {
     } else if (currentView === 'deck-list' || currentView === 'deck-edit') {
       loadDecks()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView, loadCards, loadDecks])
 
   const handleSort = (column: string) => {
@@ -83,22 +100,37 @@ export default function Admin() {
     })
 
     return filtered.sort((a, b) => {
-      let aValue: unknown = a[sortColumn as keyof Card]
-      let bValue: unknown = b[sortColumn as keyof Card]
+      const aValue: unknown = a[sortColumn as keyof Card]
+      const bValue: unknown = b[sortColumn as keyof Card]
 
+      // 数値フィールドの処理
       if (
         sortColumn === 'cost' ||
         sortColumn === 'attack' ||
         sortColumn === 'defense'
       ) {
-        aValue = (aValue as number | undefined) ?? -1
-        bValue = (bValue as number | undefined) ?? -1
+        const aNum = (aValue as number | undefined) ?? -1
+        const bNum = (bValue as number | undefined) ?? -1
+
+        console.log(
+          `Sorting ${sortColumn}: ${a.id}(${aNum}) vs ${b.id}(${bNum}), direction: ${sortDirection}`,
+        )
+
+        if (aNum !== bNum) {
+          return sortDirection === 'asc' ? aNum - bNum : bNum - aNum
+        }
+        // 数値が同じ場合はIDで二次ソート
+        return a.id.localeCompare(b.id)
       }
 
-      const aComp = aValue as string | number
-      const bComp = bValue as string | number
-      if (aComp < bComp) return sortDirection === 'asc' ? -1 : 1
-      if (aComp > bComp) return sortDirection === 'asc' ? 1 : -1
+      // 文字列フィールドの処理
+      const aStr = String(aValue ?? '')
+      const bStr = String(bValue ?? '')
+      const compareResult = aStr.localeCompare(bStr)
+
+      if (compareResult !== 0) {
+        return sortDirection === 'asc' ? compareResult : -compareResult
+      }
       return 0
     })
   }
@@ -330,7 +362,7 @@ export default function Admin() {
                         >
                           <td>{card.id}</td>
                           <td>{card.name}</td>
-                          <td>{card.type}</td>
+                          <td>{getCardTypeLabel(card.type)}</td>
                           <td>{card.cost}</td>
                           <td>{card.attack ?? '-'}</td>
                           <td>{card.defense ?? '-'}</td>

@@ -100,11 +100,11 @@ func main() {
 	gameService := service.NewGameServiceWithSecurity(deckService, logger, rateLimiter, stateValidator, cheatDetector)
 
 	// 認証インターセプターを作成
-	authInterceptor := interceptor.NewAuthInterceptorFunc(tokenProvider)
+	authInterceptor := interceptor.NewAuthInterceptorFunc(tokenProvider, logger)
 
 	// Connect-Goハンドラーを初期化
 	gameHandler := handler.NewGameConnectHandler(gameService)
-	authHandler := handler.NewAuthConnectHandler(authService)
+	authHandler := handler.NewAuthConnectHandler(authService, logger)
 	cardManagementHandler := handler.NewCardManagementConnectHandler(cardService, deckService)
 
 	// マルチプレクサを作成
@@ -170,7 +170,6 @@ func corsMiddleware(next http.Handler) http.Handler {
 		"https://www.release-notifier.net": true,
 		"https://api.release-notifier.net": true,
 		"http://localhost:3000":            true, // 開発用
-		"http://localhost:5173":            true, // Vite開発サーバー用
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

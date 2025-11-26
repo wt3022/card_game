@@ -135,6 +135,7 @@ export const login = async (
   username: string,
   password: string,
 ): Promise<UserInfo> => {
+  // エラー時は必ず既存のトークンをクリア
   try {
     // 入力バリデーション
     validateLoginInput(username, password)
@@ -142,6 +143,14 @@ export const login = async (
     const response = await authClient.login({
       username: username.trim(),
       password,
+    })
+
+    // デバッグ: レスポンスを確認
+    console.log('Login response:', {
+      hasAccessToken: !!response.accessToken,
+      tokenLength: response.accessToken?.length,
+      userId: response.userId,
+      username: response.username,
     })
 
     // レスポンスのバリデーション
@@ -158,11 +167,14 @@ export const login = async (
 
     return userInfo
   } catch (error) {
+    // エラー発生時は必ずトークンをクリア
+    removeToken()
+
     // エラーハンドリング
     if (error instanceof AuthError) {
       throw error
     }
-    
+
     // Connect-RPCエラーの処理
     const connectError = error as { code?: string; message?: string }
     if (connectError.code === 'unauthenticated') {
@@ -172,9 +184,11 @@ export const login = async (
       throw new AuthError('入力内容に誤りがあります')
     }
     if (connectError.code === 'unavailable') {
-      throw new AuthError('サーバーに接続できません。しばらく待ってから再度お試しください')
+      throw new AuthError(
+        'サーバーに接続できません。しばらく待ってから再度お試しください',
+      )
     }
-    
+
     if (error instanceof Error) {
       throw new AuthError(`ログインに失敗しました: ${error.message}`)
     }

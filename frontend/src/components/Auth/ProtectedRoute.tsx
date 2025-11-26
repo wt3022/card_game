@@ -1,5 +1,5 @@
-import { type ReactNode, useState } from 'react'
-import { isAuthenticated } from '../../lib/auth'
+import { type ReactNode, useEffect, useState } from 'react'
+import { isAuthenticated, logout } from '../../lib/auth'
 import LoginForm from './LoginForm'
 
 interface ProtectedRouteProps {
@@ -9,11 +9,23 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [authenticated, setAuthenticated] = useState(isAuthenticated())
 
+  // 認証状態が変更された時にチェック
+  useEffect(() => {
+    setAuthenticated(isAuthenticated())
+  }, [])
+
   if (!authenticated) {
     return (
       <LoginForm
         onLoginSuccess={() => {
-          setAuthenticated(true)
+          // トークンが正しく保存されているか再確認
+          if (isAuthenticated()) {
+            setAuthenticated(true)
+          } else {
+            // トークンが保存されていない場合はログアウト
+            logout()
+            setAuthenticated(false)
+          }
         }}
       />
     )
