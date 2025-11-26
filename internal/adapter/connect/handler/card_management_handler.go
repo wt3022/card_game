@@ -2,8 +2,10 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	"connectrpc.com/connect"
+	"github.com/google/uuid"
 
 	pbv1 "card_game/api/gen/proto/cardgame/v1"
 	"card_game/api/gen/proto/cardgame/v1/cardgamev1connect"
@@ -134,6 +136,7 @@ func (h *CardManagementConnectHandler) ListCards(
 	ctx context.Context,
 	req *connect.Request[pbv1.ListCardsRequest],
 ) (*connect.Response[pbv1.ListCardsResponse], error) {
+	log.Println("ListCards: start")
 	var cards []*entity.Card
 	var err error
 
@@ -162,7 +165,6 @@ func (h *CardManagementConnectHandler) ListCards(
 			}
 		}
 	}
-
 	resp := &pbv1.ListCardsResponse{
 		Cards: protoCards,
 	}
@@ -241,8 +243,14 @@ func (h *CardManagementConnectHandler) protoToCard(msg *pbv1.CreateCardRequest) 
 		traits = []entity.Trait{}
 	}
 
+	// IDが未指定の場合はUUID生成
+	cardID := msg.GetId()
+	if cardID == "" {
+		cardID = h.generateUUID()
+	}
+
 	card := &entity.Card{
-		ID:     msg.GetId(),
+		ID:     cardID,
 		Name:   msg.GetName(),
 		Type:   cardType,
 		Cost:   int(msg.GetCost()),
@@ -395,4 +403,9 @@ func (h *CardManagementConnectHandler) DeleteDeck(
 		Success: true,
 		Message: "Deck deleted successfully",
 	}), nil
+}
+
+// generateUUID UUIDを生成
+func (h *CardManagementConnectHandler) generateUUID() string {
+	return uuid.New().String()
 }

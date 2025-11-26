@@ -23,7 +23,7 @@ service CardManagementService {
 
 // カード作成リクエスト
 message CreateCardRequest {
-  string id = 1;
+  optional string id = 1; // 未指定の場合はバックエンドで自動生成
   string name = 2;
   CardType type = 3;
   int32 cost = 4;

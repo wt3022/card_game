@@ -2,12 +2,14 @@ package handler
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 
 	pbv1 "card_game/api/gen/proto/cardgame/v1"
 	"card_game/api/gen/proto/cardgame/v1/cardgamev1connect"
 	"card_game/internal/application/service"
+	"card_game/internal/core/port"
 )
 
 // ========================================
@@ -17,12 +19,14 @@ import (
 // AuthConnectHandler Connect-Go用の認証サービスハンドラー
 type AuthConnectHandler struct {
 	authService *service.AuthService
+	logger      port.Logger
 }
 
 // NewAuthConnectHandler 新しいAuthConnectHandlerを作成
-func NewAuthConnectHandler(authService *service.AuthService) *AuthConnectHandler {
+func NewAuthConnectHandler(authService *service.AuthService, logger port.Logger) *AuthConnectHandler {
 	return &AuthConnectHandler{
 		authService: authService,
+		logger:      logger,
 	}
 }
 
@@ -37,16 +41,22 @@ func (h *AuthConnectHandler) Login(
 	username := req.Msg.GetUsername()
 	password := req.Msg.GetPassword()
 
+	h.logger.Info("Login attempt for user: %s", username)
+
 	if username == "" || password == "" {
+		h.logger.Error("Login failed: empty username or password")
 		return nil, connect.NewError(connect.CodeInvalidArgument,
-			connect.NewError(connect.CodeInvalidArgument, nil))
+			fmt.Errorf("ユーザー名とパスワードは必須です"))
 	}
 
 	// 認証サービスでログイン
 	loginResp, err := h.authService.Login(username, password)
 	if err != nil {
+		h.logger.Error("Login failed for user '%s': %v", username, err)
 		return nil, connect.NewError(connect.CodeUnauthenticated, err)
 	}
+
+	h.logger.Info("Login successful for user: %s", username)
 
 	// レスポンスを作成
 	resp := &pbv1.LoginResponse{

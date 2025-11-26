@@ -748,9 +748,8 @@ export default function CardEditor({
         })
         savedCardId = response.card?.id || formData.id
       } else {
-        // 作成
+        // 作成（IDはバックエンドで自動生成）
         const response = await cardManagementClient.createCard({
-          id: formData.id,
           name: formData.name,
           type: formData.type,
           cost: formData.cost,
@@ -760,7 +759,10 @@ export default function CardEditor({
           traits: formData.traits,
           cardEffect,
         })
-        savedCardId = response.card?.id || formData.id
+        if (!response.card?.id) {
+          throw new Error('カードの作成に失敗しました')
+        }
+        savedCardId = response.card.id
       }
 
       onSave(savedCardId)
@@ -787,17 +789,12 @@ export default function CardEditor({
       <h2>{card ? 'カード編集' : '新しいカード'}</h2>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="id">カードID</label>
-          <input
-            id="id"
-            type="text"
-            value={formData.id}
-            onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-            required
-            disabled={!!card}
-          />
-        </div>
+        {card && (
+          <div className="form-group">
+            <label htmlFor="id">カードID</label>
+            <input id="id" type="text" value={formData.id} readOnly disabled />
+          </div>
+        )}
         <div className="form-group">
           <label htmlFor="name">カード名</label>
           <input

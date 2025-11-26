@@ -16,21 +16,26 @@ import (
 // AuthInterceptor 認証を検証するインターセプター
 type AuthInterceptor struct {
 	tokenProvider port.TokenProvider
+	logger        port.Logger
 }
 
 // NewAuthInterceptor 新しい認証インターセプターを作成
-func NewAuthInterceptor(tokenProvider port.TokenProvider) *AuthInterceptor {
+func NewAuthInterceptor(tokenProvider port.TokenProvider, logger port.Logger) *AuthInterceptor {
 	return &AuthInterceptor{
 		tokenProvider: tokenProvider,
+		logger:        logger,
 	}
 }
 
 // WrapUnary ユニタリーRPC用の認証インターセプター
 func (i *AuthInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 	return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+		i.logger.Info("Auth interceptor: checking request to %s", req.Spec().Procedure)
+
 		// Authorizationヘッダーからトークンを取得
 		authHeader := req.Header().Get("Authorization")
 		if authHeader == "" {
+			i.logger.Error("Auth interceptor: no Authorization header")
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
 
@@ -38,14 +43,20 @@ func (i *AuthInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
 			// Bearerプレフィックスがない場合
+			i.logger.Error("Auth interceptor: no Bearer prefix")
 			return nil, connect.NewError(connect.CodeUnauthenticated, nil)
 		}
+
+		i.logger.Info("Auth interceptor: validating token (length: %d)", len(tokenString))
 
 		// トークンを検証
 		claims, err := i.tokenProvider.ValidateToken(tokenString)
 		if err != nil {
+			i.logger.Error("Auth interceptor: token validation failed: %v", err)
 			return nil, connect.NewError(connect.CodeUnauthenticated, err)
 		}
+
+		i.logger.Info("Auth interceptor: token valid for user %s", claims.Username)
 
 		// コンテキストにクレームを追加
 		ctx = context.WithValue(ctx, "jwt_claims", claims)
@@ -96,7 +107,7 @@ func (i *AuthInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc
 }
 
 // NewAuthInterceptorFunc Connect-RPCのUnaryInterceptorFuncとして使用する関数
-func NewAuthInterceptorFunc(tokenProvider port.TokenProvider) connect.UnaryInterceptorFunc {
-	interceptor := NewAuthInterceptor(tokenProvider)
+func NewAuthInterceptorFunc(tokenProvider port.TokenProvider, logger port.Logger) connect.UnaryInterceptorFunc {
+	interceptor := NewAuthInterceptor(tokenProvider, logger)
 	return interceptor.WrapUnary
 }

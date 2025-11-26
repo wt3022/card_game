@@ -62,6 +62,10 @@ const authInterceptor: Interceptor = (next) => async (req) => {
     return response
   } catch (err) {
     const error = err as { code?: string; message?: string }
+    
+    // ログインエンドポイント（/cardgame.v1.AuthService/Login）の場合は認証エラー処理をスキップ
+    const isLoginRequest = req.url.includes('/cardgame.v1.AuthService/Login')
+    
     // 認証エラーの場合、トークンをクリアしてログインページにリダイレクト
     const isAuthError =
       (error.code &&
@@ -77,7 +81,7 @@ const authInterceptor: Interceptor = (next) => async (req) => {
         error.code as (typeof RATE_LIMIT_ERROR_CODES)[number],
       )
 
-    if (isAuthError) {
+    if (isAuthError && !isLoginRequest) {
       console.error('認証エラー:', error.message)
       localStorage.removeItem('auth_token')
       localStorage.removeItem('user_info')

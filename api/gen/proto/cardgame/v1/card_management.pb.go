@@ -24,7 +24,7 @@ const (
 // カード作成リクエスト
 type CreateCardRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"` // 未指定の場合はバックエンドで自動生成
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Type          CardType               `protobuf:"varint,3,opt,name=type,proto3,enum=cardgame.v1.CardType" json:"type,omitempty"`
 	Cost          int32                  `protobuf:"varint,4,opt,name=cost,proto3" json:"cost,omitempty"`
@@ -68,8 +68,8 @@ func (*CreateCardRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *CreateCardRequest) GetId() string {
-	if x != nil {
-		return x.Id
+	if x != nil && x.Id != nil {
+		return *x.Id
 	}
 	return ""
 }
@@ -1109,19 +1109,20 @@ var File_card_management_proto protoreflect.FileDescriptor
 
 const file_card_management_proto_rawDesc = "" +
 	"\n" +
-	"\x15card_management.proto\x12\vcardgame.v1\x1a\fcommon.proto\"\xe5\x02\n" +
-	"\x11CreateCardRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x15card_management.proto\x12\vcardgame.v1\x1a\fcommon.proto\"\xf1\x02\n" +
+	"\x11CreateCardRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
 	"\x04type\x18\x03 \x01(\x0e2\x15.cardgame.v1.CardTypeR\x04type\x12\x12\n" +
 	"\x04cost\x18\x04 \x01(\x05R\x04cost\x12\x1b\n" +
-	"\x06attack\x18\x05 \x01(\x05H\x00R\x06attack\x88\x01\x01\x12\x1d\n" +
-	"\adefense\x18\x06 \x01(\x05H\x01R\adefense\x88\x01\x01\x12\x1f\n" +
+	"\x06attack\x18\x05 \x01(\x05H\x01R\x06attack\x88\x01\x01\x12\x1d\n" +
+	"\adefense\x18\x06 \x01(\x05H\x02R\adefense\x88\x01\x01\x12\x1f\n" +
 	"\veffect_text\x18\a \x01(\tR\n" +
 	"effectText\x12*\n" +
 	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12=\n" +
-	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x02R\n" +
-	"cardEffect\x88\x01\x01B\t\n" +
+	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x03R\n" +
+	"cardEffect\x88\x01\x01B\x05\n" +
+	"\x03_idB\t\n" +
 	"\a_attackB\n" +
 	"\n" +
 	"\b_defenseB\x0e\n" +

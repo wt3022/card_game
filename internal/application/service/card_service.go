@@ -36,10 +36,12 @@ func (s *CardService) CreateCard(card *entity.Card) error {
 		return err
 	}
 
-	// 既存のカードをチェック
-	_, err := s.cardRepo.FindByID(card.ID)
-	if err == nil {
-		return entity.NewErrAlreadyExists("card", card.ID)
+	// IDの重複チェック（IDが明示的に指定されている場合）
+	if card.ID != "" {
+		_, err := s.cardRepo.FindByID(card.ID)
+		if err == nil {
+			return entity.NewErrAlreadyExists("card", card.ID)
+		}
 	}
 
 	// カードを作成

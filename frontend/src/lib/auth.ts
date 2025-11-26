@@ -162,6 +162,19 @@ export const login = async (
     if (error instanceof AuthError) {
       throw error
     }
+    
+    // Connect-RPCエラーの処理
+    const connectError = error as { code?: string; message?: string }
+    if (connectError.code === 'unauthenticated') {
+      throw new AuthError('ユーザー名またはパスワードが正しくありません')
+    }
+    if (connectError.code === 'invalid_argument') {
+      throw new AuthError('入力内容に誤りがあります')
+    }
+    if (connectError.code === 'unavailable') {
+      throw new AuthError('サーバーに接続できません。しばらく待ってから再度お試しください')
+    }
+    
     if (error instanceof Error) {
       throw new AuthError(`ログインに失敗しました: ${error.message}`)
     }

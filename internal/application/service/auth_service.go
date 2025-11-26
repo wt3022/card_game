@@ -38,17 +38,20 @@ func NewAuthService(
 func (s *AuthService) Login(username, password string) (*entity.LoginResponse, error) {
 	// 入力バリデーション
 	if err := entity.ValidateUsername(username); err != nil {
+		s.logger.Error("Username validation failed for '%s': %v", username, err)
 		return nil, fmt.Errorf("認証情報が無効です")
 	}
 
 	// ユーザーを検索
 	user, err := s.userRepo.FindByUsername(username)
 	if err != nil {
+		s.logger.Error("User not found: '%s'", username)
 		return nil, fmt.Errorf("認証情報が無効です")
 	}
 
 	// パスワードを検証（検証はpasswordHasher内で行われる）
 	if err := s.passwordHasher.VerifyPassword(user.PasswordHash, password); err != nil {
+		s.logger.Error("Password verification failed for user '%s': %v", username, err)
 		return nil, fmt.Errorf("認証情報が無効です")
 	}
 

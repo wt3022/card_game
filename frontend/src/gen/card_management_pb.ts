@@ -21,9 +21,11 @@ import { Card, CardEffect, CardType, Deck, Trait } from './common_pb.js'
  */
 export class CreateCardRequest extends Message<CreateCardRequest> {
   /**
-   * @generated from field: string id = 1;
+   * 未指定の場合はバックエンドで自動生成
+   *
+   * @generated from field: optional string id = 1;
    */
-  id = ''
+  id?: string
 
   /**
    * @generated from field: string name = 2;
@@ -75,7 +77,13 @@ export class CreateCardRequest extends Message<CreateCardRequest> {
   static readonly runtime: typeof proto3 = proto3
   static readonly typeName = 'cardgame.v1.CreateCardRequest'
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: 'id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    {
+      no: 1,
+      name: 'id',
+      kind: 'scalar',
+      T: 9 /* ScalarType.STRING */,
+      opt: true,
+    },
     { no: 2, name: 'name', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
     { no: 3, name: 'type', kind: 'enum', T: proto3.getEnumType(CardType) },
     { no: 4, name: 'cost', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
