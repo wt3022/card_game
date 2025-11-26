@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { TRAIT_LABELS } from '../../constants/game'
 import type { Card, Deck } from '../../gen/common_pb'
 import { cardManagementClient } from '../../lib/api-client'
 import './DeckEditor.css'
@@ -230,27 +231,31 @@ export default function DeckEditor({
                   const card = getCardById(entry.cardId)
                   if (!card) return null
                   const effectText = card.effect || ''
-                  const traitsText = card.traits?.join(', ') || ''
 
                   return (
-                    <div
-                      key={entry.id}
-                      className="deck-card-item"
-                      title={`${card.name}${effectText ? `\n効果: ${effectText}` : ''}${traitsText ? `\n特性: ${traitsText}` : ''}`}
-                    >
+                    <div key={entry.id} className="deck-card-item">
                       <div className="deck-card-main">
-                        <span className="deck-card-name">{card.name}</span>
+                        <div className="deck-card-header">
+                          <span className="deck-card-name">{card.name}</span>
+                          <span className="deck-card-cost">{card.cost}</span>
+                        </div>
                         <div className="deck-card-details">
-                          <span className="deck-card-cost">
-                            コスト: {card.cost}
-                          </span>
                           {card.attack !== undefined &&
                             card.defense !== undefined && (
                               <span className="deck-card-stats">
-                                {card.attack}/{card.defense}
+                                ATK {card.attack} / DEF {card.defense}
                               </span>
                             )}
                         </div>
+                        {card.traits && card.traits.length > 0 && (
+                          <div className="deck-card-traits">
+                            {card.traits.map((trait) => (
+                              <span key={trait} className="trait-badge">
+                                {TRAIT_LABELS[trait] || trait}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {effectText && (
                           <div className="deck-card-effect">{effectText}</div>
                         )}
@@ -283,38 +288,45 @@ export default function DeckEditor({
                   const isDeckFull = deckCards.length >= DECK_SIZE
                   const canAdd = !isMaxCopies && !isDeckFull
                   const effectText = card.effect || ''
-                  const traitsText = card.traits?.join(', ') || ''
 
                   return (
                     <div
                       key={card.id}
                       className={`available-card-item ${!canAdd ? 'disabled' : ''}`}
-                      title={`${card.name}${effectText ? `\n効果: ${effectText}` : ''}${traitsText ? `\n特性: ${traitsText}` : ''}`}
                     >
                       <div className="available-card-info">
                         <div className="available-card-header">
                           <span className="available-card-name">
                             {card.name}
                           </span>
-                          <div className="available-card-meta">
-                            <span className="available-card-cost">
-                              コスト: {card.cost}
-                            </span>
-                            {card.attack !== undefined &&
-                              card.defense !== undefined && (
-                                <span className="available-card-stats">
-                                  {card.attack}/{card.defense}
-                                </span>
-                              )}
-                            {count > 0 && (
-                              <span
-                                className={`available-card-count ${isMaxCopies ? 'max' : ''}`}
-                              >
-                                ×{count}/{MAX_COPIES_PER_CARD}
+                          <span className="available-card-cost">
+                            {card.cost}
+                          </span>
+                        </div>
+                        <div className="available-card-meta">
+                          {card.attack !== undefined &&
+                            card.defense !== undefined && (
+                              <span className="available-card-stats">
+                                ATK {card.attack} / DEF {card.defense}
                               </span>
                             )}
-                          </div>
+                          {count > 0 && (
+                            <span
+                              className={`available-card-count ${isMaxCopies ? 'max' : ''}`}
+                            >
+                              ×{count}/{MAX_COPIES_PER_CARD}
+                            </span>
+                          )}
                         </div>
+                        {card.traits && card.traits.length > 0 && (
+                          <div className="available-card-traits">
+                            {card.traits.map((trait) => (
+                              <span key={trait} className="trait-badge">
+                                {TRAIT_LABELS[trait] || trait}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {effectText && (
                           <div className="available-card-effect">
                             {effectText}

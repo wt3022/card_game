@@ -69,7 +69,7 @@ export function extractEffectTimingsFromText(
  * CardEffectが利用可能な場合に使用します。
  */
 export function extractTimingsFromEffectDefinition(
-  definition: any,
+  definition: { root?: unknown } | null | undefined,
 ): EffectTiming[] {
   if (!definition || !definition.root) {
     return []
@@ -81,46 +81,50 @@ export function extractTimingsFromEffectDefinition(
 /**
  * EffectChainNodeから再帰的にタイミング情報を抽出（内部関数）
  */
-function extractTimingsFromNode(node: any): EffectTiming[] {
-  if (!node) {
+function extractTimingsFromNode(node: unknown): EffectTiming[] {
+  if (!node || typeof node !== 'object') {
     return []
   }
 
   const timings: EffectTiming[] = []
+  const nodeObj = node as Record<string, unknown>
 
   // AtomicEffectのタイミングを取得
-  if (node.atomicEffect && node.atomicEffect.timing) {
-    timings.push(node.atomicEffect.timing)
+  const atomicEffect = nodeObj.atomicEffect as
+    | { timing?: EffectTiming }
+    | undefined
+  if (atomicEffect?.timing) {
+    timings.push(atomicEffect.timing)
   }
 
   // 順次実行ノードの次のノードを処理
-  if (node.next) {
-    timings.push(...extractTimingsFromNode(node.next))
+  if (nodeObj.next) {
+    timings.push(...extractTimingsFromNode(nodeObj.next))
   }
 
   // 並列実行ノードの子ノードを処理
-  if (node.children && Array.isArray(node.children)) {
-    for (const child of node.children) {
+  if (nodeObj.children && Array.isArray(nodeObj.children)) {
+    for (const child of nodeObj.children) {
       timings.push(...extractTimingsFromNode(child))
     }
   }
 
   // 条件分岐ノードの分岐先を処理
-  if (node.thenNode) {
-    timings.push(...extractTimingsFromNode(node.thenNode))
+  if (nodeObj.thenNode) {
+    timings.push(...extractTimingsFromNode(nodeObj.thenNode))
   }
-  if (node.elseNode) {
-    timings.push(...extractTimingsFromNode(node.elseNode))
+  if (nodeObj.elseNode) {
+    timings.push(...extractTimingsFromNode(nodeObj.elseNode))
   }
 
   // 繰り返しノードの効果を処理
-  if (node.repeatEffect) {
-    timings.push(...extractTimingsFromNode(node.repeatEffect))
+  if (nodeObj.repeatEffect) {
+    timings.push(...extractTimingsFromNode(nodeObj.repeatEffect))
   }
 
   // 反復ノードの効果を処理
-  if (node.foreachEffect) {
-    timings.push(...extractTimingsFromNode(node.foreachEffect))
+  if (nodeObj.foreachEffect) {
+    timings.push(...extractTimingsFromNode(nodeObj.foreachEffect))
   }
 
   // 重複を除去
@@ -130,7 +134,9 @@ function extractTimingsFromNode(node: any): EffectTiming[] {
 /**
  * CardEffectから全てのタイミング情報を抽出
  */
-export function extractTimingsFromCardEffect(cardEffect: any): EffectTiming[] {
+export function extractTimingsFromCardEffect(
+  cardEffect: { definitions?: unknown[] } | null | undefined,
+): EffectTiming[] {
   if (!cardEffect || !cardEffect.definitions) {
     return []
   }
@@ -138,7 +144,9 @@ export function extractTimingsFromCardEffect(cardEffect: any): EffectTiming[] {
   const allTimings: EffectTiming[] = []
 
   for (const definition of cardEffect.definitions) {
-    const timings = extractTimingsFromEffectDefinition(definition)
+    const timings = extractTimingsFromEffectDefinition(
+      definition as { root?: unknown } | null | undefined,
+    )
     allTimings.push(...timings)
   }
 
