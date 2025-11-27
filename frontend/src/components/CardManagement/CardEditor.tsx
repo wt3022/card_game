@@ -1,4 +1,4 @@
-import { Struct } from '@bufbuild/protobuf'
+import { type JsonValue, Struct } from '@bufbuild/protobuf'
 import { useCallback, useEffect, useState } from 'react'
 import type { Card, Trait } from '../../gen/common_pb'
 import {
@@ -670,7 +670,7 @@ export default function CardEditor({
           : undefined
 
         // parametersをJSON文字列からオブジェクトに変換
-        let parameters: Record<string, unknown> | undefined
+        let parameters: JsonValue | undefined
         if (node.atomic_effect.parameters) {
           console.log(
             '[convertNodeToProto] parameters (raw):',
