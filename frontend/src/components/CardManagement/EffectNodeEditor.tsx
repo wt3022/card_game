@@ -211,7 +211,6 @@ export default function EffectNodeEditor({
             <div className="form-label">並列実行する効果:</div>
             {node.parallel.children.map((child, index) => (
               <EffectNodeEditor
-                // biome-ignore lint/suspicious/noArrayIndexKey: 並列ノードの子要素は順序が変わらないため
                 key={`parallel-${depth}-${index}`}
                 node={child}
                 onChange={(newChild) => {
@@ -612,6 +611,23 @@ function AtomicEffectEditor({ effect, onChange }: AtomicEffectEditorProps) {
           <option value="TurnStart">ターン開始時</option>
           <option value="TurnEnd">ターン終了時</option>
         </select>
+      </div>
+      <div className="form-group">
+        <label htmlFor="atomic-effect-parameters">追加パラメータ (JSON):</label>
+        <textarea
+          id="atomic-effect-parameters"
+          value={effect.parameters}
+          onChange={(e) => {
+            console.log(
+              '[EffectNodeEditor] parameters onChange:',
+              e.target.value,
+            )
+            onChange({ ...effect, parameters: e.target.value })
+          }}
+          rows={5}
+          placeholder='{"name": "Token", "attack": 1, "defense": 1}'
+          style={{ fontFamily: 'monospace', fontSize: '12px' }}
+        />
       </div>
     </div>
   )

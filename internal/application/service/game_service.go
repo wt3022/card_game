@@ -189,13 +189,13 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player1D
 		deck, err := s.deckService.GetDeck(context.Background(), player1DeckID)
 		if err != nil {
 			s.logger.Error("プレイヤー1のデッキ取得に失敗: %v (fixtureを使用)", err)
-			player1Deck = fixturedeck.GenerateSampleDeck(player1ID)
+			player1Deck = fixturedeck.GenerateSampleDeck()
 		} else {
 			player1Deck = s.convertDeckToCards(deck, player1ID)
 			s.logger.Info("プレイヤー1のデッキID: %s をDBから取得", player1DeckID)
 		}
 	} else {
-		player1Deck = fixturedeck.GenerateSampleDeck(player1ID)
+		player1Deck = fixturedeck.GenerateSampleDeck()
 	}
 
 	if player2DeckID != "" {
@@ -203,13 +203,13 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player1D
 		deck, err := s.deckService.GetDeck(context.Background(), player2DeckID)
 		if err != nil {
 			s.logger.Error("プレイヤー2のデッキ取得に失敗: %v (fixtureを使用)", err)
-			player2Deck = fixturedeck.GenerateSampleDeck(player2ID)
+			player2Deck = fixturedeck.GenerateSampleDeck()
 		} else {
 			player2Deck = s.convertDeckToCards(deck, player2ID)
 			s.logger.Info("プレイヤー2のデッキID: %s をDBから取得", player2DeckID)
 		}
 	} else {
-		player2Deck = fixturedeck.GenerateSampleDeck(player2ID)
+		player2Deck = fixturedeck.GenerateSampleDeck()
 	}
 
 	// デッキをシャッフル
@@ -268,6 +268,135 @@ func (s *GameService) GetGameState(gameID string) (*game.State, error) {
 	}
 
 	return session.State, nil
+}
+
+// PerformCoinToss コイントスを実行
+func (s *GameService) PerformCoinToss(ctx context.Context, gameID string, playerID string) (bool, string, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	session, exists := s.games[gameID]
+	if !exists {
+		return false, "", entity.NewErrNotFound("game", gameID)
+	}
+
+	state := session.State
+	player := state.GetPlayerByID(playerID)
+	if player == nil {
+		return false, "", entity.NewErrNotFound("player", playerID)
+	}
+
+	// すでにコイントス済みかチェック
+	if state.CoinTossDone {
+		return false, "", entity.NewErrInvalidState("coin_toss", "コイントスは既に完了しています")
+	}
+
+	// コイントスを実行（50%の確率で表）
+	isHeads := game.CoinToss()
+
+	// 表が出た場合、そのプレイヤーが勝者
+	var winnerID string
+	if isHeads {
+		winnerID = playerID
+	} else {
+		// 裏が出た場合、相手プレイヤーが勝者
+		if state.Player1.ID == playerID {
+			winnerID = state.Player2.ID
+		} else {
+			winnerID = state.Player1.ID
+		}
+	}
+
+	// コイントス結果を記録
+	state.CoinTossDone = true
+	state.CoinTossWinnerID = &winnerID
+
+	winner := state.GetPlayerByID(winnerID)
+	loser := state.GetPlayerByID(playerID)
+	if winnerID != playerID && loser != nil {
+		loser = player
+	}
+
+	s.logger.Info("コイントス: %s が %s を出しました。勝者: %s",
+		player.Name,
+		map[bool]string{true: "表", false: "裏"}[isHeads],
+		winner.Name)
+
+	// コイントスイベントをブロードキャスト
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "coin_toss",
+		Message:   fmt.Sprintf("%sがコイントスで%sを出しました。%sが先攻後攻を選べます。", player.Name, map[bool]string{true: "表", false: "裏"}[isHeads], winner.Name),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		State:     state,
+	})
+
+	return isHeads, winnerID, nil
+}
+
+// ChooseTurnOrder 先攻後攻を選択
+func (s *GameService) ChooseTurnOrder(ctx context.Context, gameID string, playerID string, chooseFirst bool) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	session, exists := s.games[gameID]
+	if !exists {
+		return entity.NewErrNotFound("game", gameID)
+	}
+
+	state := session.State
+	player := state.GetPlayerByID(playerID)
+	if player == nil {
+		return entity.NewErrNotFound("player", playerID)
+	}
+
+	// コイントスが完了しているか確認
+	if !state.CoinTossDone {
+		return entity.NewErrInvalidState("turn_order", "コイントスがまだ完了していません")
+	}
+
+	// コイントスの勝者かどうか確認
+	if state.CoinTossWinnerID == nil || *state.CoinTossWinnerID != playerID {
+		return entity.NewErrInvalidState("turn_order", "コイントスの勝者のみが先攻後攻を選択できます")
+	}
+
+	// すでに決定済みかチェック
+	if state.TurnOrderDecided {
+		return entity.NewErrInvalidState("turn_order", "先攻後攻は既に決定しています")
+	}
+
+	// 先攻プレイヤーを設定
+	if chooseFirst {
+		state.CurrentPlayerID = playerID
+	} else {
+		// 後攻を選んだ場合、相手を先攻にする
+		if state.Player1.ID == playerID {
+			state.CurrentPlayerID = state.Player2.ID
+		} else {
+			state.CurrentPlayerID = state.Player1.ID
+		}
+	}
+
+	state.TurnOrderDecided = true
+
+	currentPlayer := state.GetPlayerByID(state.CurrentPlayerID)
+	s.logger.Info("%s が%sを選択しました。%s が先攻です。",
+		player.Name,
+		map[bool]string{true: "先攻", false: "後攻"}[chooseFirst],
+		currentPlayer.Name)
+
+	// 先攻後攻決定イベントをブロードキャスト
+	s.broadcastEvent(gameID, &event.GameEvent{
+		GameID:    gameID,
+		EventType: "turn_order_decided",
+		Message:   fmt.Sprintf("%sが%sを選択しました。%sが先攻です。", player.Name, map[bool]string{true: "先攻", false: "後攻"}[chooseFirst], currentPlayer.Name),
+		PlayerID:  playerID,
+		Timestamp: time.Now(),
+		State:     state,
+	})
+
+	return nil
 }
 
 // PerformMulligan 指定されたプレイヤーのマリガンを実行
@@ -809,7 +938,7 @@ func (s *GameService) convertDeckToCards(deck *entity.Deck, ownerID string) []en
 
 	if len(cards) == 0 {
 		s.logger.Error("有効なカードが1枚もありません。fixtureデッキを使用します")
-		return fixturedeck.GenerateSampleDeck(ownerID)
+		return fixturedeck.GenerateSampleDeck()
 	}
 
 	return cards

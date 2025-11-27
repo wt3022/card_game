@@ -1,0 +1,329 @@
+.coin-toss-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.95) 0%,
+    rgba(118, 75, 162, 0.95) 100%
+  );
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.coin-toss-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.coin-toss-card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  color: #333;
+}
+
+.coin-toss-card .description {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.winner-message {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* コイン */
+.coin-wrapper {
+  perspective: 1000px;
+  margin: 2rem 0;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coin {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  transform-style: preserve-3d;
+  /* JSでtransformを制御するため、CSS transitionは削除 */
+}
+
+.coin-static {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.coin-static.heads {
+  transform: rotateY(0deg);
+}
+
+.coin-static.tails {
+  transform: rotateY(180deg);
+}
+
+.coin-side {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  backface-visibility: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.coin-side.heads {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #8b6914;
+  border: 4px solid #ffa500;
+  transform: rotateY(0deg);
+}
+
+.coin-side.tails {
+  background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+  color: #555;
+  border: 4px solid #888;
+  transform: rotateY(180deg);
+}
+
+.tails-text-rotating {
+  display: inline-block;
+}
+
+.tails-text-static {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+.coin-static {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 0 auto 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.coin-static.heads {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #8b6914;
+  border: 4px solid #ffa500;
+}
+
+.coin-static.tails {
+  background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+  color: #555;
+  border: 4px solid #888;
+}
+
+.coin-result {
+  margin: 1rem 0 2rem;
+}
+
+/* ボタン */
+.coin-toss-button {
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.coin-toss-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.coin-toss-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.coin-toss-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ターン順選択ボタン */
+.turn-order-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.turn-order-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  border: 3px solid #e0e0e0;
+  border-radius: 16px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.turn-order-button:hover:not(:disabled) {
+  border-color: #667eea;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.turn-order-button.selected {
+  border-color: #667eea;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.turn-order-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.turn-order-button .button-icon {
+  font-size: 3rem;
+}
+
+.turn-order-button .button-text {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.turn-order-button .button-desc {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.turn-order-button.first .button-text {
+  color: #dc3545;
+}
+
+.turn-order-button.second .button-text {
+  color: #0d6efd;
+}
+
+/* ステータスメッセージ */
+.status-message {
+  margin-top: 1.5rem;
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.1rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* 待機スピナー */
+.waiting-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  margin: 2rem auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+  .coin-toss-card {
+    padding: 2rem;
+  }
+
+  .turn-order-buttons {
+    grid-template-columns: 1fr;
+  }
+
+  .coin-toss-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .coin {
+    width: 120px;
+    height: 120px;
+  }
+
+  .coin-side {
+    font-size: 1.5rem;
+  }
+}

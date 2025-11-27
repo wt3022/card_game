@@ -12,6 +12,7 @@ import (
 	"card_game/internal/adapter/converter"
 	"card_game/internal/application/service"
 	"card_game/internal/core/entity"
+	"card_game/internal/core/port"
 )
 
 // ========================================
@@ -105,23 +106,31 @@ func (h *CardManagementConnectHandler) GetCard(
 	req *connect.Request[pbv1.GetCardRequest],
 ) (*connect.Response[pbv1.GetCardResponse], error) {
 	cardID := req.Msg.GetId()
+	log.Printf("GetCard: cardID=%s", cardID)
 
 	// カードを取得
 	card, err := h.cardService.GetCard(cardID)
 	if err != nil {
+		log.Printf("GetCard: failed to get card: %v", err)
 		return nil, connect.NewError(connect.CodeNotFound, err)
 	}
 
 	// エンティティからprotoに変換
 	protoCard := converter.CardToProto(card)
+	log.Printf("GetCard: card=%s, type=%s", card.Name, card.Type)
 
 	// CardEffectを取得してProtoに変換
 	cardEffect, err := h.cardService.GetCardEffect(cardID)
+	log.Printf("GetCard: GetCardEffect result - err=%v, cardEffect=%v", err, cardEffect != nil)
 	if err == nil && cardEffect != nil {
+		log.Printf("GetCard: CardEffect found, converting to proto")
 		protoCard.CardEffect = converter.CardEffectToProto(cardEffect)
 		if protoCard.CardEffect != nil {
 			protoCard.CardEffect.CardId = cardID
+			log.Printf("GetCard: CardEffect set in proto, definitions count=%d", len(protoCard.CardEffect.Definitions))
 		}
+	} else if err != nil {
+		log.Printf("GetCard: CardEffect error: %v", err)
 	}
 
 	resp := &pbv1.GetCardResponse{
@@ -137,15 +146,26 @@ func (h *CardManagementConnectHandler) ListCards(
 	req *connect.Request[pbv1.ListCardsRequest],
 ) (*connect.Response[pbv1.ListCardsResponse], error) {
 	log.Println("ListCards: start")
-	var cards []*entity.Card
+
+	// ページネーションパラメータを取得
+	page := int(req.Msg.Page)
+	pageSize := int(req.Msg.PageSize)
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 {
+		pageSize = 50
+	}
+
+	var result *port.CardListResult
 	var err error
 
 	// タイプが指定されている場合はフィルタリング
 	if req.Msg.Type != nil && *req.Msg.Type != pbv1.CardType_CARD_TYPE_UNSPECIFIED {
 		cardType := converter.CardTypeFromProto(*req.Msg.Type)
-		cards, err = h.cardService.ListCardsByType(cardType)
+		result, err = h.cardService.ListCardsByTypeWithPagination(cardType, page, pageSize)
 	} else {
-		cards, err = h.cardService.ListCards()
+		result, err = h.cardService.ListCardsWithPagination(page, pageSize)
 	}
 
 	if err != nil {
@@ -153,20 +173,22 @@ func (h *CardManagementConnectHandler) ListCards(
 	}
 
 	// エンティティからprotoに変換
-	protoCards := make([]*pbv1.Card, len(cards))
-	for i, card := range cards {
+	protoCards := make([]*pbv1.Card, len(result.Cards))
+	for i, card := range result.Cards {
 		protoCards[i] = converter.CardToProto(card)
-		// CardEffectを取得してProtoに変換
-		cardEffect, err := h.cardService.GetCardEffect(card.ID)
-		if err == nil && cardEffect != nil {
-			protoCards[i].CardEffect = converter.CardEffectToProto(cardEffect)
-			if protoCards[i].CardEffect != nil {
-				protoCards[i].CardEffect.CardId = card.ID
-			}
-		}
+		// 一覧表示では効果テキスト(card.Effect)のみを使用
+		// CardEffectの詳細情報は個別取得時(GetCard)でのみ取得
 	}
+
+	// 総ページ数を計算
+	totalPages := (result.TotalCount + result.PageSize - 1) / result.PageSize
+
 	resp := &pbv1.ListCardsResponse{
-		Cards: protoCards,
+		Cards:      protoCards,
+		TotalCount: int32(result.TotalCount),
+		Page:       int32(result.Page),
+		PageSize:   int32(result.PageSize),
+		TotalPages: int32(totalPages),
 	}
 
 	return connect.NewResponse(resp), nil
@@ -203,8 +225,20 @@ func (h *CardManagementConnectHandler) UpdateCard(
 		return nil, connect.NewError(connect.CodeInternal, err)
 	}
 
+	// 更新後のカード情報を取得（CardEffectを含む）
+	updatedCard, err := h.cardService.GetCard(card.ID)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
 	// エンティティからprotoに変換
-	protoCard := converter.CardToProto(card)
+	protoCard := converter.CardToProto(updatedCard)
+
+	// CardEffectをprotoに変換して設定
+	if updatedCard.CardEffect != nil {
+		protoCard.CardEffect = converter.CardEffectToProto(updatedCard.CardEffect)
+		protoCard.CardEffect.CardId = updatedCard.ID
+	}
 
 	resp := &pbv1.UpdateCardResponse{
 		Card: protoCard,

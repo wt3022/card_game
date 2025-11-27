@@ -82,8 +82,8 @@
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  min-height: 500px;
-  max-height: 600px;
+  height: 700px;
+  overflow: hidden;
 }
 
 .deck-current-cards:hover,
@@ -101,9 +101,100 @@
 
 .deck-current-cards h3,
 .deck-available-cards h3 {
-  margin: 0;
+  margin: 0 0 1rem 0;
   color: #333;
   font-size: 1rem;
+}
+
+/* 検索とソートのコントロール */
+.card-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.search-clear:hover {
+  color: #666;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sort-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-select:hover {
+  border-color: #667eea;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.sort-order-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 2.5rem;
+}
+
+.sort-order-btn:hover {
+  background-color: #f5f5f5;
+  border-color: #667eea;
+}
+
+.sort-order-btn:active {
+  transform: scale(0.95);
 }
 
 .deck-remaining-count {
@@ -165,8 +256,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  flex: 1;
+  flex: 1 1 0;
   overflow-y: auto;
+  overflow-x: hidden;
   scroll-behavior: smooth;
   padding-right: 4px;
   min-height: 0;
@@ -279,6 +371,79 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+}
+
+.deck-card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.deck-card-count {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+  flex-shrink: 0;
+}
+
+.deck-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.deck-card-add,
+.deck-card-remove {
+  padding: 0.25rem 0.5rem;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.deck-card-add {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.deck-card-add:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+  transform: scale(1.05);
+}
+
+.deck-card-add:disabled {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.deck-card-remove {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+.deck-card-remove:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
+  transform: scale(1.05);
+}
+
+.deck-card-add:active:not(:disabled),
+.deck-card-remove:active {
+  transform: scale(0.95);
 }
 
 .deck-card-details {
@@ -617,4 +782,230 @@
   cursor: not-allowed;
   box-shadow: none;
   background: #9ca3af;
+}
+
+/* デッキ統計コンテナ */
+.deck-stats-container {
+  margin: 1.5rem 0;
+}
+
+/* デッキ統計 */
+.deck-stats {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 8px;
+  border: 1px solid #bae6fd;
+}
+
+.deck-stats-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.deck-stats-section h4 {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.empty-stats {
+  padding: 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  background: white;
+  border-radius: 6px;
+  font-style: italic;
+}
+
+/* マナカーブ */
+.mana-curve {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  height: 120px;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+}
+
+.mana-bar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  height: 100%;
+}
+
+.mana-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1e40af;
+  min-height: 1rem;
+}
+
+.mana-bar-wrapper {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  min-height: 60px;
+}
+
+.mana-bar {
+  width: 100%;
+  background: linear-gradient(to top, #3b82f6 0%, #60a5fa 100%);
+  border-radius: 4px 4px 0 0;
+  transition: all 0.3s ease;
+  min-height: 2px;
+}
+
+.mana-cost-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #64748b;
+  min-height: 1rem;
+}
+
+/* カード種別分布 */
+.type-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+}
+
+.type-item {
+  display: grid;
+  grid-template-columns: 4rem 3rem 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.type-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.type-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: right;
+}
+
+.type-bar {
+  height: 1rem;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.type-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
+  transition: width 0.3s ease;
+}
+
+/* デッキ内カードのソート */
+.deck-sort-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+}
+
+/* タイプフィルターボタン */
+.type-filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+}
+
+.type-filter-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-filter-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.type-filter-btn.active {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.type-filter-btn.active:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+}
+
+/* ページネーション */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  margin-top: 1rem;
+  border-radius: 8px;
+}
+
+.pagination-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
 }

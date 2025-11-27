@@ -312,6 +312,20 @@ export class ListCardsRequest extends Message<ListCardsRequest> {
    */
   type?: CardType
 
+  /**
+   * ページ番号 (1から開始、デフォルト1)
+   *
+   * @generated from field: int32 page = 2;
+   */
+  page = 0
+
+  /**
+   * 1ページあたりの件数 (デフォルト50)
+   *
+   * @generated from field: int32 page_size = 3;
+   */
+  pageSize = 0
+
   constructor(data?: PartialMessage<ListCardsRequest>) {
     super()
     proto3.util.initPartial(data, this)
@@ -327,6 +341,8 @@ export class ListCardsRequest extends Message<ListCardsRequest> {
       T: proto3.getEnumType(CardType),
       opt: true,
     },
+    { no: 2, name: 'page', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: 'page_size', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
   ])
 
   static fromBinary(
@@ -369,6 +385,34 @@ export class ListCardsResponse extends Message<ListCardsResponse> {
    */
   cards: Card[] = []
 
+  /**
+   * 総件数
+   *
+   * @generated from field: int32 total_count = 2;
+   */
+  totalCount = 0
+
+  /**
+   * 現在のページ番号
+   *
+   * @generated from field: int32 page = 3;
+   */
+  page = 0
+
+  /**
+   * 1ページあたりの件数
+   *
+   * @generated from field: int32 page_size = 4;
+   */
+  pageSize = 0
+
+  /**
+   * 総ページ数
+   *
+   * @generated from field: int32 total_pages = 5;
+   */
+  totalPages = 0
+
   constructor(data?: PartialMessage<ListCardsResponse>) {
     super()
     proto3.util.initPartial(data, this)
@@ -378,6 +422,10 @@ export class ListCardsResponse extends Message<ListCardsResponse> {
   static readonly typeName = 'cardgame.v1.ListCardsResponse'
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: 'cards', kind: 'message', T: Card, repeated: true },
+    { no: 2, name: 'total_count', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
+    { no: 3, name: 'page', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
+    { no: 4, name: 'page_size', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
+    { no: 5, name: 'total_pages', kind: 'scalar', T: 5 /* ScalarType.INT32 */ },
   ])
 
   static fromBinary(

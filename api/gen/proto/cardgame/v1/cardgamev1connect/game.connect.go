@@ -38,6 +38,12 @@ const (
 	// GameServiceGetGameStateProcedure is the fully-qualified name of the GameService's GetGameState
 	// RPC.
 	GameServiceGetGameStateProcedure = "/cardgame.v1.GameService/GetGameState"
+	// GameServicePerformCoinTossProcedure is the fully-qualified name of the GameService's
+	// PerformCoinToss RPC.
+	GameServicePerformCoinTossProcedure = "/cardgame.v1.GameService/PerformCoinToss"
+	// GameServiceChooseTurnOrderProcedure is the fully-qualified name of the GameService's
+	// ChooseTurnOrder RPC.
+	GameServiceChooseTurnOrderProcedure = "/cardgame.v1.GameService/ChooseTurnOrder"
 	// GameServicePerformMulliganProcedure is the fully-qualified name of the GameService's
 	// PerformMulligan RPC.
 	GameServicePerformMulliganProcedure = "/cardgame.v1.GameService/PerformMulligan"
@@ -62,6 +68,8 @@ const (
 type GameServiceClient interface {
 	CreateGame(context.Context, *connect.Request[v1.CreateGameRequest]) (*connect.Response[v1.CreateGameResponse], error)
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
+	PerformCoinToss(context.Context, *connect.Request[v1.PerformCoinTossRequest]) (*connect.Response[v1.PerformCoinTossResponse], error)
+	ChooseTurnOrder(context.Context, *connect.Request[v1.ChooseTurnOrderRequest]) (*connect.Response[v1.ChooseTurnOrderResponse], error)
 	PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
@@ -92,6 +100,18 @@ func NewGameServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			httpClient,
 			baseURL+GameServiceGetGameStateProcedure,
 			connect.WithSchema(gameServiceMethods.ByName("GetGameState")),
+			connect.WithClientOptions(opts...),
+		),
+		performCoinToss: connect.NewClient[v1.PerformCoinTossRequest, v1.PerformCoinTossResponse](
+			httpClient,
+			baseURL+GameServicePerformCoinTossProcedure,
+			connect.WithSchema(gameServiceMethods.ByName("PerformCoinToss")),
+			connect.WithClientOptions(opts...),
+		),
+		chooseTurnOrder: connect.NewClient[v1.ChooseTurnOrderRequest, v1.ChooseTurnOrderResponse](
+			httpClient,
+			baseURL+GameServiceChooseTurnOrderProcedure,
+			connect.WithSchema(gameServiceMethods.ByName("ChooseTurnOrder")),
 			connect.WithClientOptions(opts...),
 		),
 		performMulligan: connect.NewClient[v1.PerformMulliganRequest, v1.PerformMulliganResponse](
@@ -143,6 +163,8 @@ func NewGameServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 type gameServiceClient struct {
 	createGame       *connect.Client[v1.CreateGameRequest, v1.CreateGameResponse]
 	getGameState     *connect.Client[v1.GetGameStateRequest, v1.GetGameStateResponse]
+	performCoinToss  *connect.Client[v1.PerformCoinTossRequest, v1.PerformCoinTossResponse]
+	chooseTurnOrder  *connect.Client[v1.ChooseTurnOrderRequest, v1.ChooseTurnOrderResponse]
 	performMulligan  *connect.Client[v1.PerformMulliganRequest, v1.PerformMulliganResponse]
 	playCard         *connect.Client[v1.PlayCardRequest, v1.PlayCardResponse]
 	executeAttack    *connect.Client[v1.ExecuteAttackRequest, v1.ExecuteAttackResponse]
@@ -160,6 +182,16 @@ func (c *gameServiceClient) CreateGame(ctx context.Context, req *connect.Request
 // GetGameState calls cardgame.v1.GameService.GetGameState.
 func (c *gameServiceClient) GetGameState(ctx context.Context, req *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error) {
 	return c.getGameState.CallUnary(ctx, req)
+}
+
+// PerformCoinToss calls cardgame.v1.GameService.PerformCoinToss.
+func (c *gameServiceClient) PerformCoinToss(ctx context.Context, req *connect.Request[v1.PerformCoinTossRequest]) (*connect.Response[v1.PerformCoinTossResponse], error) {
+	return c.performCoinToss.CallUnary(ctx, req)
+}
+
+// ChooseTurnOrder calls cardgame.v1.GameService.ChooseTurnOrder.
+func (c *gameServiceClient) ChooseTurnOrder(ctx context.Context, req *connect.Request[v1.ChooseTurnOrderRequest]) (*connect.Response[v1.ChooseTurnOrderResponse], error) {
+	return c.chooseTurnOrder.CallUnary(ctx, req)
 }
 
 // PerformMulligan calls cardgame.v1.GameService.PerformMulligan.
@@ -201,6 +233,8 @@ func (c *gameServiceClient) JoinMatchmaking(ctx context.Context, req *connect.Re
 type GameServiceHandler interface {
 	CreateGame(context.Context, *connect.Request[v1.CreateGameRequest]) (*connect.Response[v1.CreateGameResponse], error)
 	GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error)
+	PerformCoinToss(context.Context, *connect.Request[v1.PerformCoinTossRequest]) (*connect.Response[v1.PerformCoinTossResponse], error)
+	ChooseTurnOrder(context.Context, *connect.Request[v1.ChooseTurnOrderRequest]) (*connect.Response[v1.ChooseTurnOrderResponse], error)
 	PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error)
 	PlayCard(context.Context, *connect.Request[v1.PlayCardRequest]) (*connect.Response[v1.PlayCardResponse], error)
 	ExecuteAttack(context.Context, *connect.Request[v1.ExecuteAttackRequest]) (*connect.Response[v1.ExecuteAttackResponse], error)
@@ -227,6 +261,18 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 		GameServiceGetGameStateProcedure,
 		svc.GetGameState,
 		connect.WithSchema(gameServiceMethods.ByName("GetGameState")),
+		connect.WithHandlerOptions(opts...),
+	)
+	gameServicePerformCoinTossHandler := connect.NewUnaryHandler(
+		GameServicePerformCoinTossProcedure,
+		svc.PerformCoinToss,
+		connect.WithSchema(gameServiceMethods.ByName("PerformCoinToss")),
+		connect.WithHandlerOptions(opts...),
+	)
+	gameServiceChooseTurnOrderHandler := connect.NewUnaryHandler(
+		GameServiceChooseTurnOrderProcedure,
+		svc.ChooseTurnOrder,
+		connect.WithSchema(gameServiceMethods.ByName("ChooseTurnOrder")),
 		connect.WithHandlerOptions(opts...),
 	)
 	gameServicePerformMulliganHandler := connect.NewUnaryHandler(
@@ -277,6 +323,10 @@ func NewGameServiceHandler(svc GameServiceHandler, opts ...connect.HandlerOption
 			gameServiceCreateGameHandler.ServeHTTP(w, r)
 		case GameServiceGetGameStateProcedure:
 			gameServiceGetGameStateHandler.ServeHTTP(w, r)
+		case GameServicePerformCoinTossProcedure:
+			gameServicePerformCoinTossHandler.ServeHTTP(w, r)
+		case GameServiceChooseTurnOrderProcedure:
+			gameServiceChooseTurnOrderHandler.ServeHTTP(w, r)
 		case GameServicePerformMulliganProcedure:
 			gameServicePerformMulliganHandler.ServeHTTP(w, r)
 		case GameServicePlayCardProcedure:
@@ -306,6 +356,14 @@ func (UnimplementedGameServiceHandler) CreateGame(context.Context, *connect.Requ
 
 func (UnimplementedGameServiceHandler) GetGameState(context.Context, *connect.Request[v1.GetGameStateRequest]) (*connect.Response[v1.GetGameStateResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.GetGameState is not implemented"))
+}
+
+func (UnimplementedGameServiceHandler) PerformCoinToss(context.Context, *connect.Request[v1.PerformCoinTossRequest]) (*connect.Response[v1.PerformCoinTossResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.PerformCoinToss is not implemented"))
+}
+
+func (UnimplementedGameServiceHandler) ChooseTurnOrder(context.Context, *connect.Request[v1.ChooseTurnOrderRequest]) (*connect.Response[v1.ChooseTurnOrderResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cardgame.v1.GameService.ChooseTurnOrder is not implemented"))
 }
 
 func (UnimplementedGameServiceHandler) PerformMulligan(context.Context, *connect.Request[v1.PerformMulliganRequest]) (*connect.Response[v1.PerformMulliganResponse], error) {

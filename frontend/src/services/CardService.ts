@@ -8,6 +8,17 @@ import { cardManagementClient } from '../lib/api-client'
 import { CardMapper } from '../mappers'
 
 /**
+ * ページネーション結果
+ */
+export interface CardListResult {
+  cards: Card[]
+  totalCount: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+/**
  * カード管理サービス
  */
 // biome-ignore lint/complexity/noStaticOnlyClass: Serviceクラスは名前空間として使用
@@ -18,6 +29,26 @@ export class CardService {
   static async listCards(): Promise<Card[]> {
     const response = await cardManagementClient.listCards({})
     return response.cards.map((c) => CardMapper.toDomain(c))
+  }
+
+  /**
+   * ページネーション付きですべてのカードを取得
+   */
+  static async listCardsWithPagination(
+    page = 1,
+    pageSize = 50,
+  ): Promise<CardListResult> {
+    const response = await cardManagementClient.listCards({
+      page,
+      pageSize,
+    })
+    return {
+      cards: response.cards.map((c) => CardMapper.toDomain(c)),
+      totalCount: response.totalCount,
+      page: response.page,
+      pageSize: response.pageSize,
+      totalPages: response.totalPages,
+    }
   }
 
   /**

@@ -72,6 +72,15 @@ func (s *CardService) ListCards() ([]*entity.Card, error) {
 	return cards, nil
 }
 
+// ListCardsWithPagination ページネーション付きですべてのカードを取得
+func (s *CardService) ListCardsWithPagination(page, pageSize int) (*port.CardListResult, error) {
+	result, err := s.cardRepo.FindAllWithPagination(page, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("カード一覧の取得に失敗しました: %w", err)
+	}
+	return result, nil
+}
+
 // ListCardsByType タイプでカードを取得
 func (s *CardService) ListCardsByType(cardType entity.CardType) ([]*entity.Card, error) {
 	cards, err := s.cardRepo.FindByType(cardType)
@@ -79,6 +88,15 @@ func (s *CardService) ListCardsByType(cardType entity.CardType) ([]*entity.Card,
 		return nil, fmt.Errorf("タイプ別カード一覧の取得に失敗しました: %w", err)
 	}
 	return cards, nil
+}
+
+// ListCardsByTypeWithPagination ページネーション付きでタイプでカードを取得
+func (s *CardService) ListCardsByTypeWithPagination(cardType entity.CardType, page, pageSize int) (*port.CardListResult, error) {
+	result, err := s.cardRepo.FindByTypeWithPagination(cardType, page, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("タイプ別カード一覧の取得に失敗しました: %w", err)
+	}
+	return result, nil
 }
 
 // UpdateCard カードを更新

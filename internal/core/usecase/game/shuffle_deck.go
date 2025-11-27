@@ -1,7 +1,14 @@
 package game
 
-import "card_game/internal/core/entity"
-import "math/rand"
+import (
+	"card_game/internal/core/entity"
+	"math/rand"
+)
+
+// CoinToss コイントスを実行（50%の確率で表）
+func CoinToss() bool {
+	return rand.Intn(2) == 0
+}
 
 // デッキをシャッフルする
 func ShuffleDeck(in []entity.Card) []entity.Card {

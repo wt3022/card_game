@@ -53,6 +53,21 @@ test: ## テストを実行
 	@echo "🧪 Running tests..."
 	go test -v ./...
 
+# データベース
+.PHONY: db-seed
+db-seed: ## マスターデータをDBに投入
+	@echo "🌱 Seeding database with master data..."
+	go run cmd/seed/main.go
+
+.PHONY: db-reset
+db-reset: ## DBをリセットして再度マスターデータを投入
+	@echo "🔄 Resetting database..."
+	docker compose down -v
+	docker compose up -d db
+	@echo "⏳ Waiting for MySQL to be ready..."
+	@sleep 10
+	@make db-seed
+
 # クリーンアップ
 .PHONY: clean
 clean: ## ビルド成果物を削除

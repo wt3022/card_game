@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import CardEditor from '../components/CardManagement/CardEditor'
 import DeckEditor from '../components/DeckManagement/DeckEditor'
 import type { Card, Deck } from '../gen/common_pb'
@@ -24,6 +24,9 @@ const getCardTypeLabel = (type: CardType): string => {
 }
 
 export default function Admin() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { id } = useParams<{ id: string }>()
   const [currentView, setCurrentView] = useState<AdminView>('card-list')
   const [cards, setCards] = useState<Card[]>([])
   const [selectedCard, setSelectedCard] = useState<Card | null>(null)
@@ -36,24 +39,42 @@ export default function Admin() {
   const [sortColumn, setSortColumn] = useState<string>('id')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [filterText, setFilterText] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [typeFilter, setTypeFilter] = useState<CardType | 'ALL'>('ALL')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [pageSize, setPageSize] = useState(50)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [deckSearchInput, setDeckSearchInput] = useState('')
+  const [isDeckEditMode, setIsDeckEditMode] = useState(false)
   const userInfo = getUserInfo()
 
-  const loadCards = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  const loadCards = useCallback(
+    async (page = 1, size = pageSize) => {
+      try {
+        setLoading(true)
+        setError(null)
 
-      const response = await cardManagementClient.listCards({})
-      setCards(response.cards || [])
-    } catch (err: unknown) {
-      console.error('Failed to load cards:', err)
-      setError(
-        err instanceof Error ? err.message : 'カードの読み込みに失敗しました',
-      )
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+        const response = await cardManagementClient.listCards({
+          page,
+          pageSize: size,
+        })
+        setCards(response.cards || [])
+        setTotalPages(response.totalPages)
+        setTotalCount(response.totalCount)
+        setCurrentPage(page)
+      } catch (err: unknown) {
+        console.error('Failed to load cards:', err)
+        setError(
+          err instanceof Error ? err.message : 'カードの読み込みに失敗しました',
+        )
+      } finally {
+        setLoading(false)
+      }
+    },
+    [pageSize],
+  )
 
   const loadDecks = useCallback(async () => {
     try {
@@ -69,6 +90,76 @@ export default function Admin() {
       setLoading(false)
     }
   }, [])
+
+  const loadCardDetail = useCallback(async (cardId: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await cardManagementClient.getCard({ id: cardId })
+      console.log('Loaded card detail:', response.card)
+      console.log('Card effect:', response.card?.cardEffect)
+      setSelectedCard(response.card ?? null)
+    } catch (err: unknown) {
+      console.error('Failed to load card details:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'カード詳細の読み込みに失敗しました',
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  const loadDeckDetail = useCallback(async (deckId: string) => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await cardManagementClient.getDeck({ id: deckId })
+      setSelectedDeck(response.deck ?? null)
+    } catch (err: unknown) {
+      console.error('Failed to load deck details:', err)
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'デッキ詳細の読み込みに失敗しました',
+      )
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // URLパラメータに基づいて現在のビューを判定
+  useEffect(() => {
+    const pathname = location.pathname
+    console.log('URL changed:', pathname, 'ID:', id)
+
+    if (pathname.startsWith('/admin/cards/')) {
+      setCurrentView('card-edit')
+      setIsNewCardMode(id === 'new')
+      if (id && id !== 'new') {
+        loadCardDetail(id)
+      } else if (id === 'new') {
+        setSelectedCard(null)
+      }
+    } else if (pathname.startsWith('/admin/decks/')) {
+      setCurrentView('deck-edit')
+      setIsNewDeckMode(id === 'new')
+      if (id && id !== 'new') {
+        loadDeckDetail(id)
+      } else if (id === 'new') {
+        setSelectedDeck(null)
+      }
+    } else if (pathname === '/admin' || pathname === '/admin/cards') {
+      setCurrentView('card-list')
+      setSelectedCard(null)
+      setIsNewCardMode(false)
+    } else if (pathname === '/admin/decks') {
+      setCurrentView('deck-list')
+      setSelectedDeck(null)
+      setIsNewDeckMode(false)
+    }
+  }, [location.pathname, id, loadCardDetail, loadDeckDetail])
 
   useEffect(() => {
     if (currentView === 'card-list' || currentView === 'card-edit') {
@@ -88,8 +179,36 @@ export default function Admin() {
     }
   }
 
+  const handleSearch = () => {
+    setFilterText(searchInput)
+  }
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch()
+    }
+  }
+
+  const handleDeckSearch = () => {
+    setFilterText(deckSearchInput)
+  }
+
+  const handleDeckSearchKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (e.key === 'Enter') {
+      handleDeckSearch()
+    }
+  }
+
   const getSortedAndFilteredCards = () => {
     const filtered = cards.filter((card) => {
+      // タイプフィルター
+      if (typeFilter !== 'ALL' && card.type !== typeFilter) {
+        return false
+      }
+
+      // テキスト検索
       if (!filterText) return true
       const searchText = filterText.toLowerCase()
       return (
@@ -158,21 +277,16 @@ export default function Admin() {
   }
 
   const handleCardSelect = (card: Card) => {
-    setSelectedCard(card)
-    setIsNewCardMode(false)
-    setCurrentView('card-edit')
+    navigate(`/admin/cards/${card.id}`)
   }
 
   const handleNewCardClick = () => {
-    setSelectedCard(null)
-    setIsNewCardMode(true)
-    setCurrentView('card-edit')
+    navigate('/admin/cards/new')
   }
 
   const handleCardSave = async (_savedCardId: string) => {
     await loadCards()
-    setIsNewCardMode(false)
-    setCurrentView('card-list')
+    navigate('/admin')
   }
 
   const handleCardDelete = async (cardId: string) => {
@@ -185,6 +299,7 @@ export default function Admin() {
       await loadCards()
       if (selectedCard?.id === cardId) {
         setSelectedCard(null)
+        navigate('/admin')
       }
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'カードの削除に失敗しました')
@@ -192,21 +307,16 @@ export default function Admin() {
   }
 
   const handleDeckSelect = (deck: Deck) => {
-    setSelectedDeck(deck)
-    setIsNewDeckMode(false)
-    setCurrentView('deck-edit')
+    navigate(`/admin/decks/${deck.id}`)
   }
 
   const handleNewDeckClick = () => {
-    setSelectedDeck(null)
-    setIsNewDeckMode(true)
-    setCurrentView('deck-edit')
+    navigate('/admin/decks/new')
   }
 
   const handleDeckSave = async (_savedDeckId?: string) => {
     await loadDecks()
-    setIsNewDeckMode(false)
-    setCurrentView('deck-list')
+    navigate('/admin/decks')
   }
 
   const handleDeckDelete = async (deckId: string) => {
@@ -219,6 +329,7 @@ export default function Admin() {
       await loadDecks()
       if (selectedDeck?.id === deckId) {
         setSelectedDeck(null)
+        navigate('/admin/decks')
       }
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'デッキの削除に失敗しました')
@@ -257,14 +368,14 @@ export default function Admin() {
             <button
               type="button"
               className={`nav-item ${currentView === 'card-list' || currentView === 'card-edit' ? 'active' : ''}`}
-              onClick={() => setCurrentView('card-list')}
+              onClick={() => navigate('/admin')}
             >
               カード管理
             </button>
             <button
               type="button"
               className={`nav-item ${currentView === 'deck-list' || currentView === 'deck-edit' ? 'active' : ''}`}
-              onClick={() => setCurrentView('deck-list')}
+              onClick={() => navigate('/admin/decks')}
             >
               デッキ管理
             </button>
@@ -277,13 +388,6 @@ export default function Admin() {
               <div className="list-header">
                 <h2>カード一覧</h2>
                 <div className="list-actions">
-                  <input
-                    type="text"
-                    className="filter-input"
-                    placeholder="ID、名前、タイプで検索..."
-                    value={filterText}
-                    onChange={(e) => setFilterText(e.target.value)}
-                  />
                   <button
                     type="button"
                     className="btn-primary"
@@ -291,6 +395,85 @@ export default function Admin() {
                   >
                     + 新しいカード
                   </button>
+                  <button
+                    type="button"
+                    className={`btn-edit-mode ${isEditMode ? 'active' : ''}`}
+                    onClick={() => setIsEditMode(!isEditMode)}
+                  >
+                    {isEditMode ? '✓ 編集モード' : '編集モード'}
+                  </button>
+                </div>
+              </div>
+
+              {/* フィルター・ページネーションコントロール */}
+              <div className="list-controls">
+                <div className="filter-controls">
+                  <div className="type-filter-group">
+                    <span className="filter-label">種別:</span>
+                    <button
+                      type="button"
+                      className={`type-filter-btn ${typeFilter === 'ALL' ? 'active' : ''}`}
+                      onClick={() => setTypeFilter('ALL')}
+                    >
+                      すべて
+                    </button>
+                    <button
+                      type="button"
+                      className={`type-filter-btn ${typeFilter === CardType.UNIT ? 'active' : ''}`}
+                      onClick={() => setTypeFilter(CardType.UNIT)}
+                    >
+                      ユニット
+                    </button>
+                    <button
+                      type="button"
+                      className={`type-filter-btn ${typeFilter === CardType.SPELL ? 'active' : ''}`}
+                      onClick={() => setTypeFilter(CardType.SPELL)}
+                    >
+                      スペル
+                    </button>
+                    <button
+                      type="button"
+                      className={`type-filter-btn ${typeFilter === CardType.LEADER ? 'active' : ''}`}
+                      onClick={() => setTypeFilter(CardType.LEADER)}
+                    >
+                      リーダー
+                    </button>
+                  </div>
+                  <div className="search-box">
+                    <input
+                      type="text"
+                      className="filter-input"
+                      placeholder="ID、名前で検索..."
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      onKeyDown={handleSearchKeyDown}
+                    />
+                    <button
+                      type="button"
+                      className="btn-search"
+                      onClick={handleSearch}
+                    >
+                      検索
+                    </button>
+                  </div>
+                </div>
+                <div className="page-size-selector">
+                  <label htmlFor="page-size-top">表示件数:</label>
+                  <select
+                    id="page-size-top"
+                    value={pageSize}
+                    onChange={(e) => {
+                      const newSize = Number(e.target.value)
+                      setPageSize(newSize)
+                      setCurrentPage(1)
+                      loadCards(1, newSize)
+                    }}
+                    className="page-size-select"
+                  >
+                    <option value={30}>30件</option>
+                    <option value={50}>50件</option>
+                    <option value={100}>100件</option>
+                  </select>
                 </div>
               </div>
 
@@ -350,7 +533,7 @@ export default function Admin() {
                             (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
                         <th>効果</th>
-                        <th>操作</th>
+                        {isEditMode && <th>操作</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -367,22 +550,56 @@ export default function Admin() {
                           <td>{card.attack ?? '-'}</td>
                           <td>{card.defense ?? '-'}</td>
                           <td className="effect-cell">{card.effect}</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn-danger-small"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleCardDelete(card.id)
-                              }}
-                            >
-                              削除
-                            </button>
-                          </td>
+                          {isEditMode && (
+                            <td>
+                              <button
+                                type="button"
+                                className="btn-danger-small"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleCardDelete(card.id)
+                                }}
+                              >
+                                削除
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
                   </table>
+
+                  {/* ページネーション */}
+                  {totalCount > 0 && (
+                    <div className="table-pagination">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          loadCards(Math.max(1, currentPage - 1), pageSize)
+                        }
+                        disabled={currentPage === 1}
+                        className="pagination-btn"
+                      >
+                        ← 前へ
+                      </button>
+                      <span className="pagination-info">
+                        {currentPage} / {totalPages} ページ (全{totalCount}件)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          loadCards(
+                            Math.min(totalPages, currentPage + 1),
+                            pageSize,
+                          )
+                        }
+                        disabled={currentPage >= totalPages}
+                        className="pagination-btn"
+                      >
+                        次へ →
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -394,7 +611,7 @@ export default function Admin() {
                 <button
                   type="button"
                   className="btn-back"
-                  onClick={() => setCurrentView('card-list')}
+                  onClick={() => navigate('/admin')}
                 >
                   ← 一覧に戻る
                 </button>
@@ -404,7 +621,7 @@ export default function Admin() {
                 card={selectedCard}
                 isNewCardMode={isNewCardMode}
                 onSave={handleCardSave}
-                onCancel={() => setCurrentView('card-list')}
+                onCancel={() => navigate('/admin')}
               />
             </div>
           )}
@@ -414,13 +631,6 @@ export default function Admin() {
               <div className="list-header">
                 <h2>デッキ一覧</h2>
                 <div className="list-actions">
-                  <input
-                    type="text"
-                    className="filter-input"
-                    placeholder="ID、名前で検索..."
-                    value={filterText}
-                    onChange={(e) => setFilterText(e.target.value)}
-                  />
                   <button
                     type="button"
                     className="btn-primary"
@@ -428,6 +638,36 @@ export default function Admin() {
                   >
                     + 新しいデッキ
                   </button>
+                  <button
+                    type="button"
+                    className={`btn-edit-mode ${isDeckEditMode ? 'active' : ''}`}
+                    onClick={() => setIsDeckEditMode(!isDeckEditMode)}
+                  >
+                    {isDeckEditMode ? '✓ 編集モード' : '編集モード'}
+                  </button>
+                </div>
+              </div>
+
+              {/* 検索コントロール */}
+              <div className="list-controls">
+                <div className="filter-controls">
+                  <div className="search-box">
+                    <input
+                      type="text"
+                      className="filter-input"
+                      placeholder="ID、名前で検索..."
+                      value={deckSearchInput}
+                      onChange={(e) => setDeckSearchInput(e.target.value)}
+                      onKeyDown={handleDeckSearchKeyDown}
+                    />
+                    <button
+                      type="button"
+                      className="btn-search"
+                      onClick={handleDeckSearch}
+                    >
+                      検索
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -455,7 +695,7 @@ export default function Admin() {
                             (sortDirection === 'asc' ? '▲' : '▼')}
                         </th>
                         <th>カード枚数</th>
-                        <th>操作</th>
+                        {isDeckEditMode && <th>操作</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -468,18 +708,20 @@ export default function Admin() {
                           <td>{deck.id}</td>
                           <td>{deck.name}</td>
                           <td>{deck.cardIds?.length ?? 0}枚</td>
-                          <td>
-                            <button
-                              type="button"
-                              className="btn-danger-small"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleDeckDelete(deck.id)
-                              }}
-                            >
-                              削除
-                            </button>
-                          </td>
+                          {isDeckEditMode && (
+                            <td>
+                              <button
+                                type="button"
+                                className="btn-danger-small"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleDeckDelete(deck.id)
+                                }}
+                              >
+                                削除
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -495,7 +737,7 @@ export default function Admin() {
                 <button
                   type="button"
                   className="btn-back"
-                  onClick={() => setCurrentView('deck-list')}
+                  onClick={() => navigate('/admin/decks')}
                 >
                   ← 一覧に戻る
                 </button>
@@ -505,7 +747,7 @@ export default function Admin() {
                 deck={selectedDeck}
                 isNewDeckMode={isNewDeckMode}
                 onSave={handleDeckSave}
-                onCancel={() => setCurrentView('deck-list')}
+                onCancel={() => navigate('/admin/decks')}
               />
             </div>
           )}

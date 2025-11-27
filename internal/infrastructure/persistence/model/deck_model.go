@@ -21,7 +21,7 @@ func (DeckModel) TableName() string {
 // DeckCardModel はデッキとカードの関連を表すモデル
 type DeckCardModel struct {
 	ID        uint      `gorm:"primaryKey;autoIncrement"`
-	DeckID    string    `gorm:"type:varchar(255);not null;index:idx_deck_card"`
+	DeckID    string    `gorm:"type:varchar(255);not null;index:idx_deck_card;constraint:OnDelete:CASCADE"`
 	CardID    string    `gorm:"type:varchar(255);not null;index:idx_deck_card"`
 	Position  int       `gorm:"not null"` // デッキ内の位置（0-39）
 	CreatedAt time.Time `gorm:"autoCreateTime"`

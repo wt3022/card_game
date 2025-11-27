@@ -9,6 +9,7 @@ package cardgamev1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -517,6 +518,7 @@ type AtomicEffect struct {
 	CardId        *string                `protobuf:"bytes,5,opt,name=card_id,json=cardId,proto3,oneof" json:"card_id,omitempty"`
 	Trait         *Trait                 `protobuf:"varint,6,opt,name=trait,proto3,enum=cardgame.v1.Trait,oneof" json:"trait,omitempty"`
 	Timing        EffectTiming           `protobuf:"varint,7,opt,name=timing,proto3,enum=cardgame.v1.EffectTiming" json:"timing,omitempty"` // 発動タイミング
+	Parameters    *structpb.Struct       `protobuf:"bytes,8,opt,name=parameters,proto3,oneof" json:"parameters,omitempty"`                  // 追加パラメータ (name, attack, defense, cost, count, traitsなど)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -598,6 +600,13 @@ func (x *AtomicEffect) GetTiming() EffectTiming {
 		return x.Timing
 	}
 	return EffectTiming_EFFECT_TIMING_UNSPECIFIED
+}
+
+func (x *AtomicEffect) GetParameters() *structpb.Struct {
+	if x != nil {
+		return x.Parameters
+	}
+	return nil
 }
 
 // ターゲットセレクター
@@ -1382,6 +1391,9 @@ type GameState struct {
 	IsDraw              bool                   `protobuf:"varint,9,opt,name=is_draw,json=isDraw,proto3" json:"is_draw,omitempty"`
 	Player1MulliganDone bool                   `protobuf:"varint,10,opt,name=player1_mulligan_done,json=player1MulliganDone,proto3" json:"player1_mulligan_done,omitempty"` // プレイヤー1がマリガンを完了したか
 	Player2MulliganDone bool                   `protobuf:"varint,11,opt,name=player2_mulligan_done,json=player2MulliganDone,proto3" json:"player2_mulligan_done,omitempty"` // プレイヤー2がマリガンを完了したか
+	CoinTossDone        bool                   `protobuf:"varint,12,opt,name=coin_toss_done,json=coinTossDone,proto3" json:"coin_toss_done,omitempty"`                      // コイントスが完了したか
+	CoinTossWinnerId    *string                `protobuf:"bytes,13,opt,name=coin_toss_winner_id,json=coinTossWinnerId,proto3,oneof" json:"coin_toss_winner_id,omitempty"`   // コイントスの勝者
+	TurnOrderDecided    bool                   `protobuf:"varint,14,opt,name=turn_order_decided,json=turnOrderDecided,proto3" json:"turn_order_decided,omitempty"`          // 先攻後攻が決定したか
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -1489,6 +1501,27 @@ func (x *GameState) GetPlayer1MulliganDone() bool {
 func (x *GameState) GetPlayer2MulliganDone() bool {
 	if x != nil {
 		return x.Player2MulliganDone
+	}
+	return false
+}
+
+func (x *GameState) GetCoinTossDone() bool {
+	if x != nil {
+		return x.CoinTossDone
+	}
+	return false
+}
+
+func (x *GameState) GetCoinTossWinnerId() string {
+	if x != nil && x.CoinTossWinnerId != nil {
+		return *x.CoinTossWinnerId
+	}
+	return ""
+}
+
+func (x *GameState) GetTurnOrderDecided() bool {
+	if x != nil {
+		return x.TurnOrderDecided
 	}
 	return false
 }
@@ -1683,7 +1716,7 @@ var File_common_proto protoreflect.FileDescriptor
 
 const file_common_proto_rawDesc = "" +
 	"\n" +
-	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd1\x02\n" +
+	"\fcommon.proto\x12\vcardgame.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x9e\x03\n" +
 	"\fAtomicEffect\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x121\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x1d.cardgame.v1.AtomicEffectTypeR\x04type\x128\n" +
@@ -1691,12 +1724,16 @@ const file_common_proto_rawDesc = "" +
 	"\x05value\x18\x04 \x01(\x05H\x01R\x05value\x88\x01\x01\x12\x1c\n" +
 	"\acard_id\x18\x05 \x01(\tH\x02R\x06cardId\x88\x01\x01\x12-\n" +
 	"\x05trait\x18\x06 \x01(\x0e2\x12.cardgame.v1.TraitH\x03R\x05trait\x88\x01\x01\x121\n" +
-	"\x06timing\x18\a \x01(\x0e2\x19.cardgame.v1.EffectTimingR\x06timingB\t\n" +
+	"\x06timing\x18\a \x01(\x0e2\x19.cardgame.v1.EffectTimingR\x06timing\x12<\n" +
+	"\n" +
+	"parameters\x18\b \x01(\v2\x17.google.protobuf.StructH\x04R\n" +
+	"parameters\x88\x01\x01B\t\n" +
 	"\a_targetB\b\n" +
 	"\x06_valueB\n" +
 	"\n" +
 	"\b_card_idB\b\n" +
-	"\x06_trait\"\x93\x01\n" +
+	"\x06_traitB\r\n" +
+	"\v_parameters\"\x93\x01\n" +
 	"\x0eTargetSelector\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12+\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x17.cardgame.v1.TargetTypeR\x04type\x129\n" +
@@ -1791,7 +1828,7 @@ const file_common_proto_rawDesc = "" +
 	"\x16time_remaining_seconds\x18\v \x01(\x05R\x14timeRemainingSeconds\x12%\n" +
 	"\x04hand\x18\f \x03(\v2\x11.cardgame.v1.CardR\x04hand\x12!\n" +
 	"\fis_connected\x18\r \x01(\bR\visConnected\x12D\n" +
-	"\x10last_activity_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\x0elastActivityAt\"\xe1\x03\n" +
+	"\x10last_activity_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\x0elastActivityAt\"\x81\x05\n" +
 	"\tGameState\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12-\n" +
 	"\aplayer1\x18\x02 \x01(\v2\x13.cardgame.v1.PlayerR\aplayer1\x12-\n" +
@@ -1805,9 +1842,13 @@ const file_common_proto_rawDesc = "" +
 	"\ais_draw\x18\t \x01(\bR\x06isDraw\x122\n" +
 	"\x15player1_mulligan_done\x18\n" +
 	" \x01(\bR\x13player1MulliganDone\x122\n" +
-	"\x15player2_mulligan_done\x18\v \x01(\bR\x13player2MulliganDoneB\f\n" +
+	"\x15player2_mulligan_done\x18\v \x01(\bR\x13player2MulliganDone\x12$\n" +
+	"\x0ecoin_toss_done\x18\f \x01(\bR\fcoinTossDone\x122\n" +
+	"\x13coin_toss_winner_id\x18\r \x01(\tH\x01R\x10coinTossWinnerId\x88\x01\x01\x12,\n" +
+	"\x12turn_order_decided\x18\x0e \x01(\bR\x10turnOrderDecidedB\f\n" +
 	"\n" +
-	"_winner_id\"\xde\x01\n" +
+	"_winner_idB\x16\n" +
+	"\x14_coin_toss_winner_id\"\xde\x01\n" +
 	"\tGameEvent\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x12\n" +
 	"\x04turn\x18\x02 \x01(\x05R\x04turn\x12\x14\n" +
@@ -1939,45 +1980,47 @@ var file_common_proto_goTypes = []any{
 	(*GameState)(nil),             // 16: cardgame.v1.GameState
 	(*GameEvent)(nil),             // 17: cardgame.v1.GameEvent
 	(*Deck)(nil),                  // 18: cardgame.v1.Deck
-	(*timestamppb.Timestamp)(nil), // 19: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),       // 19: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
 }
 var file_common_proto_depIdxs = []int32{
 	4,  // 0: cardgame.v1.AtomicEffect.type:type_name -> cardgame.v1.AtomicEffectType
 	8,  // 1: cardgame.v1.AtomicEffect.target:type_name -> cardgame.v1.TargetSelector
 	1,  // 2: cardgame.v1.AtomicEffect.trait:type_name -> cardgame.v1.Trait
 	3,  // 3: cardgame.v1.AtomicEffect.timing:type_name -> cardgame.v1.EffectTiming
-	5,  // 4: cardgame.v1.TargetSelector.type:type_name -> cardgame.v1.TargetType
-	9,  // 5: cardgame.v1.TargetSelector.filter:type_name -> cardgame.v1.ConditionFilter
-	6,  // 6: cardgame.v1.EffectChainNode.type:type_name -> cardgame.v1.EffectChainNodeType
-	7,  // 7: cardgame.v1.EffectChainNode.atomic_effect:type_name -> cardgame.v1.AtomicEffect
-	10, // 8: cardgame.v1.EffectChainNode.next:type_name -> cardgame.v1.EffectChainNode
-	10, // 9: cardgame.v1.EffectChainNode.children:type_name -> cardgame.v1.EffectChainNode
-	10, // 10: cardgame.v1.EffectChainNode.then_node:type_name -> cardgame.v1.EffectChainNode
-	10, // 11: cardgame.v1.EffectChainNode.else_node:type_name -> cardgame.v1.EffectChainNode
-	9,  // 12: cardgame.v1.EffectChainNode.condition:type_name -> cardgame.v1.ConditionFilter
-	10, // 13: cardgame.v1.EffectChainNode.repeat_effect:type_name -> cardgame.v1.EffectChainNode
-	10, // 14: cardgame.v1.EffectChainNode.foreach_effect:type_name -> cardgame.v1.EffectChainNode
-	8,  // 15: cardgame.v1.EffectChainNode.foreach_target:type_name -> cardgame.v1.TargetSelector
-	10, // 16: cardgame.v1.EffectDefinition.root:type_name -> cardgame.v1.EffectChainNode
-	11, // 17: cardgame.v1.CardEffect.definitions:type_name -> cardgame.v1.EffectDefinition
-	0,  // 18: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
-	1,  // 19: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
-	12, // 20: cardgame.v1.Card.card_effect:type_name -> cardgame.v1.CardEffect
-	1,  // 21: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
-	14, // 22: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
-	13, // 23: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
-	19, // 24: cardgame.v1.Player.last_activity_at:type_name -> google.protobuf.Timestamp
-	15, // 25: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
-	15, // 26: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
-	2,  // 27: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
-	19, // 28: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
-	19, // 29: cardgame.v1.Deck.created_at:type_name -> google.protobuf.Timestamp
-	19, // 30: cardgame.v1.Deck.updated_at:type_name -> google.protobuf.Timestamp
-	31, // [31:31] is the sub-list for method output_type
-	31, // [31:31] is the sub-list for method input_type
-	31, // [31:31] is the sub-list for extension type_name
-	31, // [31:31] is the sub-list for extension extendee
-	0,  // [0:31] is the sub-list for field type_name
+	19, // 4: cardgame.v1.AtomicEffect.parameters:type_name -> google.protobuf.Struct
+	5,  // 5: cardgame.v1.TargetSelector.type:type_name -> cardgame.v1.TargetType
+	9,  // 6: cardgame.v1.TargetSelector.filter:type_name -> cardgame.v1.ConditionFilter
+	6,  // 7: cardgame.v1.EffectChainNode.type:type_name -> cardgame.v1.EffectChainNodeType
+	7,  // 8: cardgame.v1.EffectChainNode.atomic_effect:type_name -> cardgame.v1.AtomicEffect
+	10, // 9: cardgame.v1.EffectChainNode.next:type_name -> cardgame.v1.EffectChainNode
+	10, // 10: cardgame.v1.EffectChainNode.children:type_name -> cardgame.v1.EffectChainNode
+	10, // 11: cardgame.v1.EffectChainNode.then_node:type_name -> cardgame.v1.EffectChainNode
+	10, // 12: cardgame.v1.EffectChainNode.else_node:type_name -> cardgame.v1.EffectChainNode
+	9,  // 13: cardgame.v1.EffectChainNode.condition:type_name -> cardgame.v1.ConditionFilter
+	10, // 14: cardgame.v1.EffectChainNode.repeat_effect:type_name -> cardgame.v1.EffectChainNode
+	10, // 15: cardgame.v1.EffectChainNode.foreach_effect:type_name -> cardgame.v1.EffectChainNode
+	8,  // 16: cardgame.v1.EffectChainNode.foreach_target:type_name -> cardgame.v1.TargetSelector
+	10, // 17: cardgame.v1.EffectDefinition.root:type_name -> cardgame.v1.EffectChainNode
+	11, // 18: cardgame.v1.CardEffect.definitions:type_name -> cardgame.v1.EffectDefinition
+	0,  // 19: cardgame.v1.Card.type:type_name -> cardgame.v1.CardType
+	1,  // 20: cardgame.v1.Card.traits:type_name -> cardgame.v1.Trait
+	12, // 21: cardgame.v1.Card.card_effect:type_name -> cardgame.v1.CardEffect
+	1,  // 22: cardgame.v1.Unit.traits:type_name -> cardgame.v1.Trait
+	14, // 23: cardgame.v1.Player.field:type_name -> cardgame.v1.Unit
+	13, // 24: cardgame.v1.Player.hand:type_name -> cardgame.v1.Card
+	20, // 25: cardgame.v1.Player.last_activity_at:type_name -> google.protobuf.Timestamp
+	15, // 26: cardgame.v1.GameState.player1:type_name -> cardgame.v1.Player
+	15, // 27: cardgame.v1.GameState.player2:type_name -> cardgame.v1.Player
+	2,  // 28: cardgame.v1.GameState.current_phase:type_name -> cardgame.v1.GamePhase
+	20, // 29: cardgame.v1.GameEvent.timestamp:type_name -> google.protobuf.Timestamp
+	20, // 30: cardgame.v1.Deck.created_at:type_name -> google.protobuf.Timestamp
+	20, // 31: cardgame.v1.Deck.updated_at:type_name -> google.protobuf.Timestamp
+	32, // [32:32] is the sub-list for method output_type
+	32, // [32:32] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_common_proto_init() }

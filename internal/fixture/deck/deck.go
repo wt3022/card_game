@@ -1,12 +1,23 @@
 package deck
 
 import (
-	"fmt"
-
 	"card_game/internal/core/entity"
+	"crypto/sha256"
+	"encoding/hex"
 )
 
-func GenerateSampleDeck(prefix string) []entity.Card {
+// generateDeterministicUUID カード名から決定的なUUIDを生成
+func generateDeterministicUUID(name string) string {
+	// カード名のSHA256ハッシュを計算
+	hash := sha256.Sum256([]byte(name))
+	// 最初の16バイトを使ってUUIDを生成
+	hashStr := hex.EncodeToString(hash[:16])
+
+	// UUID v5形式に整形（8-4-4-4-12）
+	return hashStr[0:8] + "-" + hashStr[8:12] + "-" + hashStr[12:16] + "-" + hashStr[16:20] + "-" + hashStr[20:32]
+}
+
+func GenerateSampleDeck() []entity.Card {
 	deck := []entity.Card{}
 
 	// ========================================
@@ -15,10 +26,11 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// ========================================
 
 	// 低コスト (1-2コスト): 4枚 - 序盤の展開力を重視
-	attack1, defense1 := 2, 1
+	// パワーカード: 1コストで2/2の高スタッツユニット
+	attack1, defense1 := 2, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-goblin", prefix),
-		Name:    "Goblin Scout",
+		ID:      generateDeterministicUUID("Elite Goblin"),
+		Name:    "Elite Goblin",
 		Cost:    1,
 		Type:    entity.CardTypeUnit,
 		Attack:  &attack1,
@@ -26,10 +38,11 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		Traits:  []entity.Trait{},
 	})
 
-	attack2, defense2 := 1, 3
+	// パワーカード: 2コストで3/3の高スタッツユニット
+	attack2, defense2 := 3, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-defender", prefix),
-		Name:    "Shield Bearer",
+		ID:      generateDeterministicUUID("War Veteran"),
+		Name:    "War Veteran",
 		Cost:    2,
 		Type:    entity.CardTypeUnit,
 		Attack:  &attack2,
@@ -39,7 +52,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack3, defense3 := 3, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-archer", prefix),
+		ID:      generateDeterministicUUID("Archer"),
 		Name:    "Archer",
 		Cost:    2,
 		Type:    entity.CardTypeUnit,
@@ -50,7 +63,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack4, defense4 := 2, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-soldier", prefix),
+		ID:      generateDeterministicUUID("Soldier"),
 		Name:    "Soldier",
 		Cost:    2,
 		Type:    entity.CardTypeUnit,
@@ -62,7 +75,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// 中コスト (3-5コスト): 4枚
 	attack5, defense5 := 3, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-warrior", prefix),
+		ID:      generateDeterministicUUID("Warrior"),
 		Name:    "Warrior",
 		Cost:    3,
 		Type:    entity.CardTypeUnit,
@@ -73,7 +86,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack6, defense6 := 4, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-knight", prefix),
+		ID:      generateDeterministicUUID("Knight"),
 		Name:    "Knight",
 		Cost:    4,
 		Type:    entity.CardTypeUnit,
@@ -84,7 +97,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack7, defense7 := 5, 4
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-champion", prefix),
+		ID:      generateDeterministicUUID("Champion"),
 		Name:    "Champion",
 		Cost:    5,
 		Type:    entity.CardTypeUnit,
@@ -95,7 +108,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack8, defense8 := 4, 5
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-paladin", prefix),
+		ID:      generateDeterministicUUID("Paladin"),
 		Name:    "Paladin",
 		Cost:    5,
 		Type:    entity.CardTypeUnit,
@@ -107,7 +120,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// 高コスト (6-8コスト): 2枚 - フィニッシャー
 	attack9, defense9 := 6, 6
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-warlord", prefix),
+		ID:      generateDeterministicUUID("Warlord"),
 		Name:    "Warlord",
 		Cost:    7,
 		Type:    entity.CardTypeUnit,
@@ -118,7 +131,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attack10, defense10 := 8, 8
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-unit-colossus", prefix),
+		ID:      generateDeterministicUUID("Colossus"),
 		Name:    "Colossus",
 		Cost:    8,
 		Type:    entity.CardTypeUnit,
@@ -133,10 +146,11 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// ========================================
 
 	// Rush (疾走) - 3枚 - 即座にアクションできる攻撃的ユニット
-	attackRush1, defenseRush1 := 2, 1
+	// パワーカード: 2コストで3/2 Rush
+	attackRush1, defenseRush1 := 3, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-rush-wolf", prefix),
-		Name:    "Dire Wolf",
+		ID:      generateDeterministicUUID("Alpha Wolf"),
+		Name:    "Alpha Wolf",
 		Cost:    2,
 		Type:    entity.CardTypeUnit,
 		Attack:  &attackRush1,
@@ -146,7 +160,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackRush2, defenseRush2 := 3, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-rush-knight", prefix),
+		ID:      generateDeterministicUUID("Rush Knight"),
 		Name:    "Rush Knight",
 		Cost:    3,
 		Type:    entity.CardTypeUnit,
@@ -157,7 +171,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackRush3, defenseRush3 := 4, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-rush-cavalry", prefix),
+		ID:      generateDeterministicUUID("Swift Cavalry"),
 		Name:    "Swift Cavalry",
 		Cost:    4,
 		Type:    entity.CardTypeUnit,
@@ -169,7 +183,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// Guardian (守護) - 3枚 - 防御的戦略の要
 	attackGuard1, defenseGuard1 := 1, 4
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-guardian-sentry", prefix),
+		ID:      generateDeterministicUUID("Sentry"),
 		Name:    "Sentry",
 		Cost:    3,
 		Type:    entity.CardTypeUnit,
@@ -180,7 +194,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackGuard2, defenseGuard2 := 2, 5
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-guardian-shield", prefix),
+		ID:      generateDeterministicUUID("Shield Guardian"),
 		Name:    "Shield Guardian",
 		Cost:    4,
 		Type:    entity.CardTypeUnit,
@@ -191,7 +205,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackGuard3, defenseGuard3 := 3, 6
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-guardian-wall", prefix),
+		ID:      generateDeterministicUUID("Stone Wall"),
 		Name:    "Stone Wall",
 		Cost:    5,
 		Type:    entity.CardTypeUnit,
@@ -203,7 +217,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// Windfury (疾風) - 2枚 - 高リスク高リターン
 	attackWind1, defenseWind1 := 2, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-wind-striker", prefix),
+		ID:      generateDeterministicUUID("Wind Striker"),
 		Name:    "Wind Striker",
 		Cost:    4,
 		Type:    entity.CardTypeUnit,
@@ -214,7 +228,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackWind2, defenseWind2 := 3, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-wind-master", prefix),
+		ID:      generateDeterministicUUID("Wind Master"),
 		Name:    "Wind Master",
 		Cost:    6,
 		Type:    entity.CardTypeUnit,
@@ -226,7 +240,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// Pierce (貫通) - 2枚 - Guardian対策
 	attackPierce1, defensePierce1 := 3, 2
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-pierce-lancer", prefix),
+		ID:      generateDeterministicUUID("Lance Piercer"),
 		Name:    "Lance Piercer",
 		Cost:    3,
 		Type:    entity.CardTypeUnit,
@@ -237,7 +251,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	attackPierce2, defensePierce2 := 5, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-pierce-dragon", prefix),
+		ID:      generateDeterministicUUID("Pierce Dragon"),
 		Name:    "Pierce Dragon",
 		Cost:    6,
 		Type:    entity.CardTypeUnit,
@@ -249,7 +263,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// Charge (突進) - 1枚
 	attackCharge, defenseCharge := 3, 1
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-charge-assassin", prefix),
+		ID:      generateDeterministicUUID("Shadow Assassin"),
 		Name:    "Shadow Assassin",
 		Cost:    2,
 		Type:    entity.CardTypeUnit,
@@ -261,7 +275,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// EffectShield (効果盾) - 1枚
 	attackShield, defenseShield := 3, 4
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-shield-golem", prefix),
+		ID:      generateDeterministicUUID("Shielded Golem"),
 		Name:    "Shielded Golem",
 		Cost:    5,
 		Type:    entity.CardTypeUnit,
@@ -273,7 +287,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// Untargetable (対象不可) - 1枚
 	attackUntarget, defenseUntarget := 3, 3
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-untarget-phantom", prefix),
+		ID:      generateDeterministicUUID("Phantom"),
 		Name:    "Phantom",
 		Cost:    4,
 		Type:    entity.CardTypeUnit,
@@ -285,7 +299,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// 複数特性持ち - 1枚
 	attackMulti, defenseMulti := 4, 4
 	deck = append(deck, entity.Card{
-		ID:      fmt.Sprintf("%s-multi-hero", prefix),
+		ID:      generateDeterministicUUID("Heroic Defender"),
 		Name:    "Heroic Defender",
 		Cost:    6,
 		Type:    entity.CardTypeUnit,
@@ -298,13 +312,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// 召喚効果持ちユニット（6枚）
 	// ========================================
 
-	// 召喚効果: 1/1トークンを1体召喚 (3コスト)
+	// パワーカード: 2コストで2/2 + 2/2トークン召喚
 	attackSummon1, defenseSummon1 := 2, 2
 	recruiterEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-recruit", prefix),
-				Name:          "Recruit",
+				ID:            generateDeterministicUUID("Mass Recruit"),
+				Name:          "Mass Recruit",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
 					Type: entity.OperatorSequential,
@@ -314,10 +328,10 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 							Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
 							Timing: entity.EffectTimingOnSummon,
 							Parameters: map[string]any{
-								"name":    "Recruit",
-								"attack":  1,
-								"defense": 1,
-								"cost":    1,
+								"name":    "Elite Recruit",
+								"attack":  2,
+								"defense": 2,
+								"cost":    2,
 								"count":   1,
 							},
 						},
@@ -328,9 +342,9 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	recruiterEffect.Description = recruiterEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-recruit", prefix),
-		Name:       "Recruiter",
-		Cost:       3,
+		ID:         generateDeterministicUUID("Master Recruiter"),
+		Name:       "Master Recruiter",
+		Cost:       2,
 		Type:       entity.CardTypeUnit,
 		Attack:     &attackSummon1,
 		Defense:    &defenseSummon1,
@@ -344,7 +358,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	captainEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-captain", prefix),
+				ID:            generateDeterministicUUID("Rally Troops"),
 				Name:          "Rally Troops",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
@@ -369,7 +383,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	captainEffect.Description = captainEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-captain", prefix),
+		ID:         generateDeterministicUUID("Captain"),
 		Name:       "Captain",
 		Cost:       6,
 		Type:       entity.CardTypeUnit,
@@ -380,13 +394,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		Effect:     captainEffect.Description,
 	})
 
-	// 召喚効果: Rushを持つ1/1を1体召喚 (4コスト)
+	// パワーカード: 3コストで3/3 + 3/2 Rush召喚
 	attackSummon3, defenseSummon3 := 3, 3
 	warcallerEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-warcaller", prefix),
-				Name:          "Call to Arms",
+				ID:            generateDeterministicUUID("Summon Berserker"),
+				Name:          "Summon Berserker",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
 					Type: entity.OperatorSequential,
@@ -396,10 +410,10 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 							Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
 							Timing: entity.EffectTimingOnSummon,
 							Parameters: map[string]any{
-								"name":    "Berserker",
-								"attack":  1,
-								"defense": 1,
-								"cost":    1,
+								"name":    "Elite Berserker",
+								"attack":  3,
+								"defense": 2,
+								"cost":    3,
 								"count":   1,
 								"traits":  []entity.Trait{entity.TraitRush},
 							},
@@ -411,9 +425,9 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	warcallerEffect.Description = warcallerEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-warcaller", prefix),
-		Name:       "Warcaller",
-		Cost:       4,
+		ID:         generateDeterministicUUID("Battle Warcaller"),
+		Name:       "Battle Warcaller",
+		Cost:       3,
 		Type:       entity.CardTypeUnit,
 		Attack:     &attackSummon3,
 		Defense:    &defenseSummon3,
@@ -422,56 +436,27 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		Effect:     warcallerEffect.Description,
 	})
 
-	// 複合効果: 自身に+2/+2バフ + 1/1トークン召喚 (5コスト)
-	attackSummon4, defenseSummon4 := 3, 3
+	// パワーカード: 4コストで4/4 Rush + 3/3トークン2体召喚
+	attackSummon4, defenseSummon4 := 4, 4
 	commanderEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-commander", prefix),
-				Name:          "Lead by Example",
+				ID:            generateDeterministicUUID("Army Deployment"),
+				Name:          "Army Deployment",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
-					Type: entity.OperatorParallel,
-					Parallel: &entity.ParallelNode{
-						Children: []*entity.EffectChainNode{
-							{
-								Type: entity.OperatorSequential,
-								Sequential: &entity.SequentialNode{
-									Effect: &entity.AtomicEffect{
-										Type:   entity.AtomicEffectModifyAttack,
-										Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
-										Value:  2,
-										Timing: entity.EffectTimingOnSummon,
-									},
-								},
-							},
-							{
-								Type: entity.OperatorSequential,
-								Sequential: &entity.SequentialNode{
-									Effect: &entity.AtomicEffect{
-										Type:   entity.AtomicEffectModifyDefense,
-										Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
-										Value:  2,
-										Timing: entity.EffectTimingOnSummon,
-									},
-								},
-							},
-							{
-								Type: entity.OperatorSequential,
-								Sequential: &entity.SequentialNode{
-									Effect: &entity.AtomicEffect{
-										Type:   entity.AtomicEffectSummonUnit,
-										Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
-										Timing: entity.EffectTimingOnSummon,
-										Parameters: map[string]any{
-											"name":    "Guard",
-											"attack":  1,
-											"defense": 1,
-											"cost":    1,
-											"count":   1,
-										},
-									},
-								},
+					Type: entity.OperatorSequential,
+					Sequential: &entity.SequentialNode{
+						Effect: &entity.AtomicEffect{
+							Type:   entity.AtomicEffectSummonUnit,
+							Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
+							Timing: entity.EffectTimingOnSummon,
+							Parameters: map[string]any{
+								"name":    "Elite Soldier",
+								"attack":  3,
+								"defense": 3,
+								"cost":    3,
+								"count":   2,
 							},
 						},
 					},
@@ -481,13 +466,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	commanderEffect.Description = commanderEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-commander", prefix),
-		Name:       "Battle Commander",
-		Cost:       5,
+		ID:         generateDeterministicUUID("Grand Commander"),
+		Name:       "Grand Commander",
+		Cost:       4,
 		Type:       entity.CardTypeUnit,
 		Attack:     &attackSummon4,
 		Defense:    &defenseSummon4,
-		Traits:     []entity.Trait{},
+		Traits:     []entity.Trait{entity.TraitRush},
 		CardEffect: commanderEffect,
 		Effect:     commanderEffect.Description,
 	})
@@ -497,7 +482,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	nestEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-nest", prefix),
+				ID:            generateDeterministicUUID("Spawn Spiders"),
 				Name:          "Spawn Spiders",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
@@ -522,7 +507,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	nestEffect.Description = nestEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-nest", prefix),
+		ID:         generateDeterministicUUID("Spider Nest"),
 		Name:       "Spider Nest",
 		Cost:       4,
 		Type:       entity.CardTypeUnit,
@@ -533,12 +518,12 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		Effect:     nestEffect.Description,
 	})
 
-	// 召喚効果: Guardianを持つ1/3を1体召喚 (4コスト)
+	// 召喚効果: Guardianを持つ1/3を2体召喚 (4コスト)
 	attackSummon6, defenseSummon6 := 3, 2
 	sentinelEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
 			{
-				ID:            fmt.Sprintf("%s-effect-summon-sentinel", prefix),
+				ID:            generateDeterministicUUID("Summon Sentinel"),
 				Name:          "Summon Sentinel",
 				RequireTarget: false,
 				Root: &entity.EffectChainNode{
@@ -553,7 +538,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 								"attack":  1,
 								"defense": 3,
 								"cost":    2,
-								"count":   1,
+								"count":   2,
 								"traits":  []entity.Trait{entity.TraitGuardian},
 							},
 						},
@@ -564,7 +549,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	}
 	sentinelEffect.Description = sentinelEffect.GenerateDescription()
 	deck = append(deck, entity.Card{
-		ID:         fmt.Sprintf("%s-summon-sentinel", prefix),
+		ID:         generateDeterministicUUID("Sentinel Master"),
 		Name:       "Sentinel Master",
 		Cost:       4,
 		Type:       entity.CardTypeUnit,
@@ -580,16 +565,16 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 	// 多様な効果で戦略性を向上させる
 	// ========================================
 
-	// 1. ダメージスペル - 敵1体に3ダメージ (2コスト)
+	// パワーカード: 1コストで4ダメージ
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-fireball", prefix),
-		"Fireball",
-		2,
+		generateDeterministicUUID("Blazing Fireball"),
+		"Blazing Fireball",
+		1,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-fireball", prefix),
-					Name:          "Fireball",
+					ID:            generateDeterministicUUID("Blazing Fireball"),
+					Name:          "Blazing Fireball",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -597,7 +582,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 							Effect: &entity.AtomicEffect{
 								Type:   entity.AtomicEffectDealDamage,
 								Target: entity.TargetSelector{Type: entity.EffectTargetSpecific},
-								Value:  3,
+								Value:  4,
 								Timing: entity.EffectTimingImmediate,
 							},
 						},
@@ -607,16 +592,16 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		},
 	))
 
-	// 2. 範囲ダメージスペル - 敵全体に2ダメージ (5コスト)
+	// パワーカード: 3コストで3ダメージAoE
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-meteor", prefix),
-		"Meteor Storm",
-		5,
+		generateDeterministicUUID("Apocalypse"),
+		"Apocalypse",
+		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-meteor", prefix),
-					Name:          "Meteor Storm",
+					ID:            generateDeterministicUUID("Apocalypse"),
+					Name:          "Apocalypse",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -624,7 +609,7 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 							Effect: &entity.AtomicEffect{
 								Type:   entity.AtomicEffectDealSplash,
 								Target: entity.TargetSelector{Type: entity.EffectTargetEnemies},
-								Value:  2,
+								Value:  3,
 								Timing: entity.EffectTimingImmediate,
 							},
 						},
@@ -636,13 +621,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 3. 単体大ダメージスペル - 敵1体に5ダメージ (5コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-lightning", prefix),
+		generateDeterministicUUID("Lightning Bolt"),
 		"Lightning Bolt",
 		5,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-lightning", prefix),
+					ID:            generateDeterministicUUID("Lightning Bolt"),
 					Name:          "Lightning Bolt",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
@@ -663,13 +648,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 4. 回復スペル - 自分のHPを6回復 (3コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-heal", prefix),
+		generateDeterministicUUID("Healing Light"),
 		"Healing Light",
 		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-heal", prefix),
+					ID:            generateDeterministicUUID("Healing Light"),
 					Name:          "Healing Light",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
@@ -688,25 +673,45 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		},
 	))
 
-	// 5. ドローカード - カードを2枚引く (2コスト)
+	// パワーカード: 2コスト Rush付与スペル
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-draw", prefix),
-		"Arcane Wisdom",
+		generateDeterministicUUID("Battle Fury"),
+		"Battle Fury",
 		2,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-draw", prefix),
-					Name:          "Arcane Wisdom",
-					RequireTarget: false,
+					ID:            generateDeterministicUUID("Battle Fury"),
+					Name:          "Battle Fury",
+					RequireTarget: true,
 					Root: &entity.EffectChainNode{
-						Type: entity.OperatorSequential,
-						Sequential: &entity.SequentialNode{
-							Effect: &entity.AtomicEffect{
-								Type:   entity.AtomicEffectDrawCard,
-								Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
-								Value:  2,
-								Timing: entity.EffectTimingImmediate,
+						Type: entity.OperatorParallel,
+						Parallel: &entity.ParallelNode{
+							Children: []*entity.EffectChainNode{
+								{
+									Type: entity.OperatorSequential,
+									Sequential: &entity.SequentialNode{
+										Effect: &entity.AtomicEffect{
+											Type:   entity.AtomicEffectModifyAttack,
+											Target: entity.TargetSelector{Type: entity.EffectTargetSpecific},
+											Value:  3,
+											Timing: entity.EffectTimingImmediate,
+										},
+									},
+								},
+								{
+									Type: entity.OperatorSequential,
+									Sequential: &entity.SequentialNode{
+										Effect: &entity.AtomicEffect{
+											Type:   entity.AtomicEffectGrantTrait,
+											Target: entity.TargetSelector{Type: entity.EffectTargetSpecific},
+											Timing: entity.EffectTimingImmediate,
+											Parameters: map[string]any{
+												"trait": entity.TraitRush,
+											},
+										},
+									},
+								},
 							},
 						},
 					},
@@ -717,13 +722,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 6. バフスペル - 味方1体の攻撃力+3 (2コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-strengthen", prefix),
+		generateDeterministicUUID("Power Boost"),
 		"Power Boost",
 		2,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-strengthen", prefix),
+					ID:            generateDeterministicUUID("Power Boost"),
 					Name:          "Power Boost",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
@@ -744,13 +749,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 7. 防御バフスペル - 味方1体の防御力+3 (2コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-fortify", prefix),
+		generateDeterministicUUID("Iron Skin"),
 		"Iron Skin",
 		2,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-fortify", prefix),
+					ID:            generateDeterministicUUID("Iron Skin"),
 					Name:          "Iron Skin",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
@@ -771,13 +776,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 8. 全体バフスペル - 味方全体の攻撃力+2 (3コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-rally", prefix),
+		generateDeterministicUUID("Rally"),
 		"Rally",
 		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-rally", prefix),
+					ID:            generateDeterministicUUID("Rally"),
 					Name:          "Rally",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{
@@ -796,16 +801,16 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 		},
 	))
 
-	// 9. 破壊スペル - 敵1体を破壊 (6コスト)
+	// パワーカード: 3コストで確定除去
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-destroy", prefix),
-		"Annihilate",
-		6,
+		generateDeterministicUUID("Instant Death"),
+		"Instant Death",
+		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-destroy", prefix),
-					Name:          "Annihilate",
+					ID:            generateDeterministicUUID("Instant Death"),
+					Name:          "Instant Death",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
 						Type: entity.OperatorSequential,
@@ -824,13 +829,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 10. 手札に戻すスペル - ユニット1体を手札に戻す (3コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-bounce", prefix),
+		generateDeterministicUUID("Recall"),
 		"Recall",
 		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-bounce", prefix),
+					ID:            generateDeterministicUUID("Recall"),
 					Name:          "Recall",
 					RequireTarget: true,
 					Root: &entity.EffectChainNode{
@@ -850,13 +855,13 @@ func GenerateSampleDeck(prefix string) []entity.Card {
 
 	// 11. 召喚スペル - 2/2トークンを1体召喚 (3コスト)
 	deck = append(deck, createSpellCard(
-		fmt.Sprintf("%s-spell-summon-token", prefix),
+		generateDeterministicUUID("Summon Guardian"),
 		"Summon Guardian",
 		3,
 		&entity.CardEffect{
 			Definitions: []*entity.EffectDefinition{
 				{
-					ID:            fmt.Sprintf("%s-effect-summon-token", prefix),
+					ID:            generateDeterministicUUID("Summon Guardian"),
 					Name:          "Summon Guardian",
 					RequireTarget: false,
 					Root: &entity.EffectChainNode{

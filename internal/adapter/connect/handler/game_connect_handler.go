@@ -110,6 +110,69 @@ func (h *GameConnectHandler) GetGameState(
 	return connect.NewResponse(resp), nil
 }
 
+// PerformCoinToss コイントスを実行
+func (h *GameConnectHandler) PerformCoinToss(
+	ctx context.Context,
+	req *connect.Request[pbv1.PerformCoinTossRequest],
+) (*connect.Response[pbv1.PerformCoinTossResponse], error) {
+	gameID := req.Msg.GetGameId()
+	playerID := req.Msg.GetPlayerId()
+
+	// コイントスを実行
+	isHeads, winnerID, err := h.gameService.PerformCoinToss(ctx, gameID, playerID)
+	if err != nil {
+		return nil, mapDomainErrorToConnectError(err)
+	}
+
+	// 更新されたゲーム状態を取得
+	state, err := h.gameService.GetGameState(gameID)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// レスポンスを作成
+	resp := &pbv1.PerformCoinTossResponse{
+		Success:   true,
+		Message:   "Coin toss performed successfully",
+		IsHeads:   isHeads,
+		WinnerId:  winnerID,
+		GameState: converter.GameStateToProto(state, playerID),
+	}
+
+	return connect.NewResponse(resp), nil
+}
+
+// ChooseTurnOrder 先攻後攻を選択
+func (h *GameConnectHandler) ChooseTurnOrder(
+	ctx context.Context,
+	req *connect.Request[pbv1.ChooseTurnOrderRequest],
+) (*connect.Response[pbv1.ChooseTurnOrderResponse], error) {
+	gameID := req.Msg.GetGameId()
+	playerID := req.Msg.GetPlayerId()
+	chooseFirst := req.Msg.GetChooseFirst()
+
+	// 先攻後攻を選択
+	err := h.gameService.ChooseTurnOrder(ctx, gameID, playerID, chooseFirst)
+	if err != nil {
+		return nil, mapDomainErrorToConnectError(err)
+	}
+
+	// 更新されたゲーム状態を取得
+	state, err := h.gameService.GetGameState(gameID)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeInternal, err)
+	}
+
+	// レスポンスを作成
+	resp := &pbv1.ChooseTurnOrderResponse{
+		Success:   true,
+		Message:   "Turn order chosen successfully",
+		GameState: converter.GameStateToProto(state, playerID),
+	}
+
+	return connect.NewResponse(resp), nil
+}
+
 // PerformMulligan マリガンを実行
 func (h *GameConnectHandler) PerformMulligan(
 	ctx context.Context,

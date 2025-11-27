@@ -21,6 +21,8 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	GameService_CreateGame_FullMethodName       = "/cardgame.v1.GameService/CreateGame"
 	GameService_GetGameState_FullMethodName     = "/cardgame.v1.GameService/GetGameState"
+	GameService_PerformCoinToss_FullMethodName  = "/cardgame.v1.GameService/PerformCoinToss"
+	GameService_ChooseTurnOrder_FullMethodName  = "/cardgame.v1.GameService/ChooseTurnOrder"
 	GameService_PerformMulligan_FullMethodName  = "/cardgame.v1.GameService/PerformMulligan"
 	GameService_PlayCard_FullMethodName         = "/cardgame.v1.GameService/PlayCard"
 	GameService_ExecuteAttack_FullMethodName    = "/cardgame.v1.GameService/ExecuteAttack"
@@ -38,6 +40,8 @@ const (
 type GameServiceClient interface {
 	CreateGame(ctx context.Context, in *CreateGameRequest, opts ...grpc.CallOption) (*CreateGameResponse, error)
 	GetGameState(ctx context.Context, in *GetGameStateRequest, opts ...grpc.CallOption) (*GetGameStateResponse, error)
+	PerformCoinToss(ctx context.Context, in *PerformCoinTossRequest, opts ...grpc.CallOption) (*PerformCoinTossResponse, error)
+	ChooseTurnOrder(ctx context.Context, in *ChooseTurnOrderRequest, opts ...grpc.CallOption) (*ChooseTurnOrderResponse, error)
 	PerformMulligan(ctx context.Context, in *PerformMulliganRequest, opts ...grpc.CallOption) (*PerformMulliganResponse, error)
 	PlayCard(ctx context.Context, in *PlayCardRequest, opts ...grpc.CallOption) (*PlayCardResponse, error)
 	ExecuteAttack(ctx context.Context, in *ExecuteAttackRequest, opts ...grpc.CallOption) (*ExecuteAttackResponse, error)
@@ -69,6 +73,26 @@ func (c *gameServiceClient) GetGameState(ctx context.Context, in *GetGameStateRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetGameStateResponse)
 	err := c.cc.Invoke(ctx, GameService_GetGameState_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) PerformCoinToss(ctx context.Context, in *PerformCoinTossRequest, opts ...grpc.CallOption) (*PerformCoinTossResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PerformCoinTossResponse)
+	err := c.cc.Invoke(ctx, GameService_PerformCoinToss_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gameServiceClient) ChooseTurnOrder(ctx context.Context, in *ChooseTurnOrderRequest, opts ...grpc.CallOption) (*ChooseTurnOrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ChooseTurnOrderResponse)
+	err := c.cc.Invoke(ctx, GameService_ChooseTurnOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +195,8 @@ type GameService_JoinMatchmakingClient = grpc.ServerStreamingClient[MatchmakingR
 type GameServiceServer interface {
 	CreateGame(context.Context, *CreateGameRequest) (*CreateGameResponse, error)
 	GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error)
+	PerformCoinToss(context.Context, *PerformCoinTossRequest) (*PerformCoinTossResponse, error)
+	ChooseTurnOrder(context.Context, *ChooseTurnOrderRequest) (*ChooseTurnOrderResponse, error)
 	PerformMulligan(context.Context, *PerformMulliganRequest) (*PerformMulliganResponse, error)
 	PlayCard(context.Context, *PlayCardRequest) (*PlayCardResponse, error)
 	ExecuteAttack(context.Context, *ExecuteAttackRequest) (*ExecuteAttackResponse, error)
@@ -193,6 +219,12 @@ func (UnimplementedGameServiceServer) CreateGame(context.Context, *CreateGameReq
 }
 func (UnimplementedGameServiceServer) GetGameState(context.Context, *GetGameStateRequest) (*GetGameStateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGameState not implemented")
+}
+func (UnimplementedGameServiceServer) PerformCoinToss(context.Context, *PerformCoinTossRequest) (*PerformCoinTossResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PerformCoinToss not implemented")
+}
+func (UnimplementedGameServiceServer) ChooseTurnOrder(context.Context, *ChooseTurnOrderRequest) (*ChooseTurnOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChooseTurnOrder not implemented")
 }
 func (UnimplementedGameServiceServer) PerformMulligan(context.Context, *PerformMulliganRequest) (*PerformMulliganResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PerformMulligan not implemented")
@@ -268,6 +300,42 @@ func _GameService_GetGameState_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServiceServer).GetGameState(ctx, req.(*GetGameStateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_PerformCoinToss_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PerformCoinTossRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).PerformCoinToss(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_PerformCoinToss_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).PerformCoinToss(ctx, req.(*PerformCoinTossRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GameService_ChooseTurnOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ChooseTurnOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServiceServer).ChooseTurnOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameService_ChooseTurnOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServiceServer).ChooseTurnOrder(ctx, req.(*ChooseTurnOrderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -398,6 +466,14 @@ var GameService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGameState",
 			Handler:    _GameService_GetGameState_Handler,
+		},
+		{
+			MethodName: "PerformCoinToss",
+			Handler:    _GameService_PerformCoinToss_Handler,
+		},
+		{
+			MethodName: "ChooseTurnOrder",
+			Handler:    _GameService_ChooseTurnOrder_Handler,
 		},
 		{
 			MethodName: "PerformMulligan",

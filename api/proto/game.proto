@@ -10,6 +10,8 @@ import "common.proto";
 service GameService {
   rpc CreateGame(CreateGameRequest) returns (CreateGameResponse);
   rpc GetGameState(GetGameStateRequest) returns (GetGameStateResponse);
+  rpc PerformCoinToss(PerformCoinTossRequest) returns (PerformCoinTossResponse);
+  rpc ChooseTurnOrder(ChooseTurnOrderRequest) returns (ChooseTurnOrderResponse);
   rpc PerformMulligan(PerformMulliganRequest) returns (PerformMulliganResponse);
   rpc PlayCard(PlayCardRequest) returns (PlayCardResponse);
   rpc ExecuteAttack(ExecuteAttackRequest) returns (ExecuteAttackResponse);
@@ -38,6 +40,31 @@ message GetGameStateRequest {
 
 message GetGameStateResponse {
   GameState game_state = 1;
+}
+
+message PerformCoinTossRequest {
+  string game_id = 1;
+  string player_id = 2;
+}
+
+message PerformCoinTossResponse {
+  bool success = 1;
+  string message = 2;
+  bool is_heads = 3; // 表が出たかどうか
+  string winner_id = 4; // 勝者のプレイヤーID
+  GameState game_state = 5;
+}
+
+message ChooseTurnOrderRequest {
+  string game_id = 1;
+  string player_id = 2;
+  bool choose_first = 3; // true: 先攻を選択, false: 後攻を選択
+}
+
+message ChooseTurnOrderResponse {
+  bool success = 1;
+  string message = 2;
+  GameState game_state = 3;
 }
 
 message PerformMulliganRequest {

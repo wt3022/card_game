@@ -289,6 +289,254 @@ func (x *GetGameStateResponse) GetGameState() *GameState {
 	return nil
 }
 
+type PerformCoinTossRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	PlayerId      string                 `protobuf:"bytes,2,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PerformCoinTossRequest) Reset() {
+	*x = PerformCoinTossRequest{}
+	mi := &file_game_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PerformCoinTossRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PerformCoinTossRequest) ProtoMessage() {}
+
+func (x *PerformCoinTossRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PerformCoinTossRequest.ProtoReflect.Descriptor instead.
+func (*PerformCoinTossRequest) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *PerformCoinTossRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *PerformCoinTossRequest) GetPlayerId() string {
+	if x != nil {
+		return x.PlayerId
+	}
+	return ""
+}
+
+type PerformCoinTossResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	IsHeads       bool                   `protobuf:"varint,3,opt,name=is_heads,json=isHeads,proto3" json:"is_heads,omitempty"`   // 表が出たかどうか
+	WinnerId      string                 `protobuf:"bytes,4,opt,name=winner_id,json=winnerId,proto3" json:"winner_id,omitempty"` // 勝者のプレイヤーID
+	GameState     *GameState             `protobuf:"bytes,5,opt,name=game_state,json=gameState,proto3" json:"game_state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PerformCoinTossResponse) Reset() {
+	*x = PerformCoinTossResponse{}
+	mi := &file_game_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PerformCoinTossResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PerformCoinTossResponse) ProtoMessage() {}
+
+func (x *PerformCoinTossResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PerformCoinTossResponse.ProtoReflect.Descriptor instead.
+func (*PerformCoinTossResponse) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PerformCoinTossResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *PerformCoinTossResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *PerformCoinTossResponse) GetIsHeads() bool {
+	if x != nil {
+		return x.IsHeads
+	}
+	return false
+}
+
+func (x *PerformCoinTossResponse) GetWinnerId() string {
+	if x != nil {
+		return x.WinnerId
+	}
+	return ""
+}
+
+func (x *PerformCoinTossResponse) GetGameState() *GameState {
+	if x != nil {
+		return x.GameState
+	}
+	return nil
+}
+
+type ChooseTurnOrderRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
+	PlayerId      string                 `protobuf:"bytes,2,opt,name=player_id,json=playerId,proto3" json:"player_id,omitempty"`
+	ChooseFirst   bool                   `protobuf:"varint,3,opt,name=choose_first,json=chooseFirst,proto3" json:"choose_first,omitempty"` // true: 先攻を選択, false: 後攻を選択
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChooseTurnOrderRequest) Reset() {
+	*x = ChooseTurnOrderRequest{}
+	mi := &file_game_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChooseTurnOrderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChooseTurnOrderRequest) ProtoMessage() {}
+
+func (x *ChooseTurnOrderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChooseTurnOrderRequest.ProtoReflect.Descriptor instead.
+func (*ChooseTurnOrderRequest) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ChooseTurnOrderRequest) GetGameId() string {
+	if x != nil {
+		return x.GameId
+	}
+	return ""
+}
+
+func (x *ChooseTurnOrderRequest) GetPlayerId() string {
+	if x != nil {
+		return x.PlayerId
+	}
+	return ""
+}
+
+func (x *ChooseTurnOrderRequest) GetChooseFirst() bool {
+	if x != nil {
+		return x.ChooseFirst
+	}
+	return false
+}
+
+type ChooseTurnOrderResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	GameState     *GameState             `protobuf:"bytes,3,opt,name=game_state,json=gameState,proto3" json:"game_state,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChooseTurnOrderResponse) Reset() {
+	*x = ChooseTurnOrderResponse{}
+	mi := &file_game_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChooseTurnOrderResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChooseTurnOrderResponse) ProtoMessage() {}
+
+func (x *ChooseTurnOrderResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChooseTurnOrderResponse.ProtoReflect.Descriptor instead.
+func (*ChooseTurnOrderResponse) Descriptor() ([]byte, []int) {
+	return file_game_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ChooseTurnOrderResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *ChooseTurnOrderResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ChooseTurnOrderResponse) GetGameState() *GameState {
+	if x != nil {
+		return x.GameState
+	}
+	return nil
+}
+
 type PerformMulliganRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	GameId        string                 `protobuf:"bytes,1,opt,name=game_id,json=gameId,proto3" json:"game_id,omitempty"`
@@ -300,7 +548,7 @@ type PerformMulliganRequest struct {
 
 func (x *PerformMulliganRequest) Reset() {
 	*x = PerformMulliganRequest{}
-	mi := &file_game_proto_msgTypes[4]
+	mi := &file_game_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +560,7 @@ func (x *PerformMulliganRequest) String() string {
 func (*PerformMulliganRequest) ProtoMessage() {}
 
 func (x *PerformMulliganRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[4]
+	mi := &file_game_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +573,7 @@ func (x *PerformMulliganRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerformMulliganRequest.ProtoReflect.Descriptor instead.
 func (*PerformMulliganRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{4}
+	return file_game_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PerformMulliganRequest) GetGameId() string {
@@ -360,7 +608,7 @@ type PerformMulliganResponse struct {
 
 func (x *PerformMulliganResponse) Reset() {
 	*x = PerformMulliganResponse{}
-	mi := &file_game_proto_msgTypes[5]
+	mi := &file_game_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -372,7 +620,7 @@ func (x *PerformMulliganResponse) String() string {
 func (*PerformMulliganResponse) ProtoMessage() {}
 
 func (x *PerformMulliganResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[5]
+	mi := &file_game_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -385,7 +633,7 @@ func (x *PerformMulliganResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PerformMulliganResponse.ProtoReflect.Descriptor instead.
 func (*PerformMulliganResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{5}
+	return file_game_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *PerformMulliganResponse) GetSuccess() bool {
@@ -421,7 +669,7 @@ type PlayCardRequest struct {
 
 func (x *PlayCardRequest) Reset() {
 	*x = PlayCardRequest{}
-	mi := &file_game_proto_msgTypes[6]
+	mi := &file_game_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -433,7 +681,7 @@ func (x *PlayCardRequest) String() string {
 func (*PlayCardRequest) ProtoMessage() {}
 
 func (x *PlayCardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[6]
+	mi := &file_game_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -446,7 +694,7 @@ func (x *PlayCardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayCardRequest.ProtoReflect.Descriptor instead.
 func (*PlayCardRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{6}
+	return file_game_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *PlayCardRequest) GetGameId() string {
@@ -488,7 +736,7 @@ type PlayCardResponse struct {
 
 func (x *PlayCardResponse) Reset() {
 	*x = PlayCardResponse{}
-	mi := &file_game_proto_msgTypes[7]
+	mi := &file_game_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -500,7 +748,7 @@ func (x *PlayCardResponse) String() string {
 func (*PlayCardResponse) ProtoMessage() {}
 
 func (x *PlayCardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[7]
+	mi := &file_game_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -513,7 +761,7 @@ func (x *PlayCardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayCardResponse.ProtoReflect.Descriptor instead.
 func (*PlayCardResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{7}
+	return file_game_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PlayCardResponse) GetSuccess() bool {
@@ -549,7 +797,7 @@ type ExecuteAttackRequest struct {
 
 func (x *ExecuteAttackRequest) Reset() {
 	*x = ExecuteAttackRequest{}
-	mi := &file_game_proto_msgTypes[8]
+	mi := &file_game_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -561,7 +809,7 @@ func (x *ExecuteAttackRequest) String() string {
 func (*ExecuteAttackRequest) ProtoMessage() {}
 
 func (x *ExecuteAttackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[8]
+	mi := &file_game_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +822,7 @@ func (x *ExecuteAttackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecuteAttackRequest.ProtoReflect.Descriptor instead.
 func (*ExecuteAttackRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{8}
+	return file_game_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ExecuteAttackRequest) GetGameId() string {
@@ -617,7 +865,7 @@ type ExecuteAttackResponse struct {
 
 func (x *ExecuteAttackResponse) Reset() {
 	*x = ExecuteAttackResponse{}
-	mi := &file_game_proto_msgTypes[9]
+	mi := &file_game_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -629,7 +877,7 @@ func (x *ExecuteAttackResponse) String() string {
 func (*ExecuteAttackResponse) ProtoMessage() {}
 
 func (x *ExecuteAttackResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[9]
+	mi := &file_game_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -642,7 +890,7 @@ func (x *ExecuteAttackResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExecuteAttackResponse.ProtoReflect.Descriptor instead.
 func (*ExecuteAttackResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{9}
+	return file_game_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ExecuteAttackResponse) GetSuccess() bool {
@@ -685,7 +933,7 @@ type AttackResult struct {
 
 func (x *AttackResult) Reset() {
 	*x = AttackResult{}
-	mi := &file_game_proto_msgTypes[10]
+	mi := &file_game_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -697,7 +945,7 @@ func (x *AttackResult) String() string {
 func (*AttackResult) ProtoMessage() {}
 
 func (x *AttackResult) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[10]
+	mi := &file_game_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -710,7 +958,7 @@ func (x *AttackResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AttackResult.ProtoReflect.Descriptor instead.
 func (*AttackResult) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{10}
+	return file_game_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *AttackResult) GetAttackerDestroyed() bool {
@@ -751,7 +999,7 @@ type StartTurnRequest struct {
 
 func (x *StartTurnRequest) Reset() {
 	*x = StartTurnRequest{}
-	mi := &file_game_proto_msgTypes[11]
+	mi := &file_game_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -763,7 +1011,7 @@ func (x *StartTurnRequest) String() string {
 func (*StartTurnRequest) ProtoMessage() {}
 
 func (x *StartTurnRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[11]
+	mi := &file_game_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -776,7 +1024,7 @@ func (x *StartTurnRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartTurnRequest.ProtoReflect.Descriptor instead.
 func (*StartTurnRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{11}
+	return file_game_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *StartTurnRequest) GetGameId() string {
@@ -804,7 +1052,7 @@ type StartTurnResponse struct {
 
 func (x *StartTurnResponse) Reset() {
 	*x = StartTurnResponse{}
-	mi := &file_game_proto_msgTypes[12]
+	mi := &file_game_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -816,7 +1064,7 @@ func (x *StartTurnResponse) String() string {
 func (*StartTurnResponse) ProtoMessage() {}
 
 func (x *StartTurnResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[12]
+	mi := &file_game_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -829,7 +1077,7 @@ func (x *StartTurnResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartTurnResponse.ProtoReflect.Descriptor instead.
 func (*StartTurnResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{12}
+	return file_game_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *StartTurnResponse) GetSuccess() bool {
@@ -863,7 +1111,7 @@ type EndTurnRequest struct {
 
 func (x *EndTurnRequest) Reset() {
 	*x = EndTurnRequest{}
-	mi := &file_game_proto_msgTypes[13]
+	mi := &file_game_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -875,7 +1123,7 @@ func (x *EndTurnRequest) String() string {
 func (*EndTurnRequest) ProtoMessage() {}
 
 func (x *EndTurnRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[13]
+	mi := &file_game_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -888,7 +1136,7 @@ func (x *EndTurnRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EndTurnRequest.ProtoReflect.Descriptor instead.
 func (*EndTurnRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{13}
+	return file_game_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *EndTurnRequest) GetGameId() string {
@@ -916,7 +1164,7 @@ type EndTurnResponse struct {
 
 func (x *EndTurnResponse) Reset() {
 	*x = EndTurnResponse{}
-	mi := &file_game_proto_msgTypes[14]
+	mi := &file_game_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -928,7 +1176,7 @@ func (x *EndTurnResponse) String() string {
 func (*EndTurnResponse) ProtoMessage() {}
 
 func (x *EndTurnResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[14]
+	mi := &file_game_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -941,7 +1189,7 @@ func (x *EndTurnResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EndTurnResponse.ProtoReflect.Descriptor instead.
 func (*EndTurnResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{14}
+	return file_game_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *EndTurnResponse) GetSuccess() bool {
@@ -975,7 +1223,7 @@ type GameEventRequest struct {
 
 func (x *GameEventRequest) Reset() {
 	*x = GameEventRequest{}
-	mi := &file_game_proto_msgTypes[15]
+	mi := &file_game_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -987,7 +1235,7 @@ func (x *GameEventRequest) String() string {
 func (*GameEventRequest) ProtoMessage() {}
 
 func (x *GameEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[15]
+	mi := &file_game_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1000,7 +1248,7 @@ func (x *GameEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameEventRequest.ProtoReflect.Descriptor instead.
 func (*GameEventRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{15}
+	return file_game_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GameEventRequest) GetGameId() string {
@@ -1027,7 +1275,7 @@ type GameEventResponse struct {
 
 func (x *GameEventResponse) Reset() {
 	*x = GameEventResponse{}
-	mi := &file_game_proto_msgTypes[16]
+	mi := &file_game_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1039,7 +1287,7 @@ func (x *GameEventResponse) String() string {
 func (*GameEventResponse) ProtoMessage() {}
 
 func (x *GameEventResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[16]
+	mi := &file_game_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1052,7 +1300,7 @@ func (x *GameEventResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameEventResponse.ProtoReflect.Descriptor instead.
 func (*GameEventResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{16}
+	return file_game_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GameEventResponse) GetEvent() *GameEvent {
@@ -1081,7 +1329,7 @@ type JoinMatchmakingRequest struct {
 
 func (x *JoinMatchmakingRequest) Reset() {
 	*x = JoinMatchmakingRequest{}
-	mi := &file_game_proto_msgTypes[17]
+	mi := &file_game_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1093,7 +1341,7 @@ func (x *JoinMatchmakingRequest) String() string {
 func (*JoinMatchmakingRequest) ProtoMessage() {}
 
 func (x *JoinMatchmakingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[17]
+	mi := &file_game_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1106,7 +1354,7 @@ func (x *JoinMatchmakingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinMatchmakingRequest.ProtoReflect.Descriptor instead.
 func (*JoinMatchmakingRequest) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{17}
+	return file_game_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *JoinMatchmakingRequest) GetPlayerId() string {
@@ -1142,7 +1390,7 @@ type MatchmakingResponse struct {
 
 func (x *MatchmakingResponse) Reset() {
 	*x = MatchmakingResponse{}
-	mi := &file_game_proto_msgTypes[18]
+	mi := &file_game_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1154,7 +1402,7 @@ func (x *MatchmakingResponse) String() string {
 func (*MatchmakingResponse) ProtoMessage() {}
 
 func (x *MatchmakingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_game_proto_msgTypes[18]
+	mi := &file_game_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1167,7 +1415,7 @@ func (x *MatchmakingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MatchmakingResponse.ProtoReflect.Descriptor instead.
 func (*MatchmakingResponse) Descriptor() ([]byte, []int) {
-	return file_game_proto_rawDescGZIP(), []int{18}
+	return file_game_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *MatchmakingResponse) GetStatus() MatchmakingStatus {
@@ -1220,7 +1468,26 @@ const file_game_proto_rawDesc = "" +
 	"\tplayer_id\x18\x02 \x01(\tR\bplayerId\"M\n" +
 	"\x14GetGameStateResponse\x125\n" +
 	"\n" +
-	"game_state\x18\x01 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"i\n" +
+	"game_state\x18\x01 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"N\n" +
+	"\x16PerformCoinTossRequest\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x1b\n" +
+	"\tplayer_id\x18\x02 \x01(\tR\bplayerId\"\xbc\x01\n" +
+	"\x17PerformCoinTossResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
+	"\bis_heads\x18\x03 \x01(\bR\aisHeads\x12\x1b\n" +
+	"\twinner_id\x18\x04 \x01(\tR\bwinnerId\x125\n" +
+	"\n" +
+	"game_state\x18\x05 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"q\n" +
+	"\x16ChooseTurnOrderRequest\x12\x17\n" +
+	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x1b\n" +
+	"\tplayer_id\x18\x02 \x01(\tR\bplayerId\x12!\n" +
+	"\fchoose_first\x18\x03 \x01(\bR\vchooseFirst\"\x84\x01\n" +
+	"\x17ChooseTurnOrderResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
+	"\n" +
+	"game_state\x18\x03 \x01(\v2\x16.cardgame.v1.GameStateR\tgameState\"i\n" +
 	"\x16PerformMulliganRequest\x12\x17\n" +
 	"\agame_id\x18\x01 \x01(\tR\x06gameId\x12\x1b\n" +
 	"\tplayer_id\x18\x02 \x01(\tR\bplayerId\x12\x19\n" +
@@ -1301,11 +1568,13 @@ const file_game_proto_rawDesc = "" +
 	"\x1eMATCHMAKING_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aMATCHMAKING_STATUS_WAITING\x10\x01\x12\x1e\n" +
 	"\x1aMATCHMAKING_STATUS_MATCHED\x10\x02\x12#\n" +
-	"\x1fMATCHMAKING_STATUS_GAME_STARTED\x10\x032\xf3\x05\n" +
+	"\x1fMATCHMAKING_STATUS_GAME_STARTED\x10\x032\xaf\a\n" +
 	"\vGameService\x12M\n" +
 	"\n" +
 	"CreateGame\x12\x1e.cardgame.v1.CreateGameRequest\x1a\x1f.cardgame.v1.CreateGameResponse\x12S\n" +
 	"\fGetGameState\x12 .cardgame.v1.GetGameStateRequest\x1a!.cardgame.v1.GetGameStateResponse\x12\\\n" +
+	"\x0fPerformCoinToss\x12#.cardgame.v1.PerformCoinTossRequest\x1a$.cardgame.v1.PerformCoinTossResponse\x12\\\n" +
+	"\x0fChooseTurnOrder\x12#.cardgame.v1.ChooseTurnOrderRequest\x1a$.cardgame.v1.ChooseTurnOrderResponse\x12\\\n" +
 	"\x0fPerformMulligan\x12#.cardgame.v1.PerformMulliganRequest\x1a$.cardgame.v1.PerformMulliganResponse\x12G\n" +
 	"\bPlayCard\x12\x1c.cardgame.v1.PlayCardRequest\x1a\x1d.cardgame.v1.PlayCardResponse\x12V\n" +
 	"\rExecuteAttack\x12!.cardgame.v1.ExecuteAttackRequest\x1a\".cardgame.v1.ExecuteAttackResponse\x12J\n" +
@@ -1327,67 +1596,77 @@ func file_game_proto_rawDescGZIP() []byte {
 }
 
 var file_game_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_game_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_game_proto_goTypes = []any{
 	(MatchmakingStatus)(0),          // 0: cardgame.v1.MatchmakingStatus
 	(*CreateGameRequest)(nil),       // 1: cardgame.v1.CreateGameRequest
 	(*CreateGameResponse)(nil),      // 2: cardgame.v1.CreateGameResponse
 	(*GetGameStateRequest)(nil),     // 3: cardgame.v1.GetGameStateRequest
 	(*GetGameStateResponse)(nil),    // 4: cardgame.v1.GetGameStateResponse
-	(*PerformMulliganRequest)(nil),  // 5: cardgame.v1.PerformMulliganRequest
-	(*PerformMulliganResponse)(nil), // 6: cardgame.v1.PerformMulliganResponse
-	(*PlayCardRequest)(nil),         // 7: cardgame.v1.PlayCardRequest
-	(*PlayCardResponse)(nil),        // 8: cardgame.v1.PlayCardResponse
-	(*ExecuteAttackRequest)(nil),    // 9: cardgame.v1.ExecuteAttackRequest
-	(*ExecuteAttackResponse)(nil),   // 10: cardgame.v1.ExecuteAttackResponse
-	(*AttackResult)(nil),            // 11: cardgame.v1.AttackResult
-	(*StartTurnRequest)(nil),        // 12: cardgame.v1.StartTurnRequest
-	(*StartTurnResponse)(nil),       // 13: cardgame.v1.StartTurnResponse
-	(*EndTurnRequest)(nil),          // 14: cardgame.v1.EndTurnRequest
-	(*EndTurnResponse)(nil),         // 15: cardgame.v1.EndTurnResponse
-	(*GameEventRequest)(nil),        // 16: cardgame.v1.GameEventRequest
-	(*GameEventResponse)(nil),       // 17: cardgame.v1.GameEventResponse
-	(*JoinMatchmakingRequest)(nil),  // 18: cardgame.v1.JoinMatchmakingRequest
-	(*MatchmakingResponse)(nil),     // 19: cardgame.v1.MatchmakingResponse
-	(*GameState)(nil),               // 20: cardgame.v1.GameState
-	(*GameEvent)(nil),               // 21: cardgame.v1.GameEvent
+	(*PerformCoinTossRequest)(nil),  // 5: cardgame.v1.PerformCoinTossRequest
+	(*PerformCoinTossResponse)(nil), // 6: cardgame.v1.PerformCoinTossResponse
+	(*ChooseTurnOrderRequest)(nil),  // 7: cardgame.v1.ChooseTurnOrderRequest
+	(*ChooseTurnOrderResponse)(nil), // 8: cardgame.v1.ChooseTurnOrderResponse
+	(*PerformMulliganRequest)(nil),  // 9: cardgame.v1.PerformMulliganRequest
+	(*PerformMulliganResponse)(nil), // 10: cardgame.v1.PerformMulliganResponse
+	(*PlayCardRequest)(nil),         // 11: cardgame.v1.PlayCardRequest
+	(*PlayCardResponse)(nil),        // 12: cardgame.v1.PlayCardResponse
+	(*ExecuteAttackRequest)(nil),    // 13: cardgame.v1.ExecuteAttackRequest
+	(*ExecuteAttackResponse)(nil),   // 14: cardgame.v1.ExecuteAttackResponse
+	(*AttackResult)(nil),            // 15: cardgame.v1.AttackResult
+	(*StartTurnRequest)(nil),        // 16: cardgame.v1.StartTurnRequest
+	(*StartTurnResponse)(nil),       // 17: cardgame.v1.StartTurnResponse
+	(*EndTurnRequest)(nil),          // 18: cardgame.v1.EndTurnRequest
+	(*EndTurnResponse)(nil),         // 19: cardgame.v1.EndTurnResponse
+	(*GameEventRequest)(nil),        // 20: cardgame.v1.GameEventRequest
+	(*GameEventResponse)(nil),       // 21: cardgame.v1.GameEventResponse
+	(*JoinMatchmakingRequest)(nil),  // 22: cardgame.v1.JoinMatchmakingRequest
+	(*MatchmakingResponse)(nil),     // 23: cardgame.v1.MatchmakingResponse
+	(*GameState)(nil),               // 24: cardgame.v1.GameState
+	(*GameEvent)(nil),               // 25: cardgame.v1.GameEvent
 }
 var file_game_proto_depIdxs = []int32{
-	20, // 0: cardgame.v1.CreateGameResponse.game_state:type_name -> cardgame.v1.GameState
-	20, // 1: cardgame.v1.GetGameStateResponse.game_state:type_name -> cardgame.v1.GameState
-	20, // 2: cardgame.v1.PerformMulliganResponse.game_state:type_name -> cardgame.v1.GameState
-	20, // 3: cardgame.v1.PlayCardResponse.game_state:type_name -> cardgame.v1.GameState
-	11, // 4: cardgame.v1.ExecuteAttackResponse.result:type_name -> cardgame.v1.AttackResult
-	20, // 5: cardgame.v1.ExecuteAttackResponse.game_state:type_name -> cardgame.v1.GameState
-	20, // 6: cardgame.v1.StartTurnResponse.game_state:type_name -> cardgame.v1.GameState
-	20, // 7: cardgame.v1.EndTurnResponse.game_state:type_name -> cardgame.v1.GameState
-	21, // 8: cardgame.v1.GameEventResponse.event:type_name -> cardgame.v1.GameEvent
-	20, // 9: cardgame.v1.GameEventResponse.game_state:type_name -> cardgame.v1.GameState
-	0,  // 10: cardgame.v1.MatchmakingResponse.status:type_name -> cardgame.v1.MatchmakingStatus
-	20, // 11: cardgame.v1.MatchmakingResponse.game_state:type_name -> cardgame.v1.GameState
-	1,  // 12: cardgame.v1.GameService.CreateGame:input_type -> cardgame.v1.CreateGameRequest
-	3,  // 13: cardgame.v1.GameService.GetGameState:input_type -> cardgame.v1.GetGameStateRequest
-	5,  // 14: cardgame.v1.GameService.PerformMulligan:input_type -> cardgame.v1.PerformMulliganRequest
-	7,  // 15: cardgame.v1.GameService.PlayCard:input_type -> cardgame.v1.PlayCardRequest
-	9,  // 16: cardgame.v1.GameService.ExecuteAttack:input_type -> cardgame.v1.ExecuteAttackRequest
-	12, // 17: cardgame.v1.GameService.StartTurn:input_type -> cardgame.v1.StartTurnRequest
-	14, // 18: cardgame.v1.GameService.EndTurn:input_type -> cardgame.v1.EndTurnRequest
-	16, // 19: cardgame.v1.GameService.StreamGameEvents:input_type -> cardgame.v1.GameEventRequest
-	18, // 20: cardgame.v1.GameService.JoinMatchmaking:input_type -> cardgame.v1.JoinMatchmakingRequest
-	2,  // 21: cardgame.v1.GameService.CreateGame:output_type -> cardgame.v1.CreateGameResponse
-	4,  // 22: cardgame.v1.GameService.GetGameState:output_type -> cardgame.v1.GetGameStateResponse
-	6,  // 23: cardgame.v1.GameService.PerformMulligan:output_type -> cardgame.v1.PerformMulliganResponse
-	8,  // 24: cardgame.v1.GameService.PlayCard:output_type -> cardgame.v1.PlayCardResponse
-	10, // 25: cardgame.v1.GameService.ExecuteAttack:output_type -> cardgame.v1.ExecuteAttackResponse
-	13, // 26: cardgame.v1.GameService.StartTurn:output_type -> cardgame.v1.StartTurnResponse
-	15, // 27: cardgame.v1.GameService.EndTurn:output_type -> cardgame.v1.EndTurnResponse
-	17, // 28: cardgame.v1.GameService.StreamGameEvents:output_type -> cardgame.v1.GameEventResponse
-	19, // 29: cardgame.v1.GameService.JoinMatchmaking:output_type -> cardgame.v1.MatchmakingResponse
-	21, // [21:30] is the sub-list for method output_type
-	12, // [12:21] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	24, // 0: cardgame.v1.CreateGameResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 1: cardgame.v1.GetGameStateResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 2: cardgame.v1.PerformCoinTossResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 3: cardgame.v1.ChooseTurnOrderResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 4: cardgame.v1.PerformMulliganResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 5: cardgame.v1.PlayCardResponse.game_state:type_name -> cardgame.v1.GameState
+	15, // 6: cardgame.v1.ExecuteAttackResponse.result:type_name -> cardgame.v1.AttackResult
+	24, // 7: cardgame.v1.ExecuteAttackResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 8: cardgame.v1.StartTurnResponse.game_state:type_name -> cardgame.v1.GameState
+	24, // 9: cardgame.v1.EndTurnResponse.game_state:type_name -> cardgame.v1.GameState
+	25, // 10: cardgame.v1.GameEventResponse.event:type_name -> cardgame.v1.GameEvent
+	24, // 11: cardgame.v1.GameEventResponse.game_state:type_name -> cardgame.v1.GameState
+	0,  // 12: cardgame.v1.MatchmakingResponse.status:type_name -> cardgame.v1.MatchmakingStatus
+	24, // 13: cardgame.v1.MatchmakingResponse.game_state:type_name -> cardgame.v1.GameState
+	1,  // 14: cardgame.v1.GameService.CreateGame:input_type -> cardgame.v1.CreateGameRequest
+	3,  // 15: cardgame.v1.GameService.GetGameState:input_type -> cardgame.v1.GetGameStateRequest
+	5,  // 16: cardgame.v1.GameService.PerformCoinToss:input_type -> cardgame.v1.PerformCoinTossRequest
+	7,  // 17: cardgame.v1.GameService.ChooseTurnOrder:input_type -> cardgame.v1.ChooseTurnOrderRequest
+	9,  // 18: cardgame.v1.GameService.PerformMulligan:input_type -> cardgame.v1.PerformMulliganRequest
+	11, // 19: cardgame.v1.GameService.PlayCard:input_type -> cardgame.v1.PlayCardRequest
+	13, // 20: cardgame.v1.GameService.ExecuteAttack:input_type -> cardgame.v1.ExecuteAttackRequest
+	16, // 21: cardgame.v1.GameService.StartTurn:input_type -> cardgame.v1.StartTurnRequest
+	18, // 22: cardgame.v1.GameService.EndTurn:input_type -> cardgame.v1.EndTurnRequest
+	20, // 23: cardgame.v1.GameService.StreamGameEvents:input_type -> cardgame.v1.GameEventRequest
+	22, // 24: cardgame.v1.GameService.JoinMatchmaking:input_type -> cardgame.v1.JoinMatchmakingRequest
+	2,  // 25: cardgame.v1.GameService.CreateGame:output_type -> cardgame.v1.CreateGameResponse
+	4,  // 26: cardgame.v1.GameService.GetGameState:output_type -> cardgame.v1.GetGameStateResponse
+	6,  // 27: cardgame.v1.GameService.PerformCoinToss:output_type -> cardgame.v1.PerformCoinTossResponse
+	8,  // 28: cardgame.v1.GameService.ChooseTurnOrder:output_type -> cardgame.v1.ChooseTurnOrderResponse
+	10, // 29: cardgame.v1.GameService.PerformMulligan:output_type -> cardgame.v1.PerformMulliganResponse
+	12, // 30: cardgame.v1.GameService.PlayCard:output_type -> cardgame.v1.PlayCardResponse
+	14, // 31: cardgame.v1.GameService.ExecuteAttack:output_type -> cardgame.v1.ExecuteAttackResponse
+	17, // 32: cardgame.v1.GameService.StartTurn:output_type -> cardgame.v1.StartTurnResponse
+	19, // 33: cardgame.v1.GameService.EndTurn:output_type -> cardgame.v1.EndTurnResponse
+	21, // 34: cardgame.v1.GameService.StreamGameEvents:output_type -> cardgame.v1.GameEventResponse
+	23, // 35: cardgame.v1.GameService.JoinMatchmaking:output_type -> cardgame.v1.MatchmakingResponse
+	25, // [25:36] is the sub-list for method output_type
+	14, // [14:25] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_game_proto_init() }
@@ -1396,16 +1675,16 @@ func file_game_proto_init() {
 		return
 	}
 	file_common_proto_init()
-	file_game_proto_msgTypes[6].OneofWrappers = []any{}
-	file_game_proto_msgTypes[8].OneofWrappers = []any{}
-	file_game_proto_msgTypes[17].OneofWrappers = []any{}
+	file_game_proto_msgTypes[10].OneofWrappers = []any{}
+	file_game_proto_msgTypes[12].OneofWrappers = []any{}
+	file_game_proto_msgTypes[21].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_proto_rawDesc), len(file_game_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   19,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

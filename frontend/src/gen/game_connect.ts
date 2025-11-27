@@ -5,6 +5,8 @@
 
 import { MethodKind } from '@bufbuild/protobuf'
 import {
+  ChooseTurnOrderRequest,
+  ChooseTurnOrderResponse,
   CreateGameRequest,
   CreateGameResponse,
   EndTurnRequest,
@@ -17,6 +19,8 @@ import {
   GetGameStateResponse,
   JoinMatchmakingRequest,
   MatchmakingResponse,
+  PerformCoinTossRequest,
+  PerformCoinTossResponse,
   PerformMulliganRequest,
   PerformMulliganResponse,
   PlayCardRequest,
@@ -49,6 +53,24 @@ export const GameService = {
       name: 'GetGameState',
       I: GetGameStateRequest,
       O: GetGameStateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cardgame.v1.GameService.PerformCoinToss
+     */
+    performCoinToss: {
+      name: 'PerformCoinToss',
+      I: PerformCoinTossRequest,
+      O: PerformCoinTossResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc cardgame.v1.GameService.ChooseTurnOrder
+     */
+    chooseTurnOrder: {
+      name: 'ChooseTurnOrder',
+      I: ChooseTurnOrderRequest,
+      O: ChooseTurnOrderResponse,
       kind: MethodKind.Unary,
     },
     /**

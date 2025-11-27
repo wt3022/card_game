@@ -6,6 +6,7 @@ import (
 	"card_game/internal/core/usecase/game"
 	"card_game/internal/infrastructure/event"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -39,6 +40,9 @@ func GameStateToProto(state *game.State, viewerPlayerID string) *cardgamev1.Game
 		IsDraw:              state.WinnerID != nil && *state.WinnerID == "",
 		Player1MulliganDone: state.Player1MulliganDone,
 		Player2MulliganDone: state.Player2MulliganDone,
+		CoinTossDone:        state.CoinTossDone,
+		CoinTossWinnerId:    stringPtrToOptional(state.CoinTossWinnerID),
+		TurnOrderDecided:    state.TurnOrderDecided,
 	}
 }
 
@@ -405,6 +409,11 @@ func atomicEffectToProto(effect *entity.AtomicEffect) *cardgamev1.AtomicEffect {
 		pbEffect.Trait = &pbTrait
 	}
 
+	// 全てのparametersをStructとして設定
+	if len(effect.Parameters) > 0 {
+		pbEffect.Parameters = convertMapToStruct(effect.Parameters)
+	}
+
 	return pbEffect
 }
 
@@ -539,4 +548,18 @@ func targetFilterToProto(filter *entity.TargetFilter) *cardgamev1.ConditionFilte
 		ConditionType: "",
 		Parameters:    []string{},
 	}
+}
+
+// convertMapToStruct map[string]any を google.protobuf.Struct に変換
+func convertMapToStruct(m map[string]any) *structpb.Struct {
+	if len(m) == 0 {
+		return nil
+	}
+
+	// map[string]any を structpb に変換
+	s, err := structpb.NewStruct(m)
+	if err != nil {
+		return nil
+	}
+	return s
 }

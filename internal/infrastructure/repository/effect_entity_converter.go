@@ -3,6 +3,7 @@ package repository
 import (
 	"card_game/internal/core/entity"
 	"card_game/internal/infrastructure/persistence/model"
+	"encoding/json"
 )
 
 // CardEffectFromEntityToModel entity.CardEffectをmodel.CardEffectModelに変換
@@ -96,16 +97,19 @@ func atomicEffectFromEntityToModel(effect *entity.AtomicEffect) *model.AtomicEff
 	}
 
 	effectModel := &model.AtomicEffectModel{
-		Type:   string(effect.Type),
-		Target: targetSelectorFromEntityToModel(&effect.Target),
-		Value:  effect.Value,
-		Timing: string(effect.Timing),
+		Type:       string(effect.Type),
+		Target:     targetSelectorFromEntityToModel(&effect.Target),
+		Value:      effect.Value,
+		Timing:     string(effect.Timing),
+		Parameters: "{}", // デフォルトは空のJSONオブジェクト
 	}
 
 	// ParametersをJSON文字列として保存
 	if len(effect.Parameters) > 0 {
-		// 簡易的にJSON文字列化（実装は省略）
-		effectModel.Parameters = "{}"
+		parametersJSON, err := json.Marshal(effect.Parameters)
+		if err == nil {
+			effectModel.Parameters = string(parametersJSON)
+		}
 	}
 
 	return effectModel
@@ -183,9 +187,13 @@ func effectChainNodeFromModelToEntity(node *model.EffectChainNodeModel) *entity.
 	switch node.Type {
 	case "THEN":
 		if node.Sequential != nil || node.AtomicEffect != nil {
+			var next *entity.EffectChainNode
+			if node.Sequential != nil {
+				next = effectChainNodeFromModelToEntity(node.Sequential.Next)
+			}
 			entityNode.Sequential = &entity.SequentialNode{
 				Effect: atomicEffectFromModelToEntity(node.AtomicEffect),
-				Next:   effectChainNodeFromModelToEntity(node.Sequential.Next),
+				Next:   next,
 			}
 		}
 	case "AND":
@@ -240,13 +248,16 @@ func atomicEffectFromModelToEntity(effectModel *model.AtomicEffectModel) *entity
 		Type:       entity.AtomicEffectType(effectModel.Type),
 		Target:     *targetSelectorFromModelToEntity(effectModel.Target),
 		Value:      effectModel.Value,
-		Timing:     entity.EffectTimingImmediate,
+		Timing:     entity.EffectTiming(effectModel.Timing),
 		Parameters: make(map[string]any),
 	}
 
-	// ParametersはJSON文字列からデシリアライズ（簡易実装）
-	if effectModel.Parameters != "" {
-		// TODO: JSONデシリアライズ実装
+	// ParametersはJSON文字列からデシリアライズ
+	if effectModel.Parameters != "" && effectModel.Parameters != "{}" {
+		var params map[string]any
+		if err := json.Unmarshal([]byte(effectModel.Parameters), &params); err == nil {
+			effect.Parameters = params
+		}
 	}
 
 	return effect

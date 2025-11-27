@@ -150,3 +150,5 @@ export const authClient = createClient(AuthService)
 export const cardManagementClient = createAuthenticatedClient(
   CardManagementService,
 )
+// デッキ一覧取得など、認証なしでもアクセス可能な操作用のクライアント
+export const publicCardManagementClient = createClient(CardManagementService)

@@ -1,3 +1,4 @@
+import { Struct } from '@bufbuild/protobuf'
 import { useCallback, useEffect, useState } from 'react'
 import type { Card, Trait } from '../../gen/common_pb'
 import {
@@ -6,6 +7,7 @@ import {
   CardType,
   EffectChainNodeType,
   EffectDefinition,
+  EffectTiming,
   AtomicEffect as ProtoAtomicEffect,
   EffectChainNode as ProtoEffectChainNode,
   TargetSelector as ProtoTargetSelector,
@@ -297,15 +299,38 @@ export default function CardEditor({
       if (!protoEffect) {
         return createDefaultAtomicEffect()
       }
+
+      // parametersをJSON文字列に変換
+      let parametersStr = '{}'
+      if (protoEffect.parameters) {
+        try {
+          parametersStr = JSON.stringify(protoEffect.parameters)
+        } catch {
+          parametersStr = '{}'
+        }
+      }
+
+      // timingをproto enum値からUI値に変換
+      const timingMap: Record<number, string> = {
+        [EffectTiming.IMMEDIATE]: 'Immediate',
+        [EffectTiming.ON_SUMMON]: 'OnSummon',
+        [EffectTiming.ON_DESTROY]: 'OnDestroy',
+        [EffectTiming.ON_ATTACK]: 'OnAttack',
+        [EffectTiming.ON_DAMAGED]: 'OnDamaged',
+        [EffectTiming.TURN_START]: 'TurnStart',
+        [EffectTiming.TURN_END]: 'TurnEnd',
+      }
+      const timing = timingMap[protoEffect.timing] || 'Immediate'
+
       return {
         type: AtomicEffectType[protoEffect.type] || 'DEAL_DAMAGE',
         value: protoEffect.value || 0,
         multiplier: 1.0,
         duration: null,
-        timing: 'Immediate',
+        timing: timing,
         target: convertProtoTargetToUI(protoEffect.target),
         condition: null,
-        parameters: '{}',
+        parameters: parametersStr,
       }
     },
     [convertProtoTargetToUI],
@@ -644,10 +669,54 @@ export default function CardEditor({
             ] as TargetType | undefined)
           : undefined
 
+        // parametersをJSON文字列からオブジェクトに変換
+        let parameters: Record<string, unknown> | undefined
+        if (node.atomic_effect.parameters) {
+          console.log(
+            '[convertNodeToProto] parameters (raw):',
+            node.atomic_effect.parameters,
+          )
+          try {
+            const parsed = JSON.parse(node.atomic_effect.parameters)
+            console.log('[convertNodeToProto] parameters (parsed):', parsed)
+            // パースしたオブジェクトが空でない場合のみ設定
+            if (
+              parsed &&
+              typeof parsed === 'object' &&
+              Object.keys(parsed).length > 0
+            ) {
+              parameters = parsed
+              console.log('[convertNodeToProto] parameters (set):', parameters)
+            } else {
+              console.log(
+                '[convertNodeToProto] parameters is empty object, skipping',
+              )
+            }
+          } catch (err) {
+            console.error('Failed to parse parameters:', err)
+          }
+        } else {
+          console.log('[convertNodeToProto] parameters is empty/undefined')
+        }
+
+        // timingをUI値からproto enum値に変換
+        const timingToProtoMap: Record<string, EffectTiming> = {
+          Immediate: EffectTiming.IMMEDIATE,
+          OnSummon: EffectTiming.ON_SUMMON,
+          OnDestroy: EffectTiming.ON_DESTROY,
+          OnAttack: EffectTiming.ON_ATTACK,
+          OnDamaged: EffectTiming.ON_DAMAGED,
+          TurnStart: EffectTiming.TURN_START,
+          TurnEnd: EffectTiming.TURN_END,
+        }
+        const protoTiming =
+          timingToProtoMap[node.atomic_effect.timing] || EffectTiming.IMMEDIATE
+
         protoNode.atomicEffect = new ProtoAtomicEffect({
           id: 0, // バックエンドで自動生成
           type: effectType ?? AtomicEffectType.UNSPECIFIED,
           value: node.atomic_effect.value,
+          timing: protoTiming,
           target: node.atomic_effect.target
             ? new ProtoTargetSelector({
                 id: 0,
@@ -656,6 +725,7 @@ export default function CardEditor({
                 // filter: TODO 必要に応じて実装
               })
             : undefined,
+          parameters: parameters ? Struct.fromJson(parameters) : undefined,
         })
       }
 

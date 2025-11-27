@@ -330,29 +330,17 @@ func generateSummonUnitDescription(atomicEffect *model.AtomicEffectModel) string
 
 	// 説明文を生成
 	if unitName != "" {
-		if count > 1 {
-			if attack != nil && defense != nil {
-				return fmt.Sprintf("%s(%d/%d)を%d体召喚", unitName, *attack, *defense, count)
-			}
-			return fmt.Sprintf("%sを%d体召喚", unitName, count)
-		}
 		if attack != nil && defense != nil {
-			return fmt.Sprintf("%s(%d/%d)を召喚", unitName, *attack, *defense)
+			return fmt.Sprintf("%s(%d/%d)を%d体召喚", unitName, *attack, *defense, count)
 		}
-		return fmt.Sprintf("%sを召喚", unitName)
+		return fmt.Sprintf("%sを%d体召喚", unitName, count)
 	}
 
 	// ユニット名が指定されていない場合
-	if count > 1 {
-		if attack != nil && defense != nil {
-			return fmt.Sprintf("%d/%dのユニットを%d体召喚", *attack, *defense, count)
-		}
-		return fmt.Sprintf("ユニットを%d体召喚", count)
-	}
 	if attack != nil && defense != nil {
-		return fmt.Sprintf("%d/%dのユニットを召喚", *attack, *defense)
+		return fmt.Sprintf("%d/%dのユニットを%d体召喚", *attack, *defense, count)
 	}
-	return "ユニットを召喚"
+	return fmt.Sprintf("ユニットを%d体召喚", count)
 }
 
 // generateModifyMaxHPDescription 最大HP変更効果の説明を生成

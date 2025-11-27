@@ -264,15 +264,23 @@ func atomicEffectFromProto(pb *cardgamev1.AtomicEffect) *entity.AtomicEffect {
 		Parameters: make(map[string]any),
 	}
 
-	if pb.Value != nil {
-		effect.Value = int(*pb.Value)
-		effect.Parameters["amount"] = int(*pb.Value)
+	// pb.Parametersから変換（優先）
+	if pb.Parameters != nil {
+		effect.Parameters = pb.Parameters.AsMap()
 	}
-	if pb.CardId != nil {
-		effect.Parameters["card_id"] = *pb.CardId
-	}
-	if pb.Trait != nil {
-		effect.Parameters["trait"] = TraitFromProto(*pb.Trait)
+
+	// 後方互換性のため、個別フィールドもチェック（Parametersが空の場合のみ）
+	if len(effect.Parameters) == 0 {
+		if pb.Value != nil {
+			effect.Value = int(*pb.Value)
+			effect.Parameters["amount"] = int(*pb.Value)
+		}
+		if pb.CardId != nil {
+			effect.Parameters["card_id"] = *pb.CardId
+		}
+		if pb.Trait != nil {
+			effect.Parameters["trait"] = TraitFromProto(*pb.Trait)
+		}
 	}
 
 	return effect

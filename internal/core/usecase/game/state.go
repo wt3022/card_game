@@ -28,8 +28,11 @@ type State struct {
 	IsGameOver          bool                  `json:"is_game_over"`
 	WinnerID            *string               `json:"winner_id,omitempty"`
 	IsDraw              bool                  `json:"is_draw"`
-	Player1MulliganDone bool                  `json:"player1_mulligan_done"` // プレイヤー1がマリガンを完了したか
-	Player2MulliganDone bool                  `json:"player2_mulligan_done"` // プレイヤー2がマリガンを完了したか
+	Player1MulliganDone bool                  `json:"player1_mulligan_done"`         // プレイヤー1がマリガンを完了したか
+	Player2MulliganDone bool                  `json:"player2_mulligan_done"`         // プレイヤー2がマリガンを完了したか
+	CoinTossDone        bool                  `json:"coin_toss_done"`                // コイントスが完了したか
+	CoinTossWinnerID    *string               `json:"coin_toss_winner_id,omitempty"` // コイントスの勝者
+	TurnOrderDecided    bool                  `json:"turn_order_decided"`            // 先攻後攻が決定したか
 	logger              port.Logger           `json:"-"`
 }
 

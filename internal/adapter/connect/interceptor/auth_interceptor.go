@@ -32,6 +32,12 @@ func (i *AuthInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
 	return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 		i.logger.Info("Auth interceptor: checking request to %s", req.Spec().Procedure)
 
+		// ListDecksは認証不要（デッキ一覧の名前とIDは公開情報）
+		if req.Spec().Procedure == "/cardgame.v1.CardManagementService/ListDecks" {
+			i.logger.Info("Auth interceptor: skipping auth for ListDecks (public endpoint)")
+			return next(ctx, req)
+		}
+
 		// Authorizationヘッダーからトークンを取得
 		authHeader := req.Header().Get("Authorization")
 		if authHeader == "" {

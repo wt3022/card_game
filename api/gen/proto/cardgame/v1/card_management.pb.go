@@ -269,6 +269,8 @@ func (x *GetCardResponse) GetCard() *Card {
 type ListCardsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          *CardType              `protobuf:"varint,1,opt,name=type,proto3,enum=cardgame.v1.CardType,oneof" json:"type,omitempty"` // 指定された場合、そのタイプのみ取得
+	Page          int32                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                                 // ページ番号 (1から開始、デフォルト1)
+	PageSize      int32                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`         // 1ページあたりの件数 (デフォルト50)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -310,10 +312,28 @@ func (x *ListCardsRequest) GetType() CardType {
 	return CardType_CARD_TYPE_UNSPECIFIED
 }
 
+func (x *ListCardsRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListCardsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
 // カード一覧レスポンス
 type ListCardsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Cards         []*Card                `protobuf:"bytes,1,rep,name=cards,proto3" json:"cards,omitempty"`
+	TotalCount    int32                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"` // 総件数
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`                               // 現在のページ番号
+	PageSize      int32                  `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`       // 1ページあたりの件数
+	TotalPages    int32                  `protobuf:"varint,5,opt,name=total_pages,json=totalPages,proto3" json:"total_pages,omitempty"` // 総ページ数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -353,6 +373,34 @@ func (x *ListCardsResponse) GetCards() []*Card {
 		return x.Cards
 	}
 	return nil
+}
+
+func (x *ListCardsResponse) GetTotalCount() int32 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *ListCardsResponse) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListCardsResponse) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListCardsResponse) GetTotalPages() int32 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
 }
 
 // カード更新リクエスト
@@ -1132,12 +1180,20 @@ const file_card_management_proto_rawDesc = "" +
 	"\x0eGetCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"8\n" +
 	"\x0fGetCardResponse\x12%\n" +
-	"\x04card\x18\x01 \x01(\v2\x11.cardgame.v1.CardR\x04card\"K\n" +
+	"\x04card\x18\x01 \x01(\v2\x11.cardgame.v1.CardR\x04card\"|\n" +
 	"\x10ListCardsRequest\x12.\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x15.cardgame.v1.CardTypeH\x00R\x04type\x88\x01\x01B\a\n" +
-	"\x05_type\"<\n" +
+	"\x04type\x18\x01 \x01(\x0e2\x15.cardgame.v1.CardTypeH\x00R\x04type\x88\x01\x01\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x05R\bpageSizeB\a\n" +
+	"\x05_type\"\xaf\x01\n" +
 	"\x11ListCardsResponse\x12'\n" +
-	"\x05cards\x18\x01 \x03(\v2\x11.cardgame.v1.CardR\x05cards\"\xe5\x02\n" +
+	"\x05cards\x18\x01 \x03(\v2\x11.cardgame.v1.CardR\x05cards\x12\x1f\n" +
+	"\vtotal_count\x18\x02 \x01(\x05R\n" +
+	"totalCount\x12\x12\n" +
+	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\x12\x1f\n" +
+	"\vtotal_pages\x18\x05 \x01(\x05R\n" +
+	"totalPages\"\xe5\x02\n" +
 	"\x11UpdateCardRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +

@@ -289,6 +289,286 @@ export class GetGameStateResponse extends Message<GetGameStateResponse> {
 }
 
 /**
+ * @generated from message cardgame.v1.PerformCoinTossRequest
+ */
+export class PerformCoinTossRequest extends Message<PerformCoinTossRequest> {
+  /**
+   * @generated from field: string game_id = 1;
+   */
+  gameId = ''
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = ''
+
+  constructor(data?: PartialMessage<PerformCoinTossRequest>) {
+    super()
+    proto3.util.initPartial(data, this)
+  }
+
+  static readonly runtime: typeof proto3 = proto3
+  static readonly typeName = 'cardgame.v1.PerformCoinTossRequest'
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+  ])
+
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): PerformCoinTossRequest {
+    return new PerformCoinTossRequest().fromBinary(bytes, options)
+  }
+
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): PerformCoinTossRequest {
+    return new PerformCoinTossRequest().fromJson(jsonValue, options)
+  }
+
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): PerformCoinTossRequest {
+    return new PerformCoinTossRequest().fromJsonString(jsonString, options)
+  }
+
+  static equals(
+    a:
+      | PerformCoinTossRequest
+      | PlainMessage<PerformCoinTossRequest>
+      | undefined,
+    b:
+      | PerformCoinTossRequest
+      | PlainMessage<PerformCoinTossRequest>
+      | undefined,
+  ): boolean {
+    return proto3.util.equals(PerformCoinTossRequest, a, b)
+  }
+}
+
+/**
+ * @generated from message cardgame.v1.PerformCoinTossResponse
+ */
+export class PerformCoinTossResponse extends Message<PerformCoinTossResponse> {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success = false
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message = ''
+
+  /**
+   * 表が出たかどうか
+   *
+   * @generated from field: bool is_heads = 3;
+   */
+  isHeads = false
+
+  /**
+   * 勝者のプレイヤーID
+   *
+   * @generated from field: string winner_id = 4;
+   */
+  winnerId = ''
+
+  /**
+   * @generated from field: cardgame.v1.GameState game_state = 5;
+   */
+  gameState?: GameState
+
+  constructor(data?: PartialMessage<PerformCoinTossResponse>) {
+    super()
+    proto3.util.initPartial(data, this)
+  }
+
+  static readonly runtime: typeof proto3 = proto3
+  static readonly typeName = 'cardgame.v1.PerformCoinTossResponse'
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: 'is_heads', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: 'winner_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: 'game_state', kind: 'message', T: GameState },
+  ])
+
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): PerformCoinTossResponse {
+    return new PerformCoinTossResponse().fromBinary(bytes, options)
+  }
+
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): PerformCoinTossResponse {
+    return new PerformCoinTossResponse().fromJson(jsonValue, options)
+  }
+
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): PerformCoinTossResponse {
+    return new PerformCoinTossResponse().fromJsonString(jsonString, options)
+  }
+
+  static equals(
+    a:
+      | PerformCoinTossResponse
+      | PlainMessage<PerformCoinTossResponse>
+      | undefined,
+    b:
+      | PerformCoinTossResponse
+      | PlainMessage<PerformCoinTossResponse>
+      | undefined,
+  ): boolean {
+    return proto3.util.equals(PerformCoinTossResponse, a, b)
+  }
+}
+
+/**
+ * @generated from message cardgame.v1.ChooseTurnOrderRequest
+ */
+export class ChooseTurnOrderRequest extends Message<ChooseTurnOrderRequest> {
+  /**
+   * @generated from field: string game_id = 1;
+   */
+  gameId = ''
+
+  /**
+   * @generated from field: string player_id = 2;
+   */
+  playerId = ''
+
+  /**
+   * true: 先攻を選択, false: 後攻を選択
+   *
+   * @generated from field: bool choose_first = 3;
+   */
+  chooseFirst = false
+
+  constructor(data?: PartialMessage<ChooseTurnOrderRequest>) {
+    super()
+    proto3.util.initPartial(data, this)
+  }
+
+  static readonly runtime: typeof proto3 = proto3
+  static readonly typeName = 'cardgame.v1.ChooseTurnOrderRequest'
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: 'game_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: 'player_id', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: 'choose_first', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
+  ])
+
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): ChooseTurnOrderRequest {
+    return new ChooseTurnOrderRequest().fromBinary(bytes, options)
+  }
+
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): ChooseTurnOrderRequest {
+    return new ChooseTurnOrderRequest().fromJson(jsonValue, options)
+  }
+
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): ChooseTurnOrderRequest {
+    return new ChooseTurnOrderRequest().fromJsonString(jsonString, options)
+  }
+
+  static equals(
+    a:
+      | ChooseTurnOrderRequest
+      | PlainMessage<ChooseTurnOrderRequest>
+      | undefined,
+    b:
+      | ChooseTurnOrderRequest
+      | PlainMessage<ChooseTurnOrderRequest>
+      | undefined,
+  ): boolean {
+    return proto3.util.equals(ChooseTurnOrderRequest, a, b)
+  }
+}
+
+/**
+ * @generated from message cardgame.v1.ChooseTurnOrderResponse
+ */
+export class ChooseTurnOrderResponse extends Message<ChooseTurnOrderResponse> {
+  /**
+   * @generated from field: bool success = 1;
+   */
+  success = false
+
+  /**
+   * @generated from field: string message = 2;
+   */
+  message = ''
+
+  /**
+   * @generated from field: cardgame.v1.GameState game_state = 3;
+   */
+  gameState?: GameState
+
+  constructor(data?: PartialMessage<ChooseTurnOrderResponse>) {
+    super()
+    proto3.util.initPartial(data, this)
+  }
+
+  static readonly runtime: typeof proto3 = proto3
+  static readonly typeName = 'cardgame.v1.ChooseTurnOrderResponse'
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: 'success', kind: 'scalar', T: 8 /* ScalarType.BOOL */ },
+    { no: 2, name: 'message', kind: 'scalar', T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: 'game_state', kind: 'message', T: GameState },
+  ])
+
+  static fromBinary(
+    bytes: Uint8Array,
+    options?: Partial<BinaryReadOptions>,
+  ): ChooseTurnOrderResponse {
+    return new ChooseTurnOrderResponse().fromBinary(bytes, options)
+  }
+
+  static fromJson(
+    jsonValue: JsonValue,
+    options?: Partial<JsonReadOptions>,
+  ): ChooseTurnOrderResponse {
+    return new ChooseTurnOrderResponse().fromJson(jsonValue, options)
+  }
+
+  static fromJsonString(
+    jsonString: string,
+    options?: Partial<JsonReadOptions>,
+  ): ChooseTurnOrderResponse {
+    return new ChooseTurnOrderResponse().fromJsonString(jsonString, options)
+  }
+
+  static equals(
+    a:
+      | ChooseTurnOrderResponse
+      | PlainMessage<ChooseTurnOrderResponse>
+      | undefined,
+    b:
+      | ChooseTurnOrderResponse
+      | PlainMessage<ChooseTurnOrderResponse>
+      | undefined,
+  ): boolean {
+    return proto3.util.equals(ChooseTurnOrderResponse, a, b)
+  }
+}
+
+/**
  * @generated from message cardgame.v1.PerformMulliganRequest
  */
 export class PerformMulliganRequest extends Message<PerformMulliganRequest> {

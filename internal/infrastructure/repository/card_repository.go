@@ -125,15 +125,19 @@ func (r *cardRepository) SaveCardEffect(cardID string, cardEffect *entity.CardEf
 		return fmt.Errorf("failed to delete existing card effect: %w", err)
 	}
 
-	// CardEffectModelを作成
+	// Definitionsを一時保存してCreate時の自動保存を防ぐ
+	definitions := cardEffectModel.Definitions
+	cardEffectModel.Definitions = nil
+
+	// CardEffectModelを作成(Definitionsは空にしておく)
 	cardEffectModel.CardID = cardID
 	if err := r.db.Create(cardEffectModel).Error; err != nil {
 		return fmt.Errorf("failed to create card effect: %w", err)
 	}
 
-	// EffectDefinitionを保存
-	for i := range cardEffectModel.Definitions {
-		if err := r.saveEffectDefinitionModel(cardEffectModel.ID, &cardEffectModel.Definitions[i]); err != nil {
+	// EffectDefinitionを明示的に保存
+	for i := range definitions {
+		if err := r.saveEffectDefinitionModel(cardEffectModel.ID, &definitions[i]); err != nil {
 			return fmt.Errorf("failed to save effect definition: %w", err)
 		}
 	}
@@ -515,18 +519,115 @@ func (r *cardRepository) FindAll() ([]*entity.Card, error) {
 	if err := r.db.Preload("Traits").Find(&cardModels).Error; err != nil {
 		return nil, fmt.Errorf("failed to query cards: %w", err)
 	}
+
+	// カードIDのリストを作成
+	cardIDs := make([]string, len(cardModels))
+	for i, cardModel := range cardModels {
+		cardIDs[i] = cardModel.ID
+	}
+
+	// CardEffectModelを一括取得
+	var cardEffectModels []model.CardEffectModel
+	if err := r.db.Where("card_id IN ?", cardIDs).Find(&cardEffectModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to load card effects: %w", err)
+	}
+
+	// CardEffectをマップに変換
+	cardEffectMap := make(map[string]*model.CardEffectModel)
+	for i := range cardEffectModels {
+		cardEffectMap[cardEffectModels[i].CardID] = &cardEffectModels[i]
+	}
+
+	// カードを変換
 	cards := make([]*entity.Card, len(cardModels))
 	for i, cardModel := range cardModels {
 		card, err := toEntityCard(&cardModel)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert card model to entity: %w", err)
 		}
-		if err := r.attachCardEffect(card); err != nil {
-			return nil, err
+
+		// CardEffectの説明を設定（マップから取得）
+		if cardEffectModel, exists := cardEffectMap[card.ID]; exists {
+			effectDescription := GenerateEffectDescription(cardEffectModel)
+			if effectDescription != "" {
+				card.Effect = effectDescription
+			}
+			// entity.CardEffectは一覧表示では不要なので省略
+			// 個別のカード取得時のみloadCardEffectを呼ぶ
 		}
+
 		cards[i] = card
 	}
 	return cards, nil
+}
+
+// FindAllWithPagination ページネーション付きですべてのカードを取得
+func (r *cardRepository) FindAllWithPagination(page, pageSize int) (*port.CardListResult, error) {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 50
+	}
+
+	// 総件数を取得
+	var totalCount int64
+	if err := r.db.Model(&model.CardModel{}).Count(&totalCount).Error; err != nil {
+		return nil, fmt.Errorf("failed to count cards: %w", err)
+	}
+
+	// ページネーション付きでカードを取得
+	var cardModels []model.CardModel
+	offset := (page - 1) * pageSize
+	if err := r.db.Preload("Traits").Offset(offset).Limit(pageSize).Find(&cardModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to query cards: %w", err)
+	}
+
+	// カードIDのリストを作成
+	cardIDs := make([]string, len(cardModels))
+	for i, cardModel := range cardModels {
+		cardIDs[i] = cardModel.ID
+	}
+
+	// CardEffectModelを一括取得
+	var cardEffectModels []model.CardEffectModel
+	if len(cardIDs) > 0 {
+		if err := r.db.Where("card_id IN ?", cardIDs).Find(&cardEffectModels).Error; err != nil {
+			return nil, fmt.Errorf("failed to load card effects: %w", err)
+		}
+	}
+
+	// CardEffectをマップに変換
+	cardEffectMap := make(map[string]*model.CardEffectModel)
+	for i := range cardEffectModels {
+		cardEffectMap[cardEffectModels[i].CardID] = &cardEffectModels[i]
+	}
+
+	// カードを変換
+	cards := make([]*entity.Card, len(cardModels))
+	for i, cardModel := range cardModels {
+		card, err := toEntityCard(&cardModel)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert card model to entity: %w", err)
+		}
+
+		// CardEffectの説明を設定（マップから取得）
+		if cardEffectModel, exists := cardEffectMap[card.ID]; exists {
+			effectDescription := GenerateEffectDescription(cardEffectModel)
+			if effectDescription != "" {
+				card.Effect = effectDescription
+			}
+		}
+
+		cards[i] = card
+	}
+
+	return &port.CardListResult{
+		Cards:      cards,
+		TotalCount: int(totalCount),
+		Page:       page,
+		PageSize:   pageSize,
+	}, nil
 }
 
 // FindByType タイプでカードを検索
@@ -535,18 +636,115 @@ func (r *cardRepository) FindByType(cardType entity.CardType) ([]*entity.Card, e
 	if err := r.db.Preload("Traits").Where("type = ?", string(cardType)).Find(&cardModels).Error; err != nil {
 		return nil, fmt.Errorf("failed to query cards by type: %w", err)
 	}
+
+	// カードIDのリストを作成
+	cardIDs := make([]string, len(cardModels))
+	for i, cardModel := range cardModels {
+		cardIDs[i] = cardModel.ID
+	}
+
+	// CardEffectModelを一括取得
+	var cardEffectModels []model.CardEffectModel
+	if len(cardIDs) > 0 {
+		if err := r.db.Where("card_id IN ?", cardIDs).Find(&cardEffectModels).Error; err != nil {
+			return nil, fmt.Errorf("failed to load card effects: %w", err)
+		}
+	}
+
+	// CardEffectをマップに変換
+	cardEffectMap := make(map[string]*model.CardEffectModel)
+	for i := range cardEffectModels {
+		cardEffectMap[cardEffectModels[i].CardID] = &cardEffectModels[i]
+	}
+
+	// カードを変換
 	cards := make([]*entity.Card, len(cardModels))
 	for i, cardModel := range cardModels {
 		card, err := toEntityCard(&cardModel)
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert card model to entity: %w", err)
 		}
-		if err := r.attachCardEffect(card); err != nil {
-			return nil, err
+
+		// CardEffectの説明を設定（マップから取得）
+		if cardEffectModel, exists := cardEffectMap[card.ID]; exists {
+			effectDescription := GenerateEffectDescription(cardEffectModel)
+			if effectDescription != "" {
+				card.Effect = effectDescription
+			}
 		}
+
 		cards[i] = card
 	}
 	return cards, nil
+}
+
+// FindByTypeWithPagination ページネーション付きでタイプでカードを検索
+func (r *cardRepository) FindByTypeWithPagination(cardType entity.CardType, page, pageSize int) (*port.CardListResult, error) {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize < 1 || pageSize > 100 {
+		pageSize = 50
+	}
+
+	// 総件数を取得
+	var totalCount int64
+	if err := r.db.Model(&model.CardModel{}).Where("type = ?", string(cardType)).Count(&totalCount).Error; err != nil {
+		return nil, fmt.Errorf("failed to count cards by type: %w", err)
+	}
+
+	// ページネーション付きでカードを取得
+	var cardModels []model.CardModel
+	offset := (page - 1) * pageSize
+	if err := r.db.Preload("Traits").Where("type = ?", string(cardType)).Offset(offset).Limit(pageSize).Find(&cardModels).Error; err != nil {
+		return nil, fmt.Errorf("failed to query cards by type: %w", err)
+	}
+
+	// カードIDのリストを作成
+	cardIDs := make([]string, len(cardModels))
+	for i, cardModel := range cardModels {
+		cardIDs[i] = cardModel.ID
+	}
+
+	// CardEffectModelを一括取得
+	var cardEffectModels []model.CardEffectModel
+	if len(cardIDs) > 0 {
+		if err := r.db.Where("card_id IN ?", cardIDs).Find(&cardEffectModels).Error; err != nil {
+			return nil, fmt.Errorf("failed to load card effects: %w", err)
+		}
+	}
+
+	// CardEffectをマップに変換
+	cardEffectMap := make(map[string]*model.CardEffectModel)
+	for i := range cardEffectModels {
+		cardEffectMap[cardEffectModels[i].CardID] = &cardEffectModels[i]
+	}
+
+	// カードを変換
+	cards := make([]*entity.Card, len(cardModels))
+	for i, cardModel := range cardModels {
+		card, err := toEntityCard(&cardModel)
+		if err != nil {
+			return nil, fmt.Errorf("failed to convert card model to entity: %w", err)
+		}
+
+		// CardEffectの説明を設定（マップから取得）
+		if cardEffectModel, exists := cardEffectMap[card.ID]; exists {
+			effectDescription := GenerateEffectDescription(cardEffectModel)
+			if effectDescription != "" {
+				card.Effect = effectDescription
+			}
+		}
+
+		cards[i] = card
+	}
+
+	return &port.CardListResult{
+		Cards:      cards,
+		TotalCount: int(totalCount),
+		Page:       page,
+		PageSize:   pageSize,
+	}, nil
 }
 
 // Update カードを更新
@@ -1068,6 +1266,9 @@ func (r *cardRepository) loadSequentialNodeModel(nodeID uint) (*model.Sequential
 func (r *cardRepository) loadParallelNodeModel(nodeID uint) (*model.ParallelNodeModel, error) {
 	var parModel model.ParallelNodeModel
 	if err := r.db.First(&parModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &model.ParallelNodeModel{NodeID: nodeID}, nil
+		}
 		return nil, fmt.Errorf("failed to load parallel node model: %w", err)
 	}
 
@@ -1101,6 +1302,9 @@ func (r *cardRepository) loadParallelNodeModel(nodeID uint) (*model.ParallelNode
 func (r *cardRepository) loadIfElseNodeModel(nodeID uint) (*model.IfElseNodeModel, error) {
 	var ifElseModel model.IfElseNodeModel
 	if err := r.db.First(&ifElseModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &model.IfElseNodeModel{NodeID: nodeID}, nil
+		}
 		return nil, fmt.Errorf("failed to load if_else node model: %w", err)
 	}
 
@@ -1134,6 +1338,9 @@ func (r *cardRepository) loadIfElseNodeModel(nodeID uint) (*model.IfElseNodeMode
 func (r *cardRepository) loadRepeatNodeModel(nodeID uint) (*model.RepeatNodeModel, error) {
 	var repeatModel model.RepeatNodeModel
 	if err := r.db.First(&repeatModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &model.RepeatNodeModel{NodeID: nodeID}, nil
+		}
 		return nil, fmt.Errorf("failed to load repeat node model: %w", err)
 	}
 
@@ -1150,6 +1357,9 @@ func (r *cardRepository) loadRepeatNodeModel(nodeID uint) (*model.RepeatNodeMode
 func (r *cardRepository) loadForEachNodeModel(nodeID uint) (*model.ForEachNodeModel, error) {
 	var forEachModel model.ForEachNodeModel
 	if err := r.db.First(&forEachModel, "node_id = ?", nodeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return &model.ForEachNodeModel{NodeID: nodeID}, nil
+		}
 		return nil, fmt.Errorf("failed to load for_each node model: %w", err)
 	}
 

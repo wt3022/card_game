@@ -5,6 +5,7 @@ package cardgame.v1;
 option go_package = "card_game/api/gen/proto/cardgame/v1;cardgamev1";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 // 共通メッセージ定義
 
@@ -111,6 +112,7 @@ message AtomicEffect {
   optional string card_id = 5;
   optional Trait trait = 6;
   EffectTiming timing = 7;  // 発動タイミング
+  optional google.protobuf.Struct parameters = 8;  // 追加パラメータ (name, attack, defense, cost, count, traitsなど)
 }
 
 // ターゲットセレクター
@@ -217,6 +219,9 @@ message GameState {
   bool is_draw = 9;
   bool player1_mulligan_done = 10;  // プレイヤー1がマリガンを完了したか
   bool player2_mulligan_done = 11;  // プレイヤー2がマリガンを完了したか
+  bool coin_toss_done = 12;  // コイントスが完了したか
+  optional string coin_toss_winner_id = 13;  // コイントスの勝者
+  bool turn_order_decided = 14;  // 先攻後攻が決定したか
 }
 
 // イベント

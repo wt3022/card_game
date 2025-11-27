@@ -11,7 +11,7 @@ import type {
   PartialMessage,
   PlainMessage,
 } from '@bufbuild/protobuf'
-import { Message, proto3, Timestamp } from '@bufbuild/protobuf'
+import { Message, proto3, Struct, Timestamp } from '@bufbuild/protobuf'
 
 /**
  * カードタイプ
@@ -564,6 +564,13 @@ export class AtomicEffect extends Message<AtomicEffect> {
    */
   timing = EffectTiming.UNSPECIFIED
 
+  /**
+   * 追加パラメータ (name, attack, defense, cost, count, traitsなど)
+   *
+   * @generated from field: optional google.protobuf.Struct parameters = 8;
+   */
+  parameters?: Struct
+
   constructor(data?: PartialMessage<AtomicEffect>) {
     super()
     proto3.util.initPartial(data, this)
@@ -607,6 +614,7 @@ export class AtomicEffect extends Message<AtomicEffect> {
       kind: 'enum',
       T: proto3.getEnumType(EffectTiming),
     },
+    { no: 8, name: 'parameters', kind: 'message', T: Struct, opt: true },
   ])
 
   static fromBinary(
@@ -1597,6 +1605,27 @@ export class GameState extends Message<GameState> {
    */
   player2MulliganDone = false
 
+  /**
+   * コイントスが完了したか
+   *
+   * @generated from field: bool coin_toss_done = 12;
+   */
+  coinTossDone = false
+
+  /**
+   * コイントスの勝者
+   *
+   * @generated from field: optional string coin_toss_winner_id = 13;
+   */
+  coinTossWinnerId?: string
+
+  /**
+   * 先攻後攻が決定したか
+   *
+   * @generated from field: bool turn_order_decided = 14;
+   */
+  turnOrderDecided = false
+
   constructor(data?: PartialMessage<GameState>) {
     super()
     proto3.util.initPartial(data, this)
@@ -1644,6 +1673,25 @@ export class GameState extends Message<GameState> {
     {
       no: 11,
       name: 'player2_mulligan_done',
+      kind: 'scalar',
+      T: 8 /* ScalarType.BOOL */,
+    },
+    {
+      no: 12,
+      name: 'coin_toss_done',
+      kind: 'scalar',
+      T: 8 /* ScalarType.BOOL */,
+    },
+    {
+      no: 13,
+      name: 'coin_toss_winner_id',
+      kind: 'scalar',
+      T: 9 /* ScalarType.STRING */,
+      opt: true,
+    },
+    {
+      no: 14,
+      name: 'turn_order_decided',
       kind: 'scalar',
       T: 8 /* ScalarType.BOOL */,
     },

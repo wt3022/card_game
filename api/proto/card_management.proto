@@ -52,11 +52,17 @@ message GetCardResponse {
 // カード一覧リクエスト
 message ListCardsRequest {
   optional CardType type = 1; // 指定された場合、そのタイプのみ取得
+  int32 page = 2; // ページ番号 (1から開始、デフォルト1)
+  int32 page_size = 3; // 1ページあたりの件数 (デフォルト50)
 }
 
 // カード一覧レスポンス
 message ListCardsResponse {
   repeated Card cards = 1;
+  int32 total_count = 2; // 総件数
+  int32 page = 3; // 現在のページ番号
+  int32 page_size = 4; // 1ページあたりの件数
+  int32 total_pages = 5; // 総ページ数
 }
 
 // カード更新リクエスト

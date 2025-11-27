@@ -56,6 +56,23 @@ func (g *State) ExecuteDrawPhase(player *entity.Player) {
 
 	g.logger.Info("%s: 「%s」をドロー (手札: %d枚, デッキ: %d枚)", player.Name, card.Name, len(player.Hand), len(player.Deck))
 	g.AddLog(player.ID, "ドローフェイズ", fmt.Sprintf("%s をドロー", card.Name))
+
+	// NOTE: ゲーム加速のためにもう一回ドロー
+	if len(player.Deck) != 0 {
+		card, err = player.DrawCard()
+		if err != nil {
+			// デッキ切れの場合、即敗北
+			g.logger.Info("%s: デッキ切れ！敗北", player.Name)
+			g.IsGameOver = true
+			opponent := g.GetOpponent(player.ID)
+			g.WinnerID = &opponent.ID
+			g.AddLog(player.ID, "ドローフェイズ", "デッキ切れにより敗北")
+			return
+		}
+
+		g.logger.Info("%s: 「%s」をドロー (手札: %d枚, デッキ: %d枚)", player.Name, card.Name, len(player.Hand), len(player.Deck))
+		g.AddLog(player.ID, "ドローフェイズ", fmt.Sprintf("%s をドロー", card.Name))
+	}
 }
 
 // リソース増加フェイズを実行
