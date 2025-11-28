@@ -64,13 +64,14 @@ func (r *deckRepository) FindByID(ctx context.Context, id string) (*entity.Deck,
 }
 
 // FindByUserID はユーザーIDでデッキ一覧を取得
+// systemユーザーのデッキ（マスターデッキ）も含めて返す
 func (r *deckRepository) FindByUserID(ctx context.Context, userID string) ([]*entity.Deck, error) {
 	var deckModels []model.DeckModel
 	if err := r.db.WithContext(ctx).
 		Preload("Cards", func(db *gorm.DB) *gorm.DB {
 			return db.Order("position ASC")
 		}).
-		Where("user_id = ?", userID).
+		Where("user_id = ? OR user_id = ?", userID, "system").
 		Find(&deckModels).Error; err != nil {
 		return nil, err
 	}

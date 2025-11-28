@@ -130,6 +130,7 @@ func CardToProto(card *entity.Card) *cardgamev1.Card {
 
 	return &cardgamev1.Card{
 		Id:         card.ID,
+		InstanceId: card.InstanceID,
 		Name:       card.Name,
 		Type:       CardTypeToProto(card.Type),
 		Cost:       int32(card.Cost),

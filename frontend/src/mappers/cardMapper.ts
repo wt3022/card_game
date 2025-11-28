@@ -47,6 +47,7 @@ export class CardMapper {
   static toDomain(proto: ProtoCard): Card {
     return {
       id: proto.id,
+      instanceId: proto.instanceId || undefined,
       name: proto.name,
       type: CardMapper.cardTypeToDomain(proto.type),
       cost: proto.cost,
@@ -64,6 +65,7 @@ export class CardMapper {
   static toProto(domain: Card): Partial<ProtoCard> {
     return {
       id: domain.id,
+      instanceId: domain.instanceId || '',
       name: domain.name,
       type: CardMapper.cardTypeToProto(domain.type),
       cost: domain.cost,

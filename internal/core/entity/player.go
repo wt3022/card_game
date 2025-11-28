@@ -217,9 +217,11 @@ func (p *Player) GetCurrentTurnMana() int {
 // ========================================
 
 // PlayCardFromHand 手札からカードをプレイ
+// cardIDはInstanceIDまたはマスターカードIDのいずれかを指定可能
 func (p *Player) PlayCardFromHand(cardID string) (*Card, error) {
 	for i, card := range p.Hand {
-		if card.ID == cardID {
+		// InstanceIDで検索（優先）、なければマスターカードIDで検索
+		if card.InstanceID == cardID || (card.InstanceID == "" && card.ID == cardID) {
 			// マナチェック
 			if err := p.SpendMana(card.Cost); err != nil {
 				return nil, err

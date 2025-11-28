@@ -170,6 +170,7 @@ message Card {
   string effect = 7;
   repeated Trait traits = 8;
   optional CardEffect card_effect = 9; // カード管理UI向けの効果定義(型安全)
+  string instance_id = 10; // ゲーム内での一意なインスタンスID
 }
 
 // ユニット

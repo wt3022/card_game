@@ -998,6 +998,7 @@ type Card struct {
 	Effect        string                 `protobuf:"bytes,7,opt,name=effect,proto3" json:"effect,omitempty"`
 	Traits        []Trait                `protobuf:"varint,8,rep,packed,name=traits,proto3,enum=cardgame.v1.Trait" json:"traits,omitempty"`
 	CardEffect    *CardEffect            `protobuf:"bytes,9,opt,name=card_effect,json=cardEffect,proto3,oneof" json:"card_effect,omitempty"` // カード管理UI向けの効果定義(型安全)
+	InstanceId    string                 `protobuf:"bytes,10,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`      // ゲーム内での一意なインスタンスID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1093,6 +1094,13 @@ func (x *Card) GetCardEffect() *CardEffect {
 		return x.CardEffect
 	}
 	return nil
+}
+
+func (x *Card) GetInstanceId() string {
+	if x != nil {
+		return x.InstanceId
+	}
+	return ""
 }
 
 // ユニット
@@ -1780,7 +1788,7 @@ const file_common_proto_rawDesc = "" +
 	"CardEffect\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\x12\x17\n" +
 	"\acard_id\x18\x02 \x01(\tR\x06cardId\x12?\n" +
-	"\vdefinitions\x18\x03 \x03(\v2\x1d.cardgame.v1.EffectDefinitionR\vdefinitions\"\xcf\x02\n" +
+	"\vdefinitions\x18\x03 \x03(\v2\x1d.cardgame.v1.EffectDefinitionR\vdefinitions\"\xf0\x02\n" +
 	"\x04Card\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -1791,7 +1799,10 @@ const file_common_proto_rawDesc = "" +
 	"\x06effect\x18\a \x01(\tR\x06effect\x12*\n" +
 	"\x06traits\x18\b \x03(\x0e2\x12.cardgame.v1.TraitR\x06traits\x12=\n" +
 	"\vcard_effect\x18\t \x01(\v2\x17.cardgame.v1.CardEffectH\x02R\n" +
-	"cardEffect\x88\x01\x01B\t\n" +
+	"cardEffect\x88\x01\x01\x12\x1f\n" +
+	"\vinstance_id\x18\n" +
+	" \x01(\tR\n" +
+	"instanceIdB\t\n" +
 	"\a_attackB\n" +
 	"\n" +
 	"\b_defenseB\x0e\n" +

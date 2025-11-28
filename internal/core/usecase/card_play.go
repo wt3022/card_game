@@ -104,9 +104,11 @@ func executeUseSpell(state port.GameState, playerID string, cardID string, targe
 }
 
 // 手札からカードを検索
+// cardIDはInstanceIDまたはマスターカードIDのいずれかを指定可能
 func findCardInHand(player *entity.Player, cardID string) *entity.Card {
 	for i := range player.Hand {
-		if player.Hand[i].ID == cardID {
+		// InstanceIDで検索（優先）、なければマスターカードIDで検索
+		if player.Hand[i].InstanceID == cardID || (player.Hand[i].InstanceID == "" && player.Hand[i].ID == cardID) {
 			return &player.Hand[i]
 		}
 	}

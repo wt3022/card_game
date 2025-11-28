@@ -16,6 +16,7 @@ export type Trait =
 
 export interface Card {
   id: string
+  instanceId?: string // ゲーム内でのユニークなインスタンスID（同じカードを複数枚区別するため）
   name: string
   type: CardType
   cost: number

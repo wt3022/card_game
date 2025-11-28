@@ -1169,6 +1169,13 @@ export class Card extends Message<Card> {
    */
   cardEffect?: CardEffect
 
+  /**
+   * ゲーム内での一意なインスタンスID
+   *
+   * @generated from field: string instance_id = 10;
+   */
+  instanceId = ''
+
   constructor(data?: PartialMessage<Card>) {
     super()
     proto3.util.initPartial(data, this)
@@ -1204,6 +1211,12 @@ export class Card extends Message<Card> {
       repeated: true,
     },
     { no: 9, name: 'card_effect', kind: 'message', T: CardEffect, opt: true },
+    {
+      no: 10,
+      name: 'instance_id',
+      kind: 'scalar',
+      T: 9 /* ScalarType.STRING */,
+    },
   ])
 
   static fromBinary(

@@ -22,14 +22,15 @@ func CardFromProto(pb *cardgamev1.Card) *entity.Card {
 	}
 
 	return &entity.Card{
-		ID:      pb.Id,
-		Name:    pb.Name,
-		Type:    CardTypeFromProto(pb.Type),
-		Cost:    int(pb.Cost),
-		Attack:  optionalInt32ToPtrInt(pb.Attack),
-		Defense: optionalInt32ToPtrInt(pb.Defense),
-		Effect:  pb.Effect,
-		Traits:  TraitsFromProto(pb.Traits),
+		ID:         pb.Id,
+		InstanceID: pb.InstanceId,
+		Name:       pb.Name,
+		Type:       CardTypeFromProto(pb.Type),
+		Cost:       int(pb.Cost),
+		Attack:     optionalInt32ToPtrInt(pb.Attack),
+		Defense:    optionalInt32ToPtrInt(pb.Defense),
+		Effect:     pb.Effect,
+		Traits:     TraitsFromProto(pb.Traits),
 		// CardEffectは設定しない（サーバー側でのみ管理）
 	}
 }

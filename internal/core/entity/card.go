@@ -18,7 +18,8 @@ const (
 
 // カードの基本構造
 type Card struct {
-	ID         string      `json:"id"`                    // カードID
+	ID         string      `json:"id"`                    // マスターカードID（カード定義のID）
+	InstanceID string      `json:"instance_id"`           // インスタンスID（ゲーム内での一意なID）
 	Name       string      `json:"name"`                  // カード名
 	Type       CardType    `json:"type"`                  // カード種別
 	Cost       int         `json:"cost"`                  // マナコスト

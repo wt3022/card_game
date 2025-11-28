@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -189,13 +190,13 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player1D
 		deck, err := s.deckService.GetDeck(context.Background(), player1DeckID)
 		if err != nil {
 			s.logger.Error("プレイヤー1のデッキ取得に失敗: %v (fixtureを使用)", err)
-			player1Deck = fixturedeck.GenerateSampleDeck()
+			player1Deck = s.assignInstanceIDs(fixturedeck.GenerateSampleDeck())
 		} else {
 			player1Deck = s.convertDeckToCards(deck, player1ID)
 			s.logger.Info("プレイヤー1のデッキID: %s をDBから取得", player1DeckID)
 		}
 	} else {
-		player1Deck = fixturedeck.GenerateSampleDeck()
+		player1Deck = s.assignInstanceIDs(fixturedeck.GenerateSampleDeck())
 	}
 
 	if player2DeckID != "" {
@@ -203,13 +204,13 @@ func (s *GameService) CreateGame(gameID string, player1ID, player1Name, player1D
 		deck, err := s.deckService.GetDeck(context.Background(), player2DeckID)
 		if err != nil {
 			s.logger.Error("プレイヤー2のデッキ取得に失敗: %v (fixtureを使用)", err)
-			player2Deck = fixturedeck.GenerateSampleDeck()
+			player2Deck = s.assignInstanceIDs(fixturedeck.GenerateSampleDeck())
 		} else {
 			player2Deck = s.convertDeckToCards(deck, player2ID)
 			s.logger.Info("プレイヤー2のデッキID: %s をDBから取得", player2DeckID)
 		}
 	} else {
-		player2Deck = fixturedeck.GenerateSampleDeck()
+		player2Deck = s.assignInstanceIDs(fixturedeck.GenerateSampleDeck())
 	}
 
 	// デッキをシャッフル
@@ -933,15 +934,33 @@ func (s *GameService) convertDeckToCards(deck *entity.Deck, ownerID string) []en
 		}
 		// カードをコピー (ゲーム内での独立したインスタンスとして扱う)
 		cardCopy := *card
+		// 一意のInstanceIDを生成（同一カードが複数枚あっても区別できる）
+		cardCopy.InstanceID = generateCardInstanceID(cardID)
 		cards = append(cards, cardCopy)
 	}
 
 	if len(cards) == 0 {
 		s.logger.Error("有効なカードが1枚もありません。fixtureデッキを使用します")
-		return fixturedeck.GenerateSampleDeck()
+		return s.assignInstanceIDs(fixturedeck.GenerateSampleDeck())
 	}
 
 	return cards
+}
+
+// generateCardInstanceID カードの一意なインスタンスIDを生成
+func generateCardInstanceID(cardID string) string {
+	return fmt.Sprintf("%s-%d-%d", cardID, time.Now().UnixNano(), rand.Intn(10000))
+}
+
+// assignInstanceIDs カードスライスに一意のInstanceIDを割り当てる
+func (s *GameService) assignInstanceIDs(cards []entity.Card) []entity.Card {
+	result := make([]entity.Card, len(cards))
+	for i, card := range cards {
+		cardCopy := card
+		cardCopy.InstanceID = generateCardInstanceID(card.ID)
+		result[i] = cardCopy
+	}
+	return result
 }
 
 // LeaveQueue プレイヤーをマッチングキューから削除

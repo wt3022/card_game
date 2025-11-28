@@ -253,57 +253,62 @@ export default function GameBoard({
         )}
         <div className="hand-cards">
           {currentPlayer?.hand && currentPlayer.hand.length > 0 ? (
-            currentPlayer.hand.map((card) => (
-              <div
-                key={card.id}
-                className={`hand-card-detailed ${selectedCardId === card.id ? 'selected' : ''}`}
-                role="button"
-                tabIndex={0}
-                onClick={() =>
-                  setSelectedCardId(selectedCardId === card.id ? null : card.id)
-                }
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
+            currentPlayer.hand.map((card) => {
+              const cardKey = card.instanceId || card.id
+              return (
+                <div
+                  key={cardKey}
+                  className={`hand-card-detailed ${selectedCardId === cardKey ? 'selected' : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() =>
                     setSelectedCardId(
-                      selectedCardId === card.id ? null : card.id,
+                      selectedCardId === cardKey ? null : cardKey,
                     )
                   }
-                }}
-                title={`${card.name} - コスト:${card.cost} ${card.effect}`}
-              >
-                <div className="card-cost">{card.cost}</div>
-                <div className="card-name">{card.name}</div>
-                {card.effect && (
-                  <div className="card-effect">{card.effect}</div>
-                )}
-                {card.attack !== undefined && card.attack !== null && (
-                  <div className="card-stats">
-                    <span className="atk">{card.attack}</span>
-                    <span className="def">{card.defense}</span>
-                  </div>
-                )}
-                {card.traits && card.traits.length > 0 && (
-                  <div className="card-traits">
-                    {card.traits.map((trait) => (
-                      <span key={trait} className="trait-badge-small">
-                        {TRAIT_LABELS[trait] || trait}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <button
-                  type="button"
-                  className="card-play-button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handlePlayCard(card.id)
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setSelectedCardId(
+                        selectedCardId === cardKey ? null : cardKey,
+                      )
+                    }
                   }}
+                  title={`${card.name} - コスト:${card.cost} ${card.effect}`}
                 >
-                  使用
-                </button>
-              </div>
-            ))
+                  <div className="card-cost">{card.cost}</div>
+                  <div className="card-name">{card.name}</div>
+                  {card.effect && (
+                    <div className="card-effect">{card.effect}</div>
+                  )}
+                  {card.attack !== undefined && card.attack !== null && (
+                    <div className="card-stats">
+                      <span className="atk">{card.attack}</span>
+                      <span className="def">{card.defense}</span>
+                    </div>
+                  )}
+                  {card.traits && card.traits.length > 0 && (
+                    <div className="card-traits">
+                      {card.traits.map((trait) => (
+                        <span key={trait} className="trait-badge-small">
+                          {TRAIT_LABELS[trait] || trait}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    className="card-play-button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handlePlayCard(cardKey)
+                    }}
+                  >
+                    使用
+                  </button>
+                </div>
+              )
+            })
           ) : (
             <div className="no-cards">手札がありません</div>
           )}
