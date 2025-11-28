@@ -162,6 +162,8 @@ func (r *cardRepository) saveEffectDefinitionModel(cardEffectID uint, def *model
 	// EffectDefinitionModelを作成
 	def.CardEffectID = cardEffectID
 	def.RootNodeID = rootNodeID
+	// GORMがRootを自動保存しないようにnilをセット（既にsaveEffectChainNodeModelで保存済み）
+	def.Root = nil
 	if err := r.db.Create(def).Error; err != nil {
 		return fmt.Errorf("failed to create effect definition: %w", err)
 	}

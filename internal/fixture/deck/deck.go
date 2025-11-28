@@ -477,7 +477,7 @@ func GenerateSampleDeck() []entity.Card {
 		Effect:     commanderEffect.Description,
 	})
 
-	// 死亡時効果: 1/1を2体召喚 (4コスト)
+	// 1/1を2体召喚 (4コスト)
 	attackSummon5, defenseSummon5 := 2, 4
 	nestEffect := &entity.CardEffect{
 		Definitions: []*entity.EffectDefinition{
@@ -491,7 +491,7 @@ func GenerateSampleDeck() []entity.Card {
 						Effect: &entity.AtomicEffect{
 							Type:   entity.AtomicEffectSummonUnit,
 							Target: entity.TargetSelector{Type: entity.EffectTargetSelf},
-							Timing: entity.EffectTimingOnDestroy,
+							Timing: entity.EffectTimingOnSummon,
 							Parameters: map[string]any{
 								"name":    "Spider",
 								"attack":  1,
