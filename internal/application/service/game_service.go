@@ -52,39 +52,89 @@ type GameService struct {
 	rateLimiter    RateLimiter
 	stateValidator StateValidator
 	cheatDetector  CheatDetector
+	// 切断猶予管理（タブ切替による一時切断を無視するため）
+	pendingDisconnects map[string]context.CancelFunc // key: "gameID:playerID"
 }
+
+// disconnectGracePeriod は切断通知の猶予時間（タブ切替などの一時切断を無視するため）
+const disconnectGracePeriod = 3 * time.Second
 
 func (s *GameService) MarkPlayerDisconnected(gameID string, playerID string) {
 	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	session, exists := s.games[gameID]
 	if !exists {
+		s.mu.Unlock()
 		return
 	}
 
 	state := session.State
 	player := state.GetPlayerByID(playerID)
 	if player == nil {
+		s.mu.Unlock()
 		return
 	}
 
-	// プレイヤーを切断状態に設定
-	player.IsConnected = false
-	player.LastActivityAt = time.Now()
+	// 既にペンディング中の切断があればキャンセル
+	key := fmt.Sprintf("%s:%s", gameID, playerID)
+	if cancel, exists := s.pendingDisconnects[key]; exists {
+		cancel()
+	}
 
-	s.logger.Info("プレイヤー %s がゲーム %s から切断されました", playerID, gameID)
+	// 猶予時間後に切断通知を送信するgoroutineを起動
+	ctx, cancel := context.WithCancel(context.Background())
+	s.pendingDisconnects[key] = cancel
+	playerName := player.Name
 
-	// 切断イベントをブロードキャスト
-	s.logger.Info("📡 %s のプレイヤー切断イベントをゲーム %s にブロードキャスト中", player.Name, gameID)
-	s.broadcastEvent(gameID, &event.GameEvent{
-		GameID:    gameID,
-		EventType: "player_disconnected",
-		Message:   fmt.Sprintf("プレイヤー %s が切断されました", player.Name),
-		PlayerID:  playerID,
-		Timestamp: time.Now(),
-		State:     state,
-	})
+	s.mu.Unlock()
+
+	go func() {
+		select {
+		case <-time.After(disconnectGracePeriod):
+			// 猶予時間が経過したら切断を確定
+			s.mu.Lock()
+			defer s.mu.Unlock()
+
+			// キーがまだ存在するか確認（再接続でキャンセルされていないか）
+			if _, stillPending := s.pendingDisconnects[key]; !stillPending {
+				return
+			}
+			delete(s.pendingDisconnects, key)
+
+			// ゲームがまだ存在するか確認
+			session, exists := s.games[gameID]
+			if !exists {
+				return
+			}
+
+			state := session.State
+			player := state.GetPlayerByID(playerID)
+			if player == nil {
+				return
+			}
+
+			// プレイヤーを切断状態に設定
+			player.IsConnected = false
+			player.LastActivityAt = time.Now()
+
+			s.logger.Info("プレイヤー %s がゲーム %s から切断されました", playerID, gameID)
+
+			// 切断イベントをブロードキャスト
+			s.logger.Info("📡 %s のプレイヤー切断イベントをゲーム %s にブロードキャスト中", playerName, gameID)
+			s.broadcastEvent(gameID, &event.GameEvent{
+				GameID:    gameID,
+				EventType: "player_disconnected",
+				Message:   fmt.Sprintf("プレイヤー %s が切断されました", playerName),
+				PlayerID:  playerID,
+				Timestamp: time.Now(),
+				State:     state,
+			})
+
+		case <-ctx.Done():
+			// 再接続によりキャンセルされた
+			return
+		}
+	}()
 }
 
 func (s *GameService) MarkPlayerConnected(gameID string, playerID string) error {
@@ -100,6 +150,18 @@ func (s *GameService) MarkPlayerConnected(gameID string, playerID string) error 
 	player := state.GetPlayerByID(playerID)
 	if player == nil {
 		return entity.NewErrNotFound("player", playerID)
+	}
+
+	// ペンディング中の切断をキャンセル
+	key := fmt.Sprintf("%s:%s", gameID, playerID)
+	if cancel, exists := s.pendingDisconnects[key]; exists {
+		cancel()
+		delete(s.pendingDisconnects, key)
+	}
+
+	// 既に接続済みの場合はイベントを送信しない（重複防止）
+	if player.IsConnected {
+		return nil
 	}
 
 	// プレイヤーを接続状態に設定
@@ -143,14 +205,15 @@ type MatchResult struct {
 // NewGameService は新しいGameServiceを作成
 func NewGameService(deckService *DeckService, logger port.Logger) *GameService {
 	return &GameService{
-		games:            make(map[string]*GameSession),
-		eventBroadcaster: event.NewBroadcaster(),
-		deckService:      deckService,
-		logger:           logger,
-		waitingPlayers:   []*MatchmakingPlayer{},
-		rateLimiter:      nil,
-		stateValidator:   nil,
-		cheatDetector:    nil,
+		games:              make(map[string]*GameSession),
+		eventBroadcaster:   event.NewBroadcaster(),
+		deckService:        deckService,
+		logger:             logger,
+		waitingPlayers:     []*MatchmakingPlayer{},
+		rateLimiter:        nil,
+		stateValidator:     nil,
+		cheatDetector:      nil,
+		pendingDisconnects: make(map[string]context.CancelFunc),
 	}
 }
 
@@ -163,14 +226,15 @@ func NewGameServiceWithSecurity(
 	cheatDetector CheatDetector,
 ) *GameService {
 	return &GameService{
-		games:            make(map[string]*GameSession),
-		eventBroadcaster: event.NewBroadcaster(),
-		deckService:      deckService,
-		logger:           logger,
-		waitingPlayers:   []*MatchmakingPlayer{},
-		rateLimiter:      rateLimiter,
-		stateValidator:   stateValidator,
-		cheatDetector:    cheatDetector,
+		games:              make(map[string]*GameSession),
+		eventBroadcaster:   event.NewBroadcaster(),
+		deckService:        deckService,
+		logger:             logger,
+		waitingPlayers:     []*MatchmakingPlayer{},
+		rateLimiter:        rateLimiter,
+		stateValidator:     stateValidator,
+		cheatDetector:      cheatDetector,
+		pendingDisconnects: make(map[string]context.CancelFunc),
 	}
 }
 
@@ -544,10 +608,11 @@ func (s *GameService) PlayCard(ctx context.Context, gameID string, playerID stri
 	}
 
 	// カードを手札から検索
+	// cardIDはInstanceIDまたはマスターカードIDのいずれかを指定可能
 	var targetCard *entity.Card
-	for _, card := range player.Hand {
-		if card.ID == cardID {
-			targetCard = &card
+	for i := range player.Hand {
+		if player.Hand[i].InstanceID == cardID || (player.Hand[i].InstanceID == "" && player.Hand[i].ID == cardID) {
+			targetCard = &player.Hand[i]
 			break
 		}
 	}
